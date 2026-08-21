@@ -1,0 +1,70 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "列车狼人杀-BP",
+        "description": "为列车地图制作的狼人杀玩法Addon/nBy Xiaopa",
+        "uuid": "6d0e9914-8349-46e4-a44a-d1902110a387",
+        "min_engine_version": [
+            1,
+            21,
+            120
+        ],
+        "version": [
+            1,
+            0,
+            0
+        ]
+    },
+    "modules": [
+        {
+            "type": "data",
+            "description": "Behavior Pack",
+            "uuid": "3628d3e2-d3b8-4101-b7df-ae65b037e5fd",
+            "version": [
+                1,
+                0,
+                0
+            ]
+        },
+        {
+            "type": "script",
+            "description": "Script API",
+            "language": "javascript",
+            "uuid": "25b8376b-d11c-4582-b099-4860b81bc96f",
+            "entry": "scripts/main.js",
+            "version": [
+                1,
+                0,
+                0
+            ]
+        }
+    ],
+    "capabilities": [
+        "script_eval"
+    ],
+    "dependencies": [
+        {
+            "uuid": "464b6b06-b0fb-4162-bc58-2546dcec9b25",
+            "version": [
+                1,
+                0,
+                0
+            ]
+        },
+        {
+            "module_name": "@minecraft/server",
+            "version": "2.3.0"
+        },
+        {
+            "module_name": "@minecraft/server-ui",
+            "version": "2.0.0"
+        }
+    ],
+    "metadata": {
+        "authors": [
+            "狮狼传奇_小怕",
+            "LW.狮狼传奇工作室",
+            "尘世之狼"
+        ]
+    }
+}

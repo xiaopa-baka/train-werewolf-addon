@@ -1,0 +1,87 @@
+{
+    "resource_pack_name": "vanilla",
+    "texture_name": "atlas.items",
+    "texture_data": {
+        "lw_p1:tp_game": {
+            "textures": "textures/items/tp_game"
+        },
+        "lw_p1:killer_shop": {
+            "textures": "textures/items/killer_shop"
+        },
+        "lw_p1:dagger": {
+            "textures": "textures/items/dagger"
+        },
+        "lw_p1:pistol": {
+            "textures": "textures/items/pistol"
+        },
+        "lw_p1:pistol_mini": {
+            "textures": "textures/items/pistol_mini"
+        },
+        "lw_p1:firecracker": {
+            "textures": "textures/items/firecracker"
+        },
+        "lw_p1:bat": {
+            "textures": "textures/items/bat"
+        },
+        "lw_p1:mineral_water": {
+            "textures": "textures/items/mineral_water"
+        },
+        "lw_p1:cigarette": {
+            "textures": "textures/items/cigarette"
+        },
+        "lw_p1:crowbar": {
+            "textures": "textures/items/crowbar"
+        },
+        "lw_p1:grenade": {
+            "textures": "textures/items/grenade"
+        },
+        "lw_p1:lockpick": {
+            "textures": "textures/items/lockpick"
+        },
+        "lw_p1:magic_conch": {
+            "textures": "textures/items/magic_conch"
+        },
+        "lw_p1:note": {
+            "textures": "textures/items/note"
+        },
+        "lw_p1:pocke_watch": {
+            "textures": "textures/items/pocke_watch"
+        },
+        "lw_p1:poison": {
+            "textures": "textures/items/poison"
+        },
+        "lw_p1:power_cut": {
+            "textures": "textures/items/power_cut"
+        },
+        "lw_p1:royal_jelly": {
+            "textures": "textures/items/royal_jelly"
+        },
+        "lw_p1:mineral_water_bottle": {
+            "textures": "textures/items/mineral_water_bottle"
+        },
+        "lw_p1:key_1": {
+            "textures": "textures/items/door_key"
+        },
+        "lw_p1:key_2": {
+            "textures": "textures/items/door_key"
+        },
+        "lw_p1:key_3": {
+            "textures": "textures/items/door_key"
+        },
+        "lw_p1:key_4": {
+            "textures": "textures/items/door_key"
+        },
+        "lw_p1:key_5": {
+            "textures": "textures/items/door_key"
+        },
+        "lw_p1:key_6": {
+            "textures": "textures/items/door_key"
+        },
+        "lw_p1:key_7": {
+            "textures": "textures/items/door_key"
+        },
+        "lw_p1:key_8": {
+            "textures": "textures/items/door_key"
+        }
+    }
+}

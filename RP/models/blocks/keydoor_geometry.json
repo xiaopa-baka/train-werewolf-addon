@@ -1,0 +1,231 @@
+{
+	"format_version": "1.21.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.keydoor_carried",
+				"texture_width": 16,
+				"texture_height": 16,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "door_half",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{
+							"origin": [-4, 0, -1],
+							"size": [8, 8, 2],
+							"uv": {
+								"north": {"uv": [0, 0], "uv_size": [16, 16], "material_instance": "bottom"},
+								"east": {"uv": [14, 0], "uv_size": [2, 16], "material_instance": "bottom"},
+								"south": {"uv": [0, 0], "uv_size": [16, 16], "material_instance": "bottom"},
+								"west": {"uv": [0, 0], "uv_size": [2, 16], "material_instance": "bottom"},
+								"down": {"uv": [16, 16], "uv_size": [-16, -2], "material_instance": "bottom"}
+							}
+						},
+						{
+							"origin": [-4, 8, -1],
+							"size": [8, 8, 2],
+							"uv": {
+								"north": {"uv": [0, 0], "uv_size": [16, 16], "material_instance": "top"},
+								"east": {"uv": [14, 0], "uv_size": [2, 16], "material_instance": "top"},
+								"south": {"uv": [0, 0], "uv_size": [16, 16], "material_instance": "top"},
+								"west": {"uv": [0, 0], "uv_size": [2, 16], "material_instance": "top"},
+								"up": {"uv": [16, 2], "uv_size": [-16, -2], "material_instance": "top"}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"description": {
+				"identifier": "geometry.keydoor_close_bottom",
+				"texture_width": 16,
+				"texture_height": 16,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "door_half",
+					"pivot": [0, 8, 0],
+					"cubes": [
+						{
+							"origin": [-8, 0, 5],
+							"size": [16, 16, 3],
+							"uv": {
+								"north": {
+									"uv": [16, 0],
+									"uv_size": [-16, 16],
+									"material_instance": "face"
+								},
+								"east": {
+									"uv": [13, 0],
+									"uv_size": [3, 16]
+								},
+								"south": {
+									"uv": [0, 0],
+									"uv_size": [16, 16],
+									"material_instance": "face"
+								},
+								"west": {
+									"uv": [0, 0],
+									"uv_size": [3, 16]
+								},
+								"down": {
+									"uv": [16, 16],
+									"uv_size": [-16, -3]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"description": {
+				"identifier": "geometry.keydoor_close_top",
+				"texture_width": 16,
+				"texture_height": 16,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "door_half",
+					"pivot": [0, 8, 0],
+					"cubes": [
+						{
+							"origin": [-8, 0, 5],
+							"size": [16, 16, 3],
+							"uv": {
+								"north": {
+									"uv": [16, 0],
+									"uv_size": [-16, 16],
+									"material_instance": "face"
+								},
+								"east": {
+									"uv": [13, 0],
+									"uv_size": [3, 16]
+								},
+								"south": {
+									"uv": [0, 0],
+									"uv_size": [16, 16],
+									"material_instance": "face"
+								},
+								"west": {
+									"uv": [0, 0],
+									"uv_size": [3, 16]
+								},
+								"up": {
+									"uv": [16, 3],
+									"uv_size": [-16, -3]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"description": {
+				"identifier": "geometry.keydoor_open_bottom",
+				"texture_width": 16,
+				"texture_height": 16,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "door_half",
+					"pivot": [0, 8, 0],
+					"cubes": [
+						{
+							"origin": [5, 0, -8],
+							"size": [3, 16, 16],
+							"uv": {
+								"north": {
+									"uv": [0, 0],
+									"uv_size": [3, 16]
+								},
+								"east": {
+									"uv": [0, 0],
+									"uv_size": [16, 16],
+									"material_instance": "face"
+								},
+								"south": {
+									"uv": [13, 0],
+									"uv_size": [3, 16]
+								},
+								"west": {
+									"uv": [0, 0],
+									"uv_size": [16, 16],
+									"material_instance": "face"
+								},
+								"down": {
+									"uv": [16, 16],
+									"uv_size": [-16, -3],
+									"uv_rotation": 90
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"description": {
+				"identifier": "geometry.keydoor_open_top",
+				"texture_width": 16,
+				"texture_height": 16,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "door_half",
+					"pivot": [0, 8, 0],
+					"cubes": [
+						{
+							"origin": [5, 0, -8],
+							"size": [3, 16, 16],
+							"uv": {
+								"north": {
+									"uv": [0, 0],
+									"uv_size": [3, 16]
+								},
+								"east": {
+									"uv": [0, 0],
+									"uv_size": [16, 16],
+									"material_instance": "face"
+								},
+								"south": {
+									"uv": [13, 0],
+									"uv_size": [3, 16]
+								},
+								"west": {
+									"uv": [0, 0],
+									"uv_size": [16, 16],
+									"material_instance": "face"
+								},
+								"up": {
+									"uv": [16, 3],
+									"uv_size": [-16, -3],
+									"uv_rotation": 90
+								}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

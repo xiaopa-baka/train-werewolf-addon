@@ -1,0 +1,40 @@
+{
+    "format_version": "1.21.120",
+    "minecraft:entity": {
+        "description": {
+            "identifier": "lw_p1:bullet",
+            "is_spawnable": false,
+            "is_summonable": true,
+            "is_experimental": false
+        },
+        "components": {
+            "minecraft:collision_box": {
+                "height": 0,
+                "width": 0
+            },
+            "minecraft:physics": {
+                "has_gravity": false,
+                "has_collision": false
+            },
+            "minecraft:projectile": {
+                "anchor": 1,
+                "gravity": 0,
+                "power": 3,
+                "on_hit": {
+                    "impact_damage": {
+                        "damage": 0,
+                        "destroy_on_hit": true,
+                        "knockback": false
+                    }
+                },
+                "offset": [
+                    0,
+                    0,
+                    0
+                ],
+                "uncertainty_base": 1,
+                "uncertainty_multiplier": 0
+            }
+        }
+    }
+}

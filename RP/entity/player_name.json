@@ -1,0 +1,20 @@
+{
+    "format_version": "1.21.120",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "lw_p1:player_name",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/player_name"
+            },
+            "geometry": {
+                "default": "geometry.player_name"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

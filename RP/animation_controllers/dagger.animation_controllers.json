@@ -1,0 +1,56 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.dagger.wield": {
+      "initial_state": "first_person",
+      "states": {
+        "first_person": {
+          "animations": [
+            "wield_first_person"
+          ],
+          "transitions": [
+            {
+              "third_person": "!c.is_first_person"
+            },
+            {
+              "charging_first_person": "query.is_using_item"
+            }
+          ]
+        },
+        "third_person": {
+          "animations": [
+            "wield_third_person"
+          ],
+          "transitions": [
+            {
+              "first_person": "c.is_first_person"
+            },
+            {
+              "charging_third_person": "query.is_using_item"
+            }
+          ]
+        },
+        "charging_first_person": {
+          "animations": [
+            "charge_first_person"
+          ],
+          "transitions": [
+            {
+              "first_person": "!query.is_using_item"
+            }
+          ]
+        },
+        "charging_third_person": {
+          "animations": [
+            "charge_third_person"
+          ],
+          "transitions": [
+            {
+              "third_person": "!query.is_using_item"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

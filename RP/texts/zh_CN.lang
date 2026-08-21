@@ -1,0 +1,60 @@
+## ADDON-RP zh_CN.lang
+pack.name=列车狼人杀-RP
+pack.description=为列车地图制作的狼人杀玩法Addon\nBy Xiaopa
+
+## 物品
+item.lw_p1:tp_game=§e传送至车头
+item.lw_p1:killer_shop=§a打开商店
+item.lw_p1:dagger=匕首
+item.lw_p1:pistol=左轮手枪
+item.lw_p1:pistol_mini=德林杰手枪
+item.lw_p1:key_1=1号钥匙
+item.lw_p1:key_2=2号钥匙
+item.lw_p1:key_3=3号钥匙
+item.lw_p1:key_4=4号钥匙
+item.lw_p1:key_5=5号钥匙
+item.lw_p1:key_6=6号钥匙
+item.lw_p1:key_7=7号钥匙
+item.lw_p1:key_8=8号钥匙
+item.lw_p1:crowbar=撬棍
+item.lw_p1:lockpick=开锁器
+item.lw_p1:poison=毒药
+item.lw_p1:grenade=手雷
+item.lw_p1:bat=球棍
+item.lw_p1:power_cut=断电装置
+item.lw_p1:mineral_water=矿泉水
+item.lw_p1:mineral_water_bottle=矿泉水瓶
+item.lw_p1:cigarette=香烟
+item.lw_p1:note=便条
+item.lw_p1:magic_conch=神奇的海螺
+item.lw_p1:pocke_watch=父亲的怀表
+item.lw_p1:royal_jelly=野生蜂王浆
+
+## 刷怪蛋
+item.spawn_egg.entity.lw_p1:firecracker.name=爆竹
+
+## 方块
+tile.lw_p1:vending_machine_lower.name=自动贩卖机
+tile.lw_p1:vending_machine_upper.name=自动贩卖机（上）
+tile.lw_p1:food_tray.name=普通食物托盘
+tile.lw_p1:food_tray_wood.name=木制食物托盘
+tile.lw_p1:food_tray_ceramic.name=陶瓷食物托盘
+tile.lw_p1:food_tray_glass.name=玻璃食物托盘
+tile.lw_p1:keydoor_1.name=1号门
+tile.lw_p1:keydoor_2.name=2号门
+tile.lw_p1:keydoor_3.name=3号门
+tile.lw_p1:keydoor_4.name=4号门
+tile.lw_p1:keydoor_5.name=5号门
+tile.lw_p1:keydoor_6.name=6号门
+tile.lw_p1:keydoor_7.name=7号门
+tile.lw_p1:keydoor_8.name=8号门
+tile.lw_p1:keydoor_9.name=列车门
+tile.lw_p1:keydoor_10.name=车厢门
+
+## 实体
+entity.lw_p1:firecracker.name=爆竹
+entity.lw_p1:pistol.name=左轮手枪
+entity.lw_p1:bullet.name=子弹
+entity.lw_p1:grenade.name=手雷
+entity.lw_p1:corpes.name=尸体
+entity.lw_p1:player_name.name=玩家名

@@ -1,0 +1,26 @@
+{
+    "format_version": "1.21.120",
+    "minecraft:item": {
+        "description": {
+            "identifier": "lw_p1:pistol_mini",
+            "menu_category": {
+                "category": "equipment"
+            }
+        },
+        "components": {
+            "minecraft:icon": "lw_p1:pistol_mini",
+            "minecraft:max_stack_size": 1,
+            "minecraft:hand_equipped": true,
+            "minecraft:can_destroy_in_creative": false,
+            "minecraft:use_animation": "bow",
+            "minecraft:use_modifiers": {
+                "use_duration": 30,
+                "movement_modifier": 0.4
+            },
+            "minecraft:cooldown": {
+                "category": "lw_p1_pistol_mini",
+                "duration": 0.1
+            }
+        }
+    }
+}

@@ -1,0 +1,83 @@
+{
+  "format_version": "1.10.0",
+  "animations": {
+    "animation.dagger.wield_first_person": {
+      "loop": true,
+      "bones": {
+        "dagger": {
+          "position": [
+            -5.0,
+            14.0,
+            0.0
+          ],
+          "rotation": [
+            180.0,
+            0.0,
+            -10.0
+          ]
+        }
+      }
+    },
+    "animation.dagger.wield_third_person": {
+      "loop": true,
+      "bones": {
+        "dagger": {
+          "position": [
+            0.0,
+            17.4,
+            -5.0
+          ],
+          "rotation": [
+            90.0,
+            -14.0,
+            90.0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        }
+      }
+    },
+    "animation.dagger.charge_first_person": {
+      "loop": true,
+      "bones": {
+        "dagger": {
+          "position": [
+            -5.0,
+            4.0,
+            0.0
+          ],
+          "rotation": [
+            180.0,
+            0.0,
+            -90.0
+          ]
+        }
+      }
+    },
+    "animation.dagger.charge_third_person": {
+      "loop": true,
+      "bones": {
+        "dagger": {
+          "position": [
+            0.0,
+            15.4,
+            5.0
+          ],
+          "rotation": [
+            90.0,
+            135.0,
+            90.0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        }
+      }
+    }
+  }
+}

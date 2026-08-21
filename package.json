@@ -1,0 +1,10 @@
+{
+  "name": "lw_p1-addon",
+  "version": "1.0.0",
+  "description": "列车狼人杀 Addon - Minecraft Bedrock Edition",
+  "devDependencies": {
+    "@minecraft/server": "2.3.0",
+    "@minecraft/server-ui": "2.0.0",
+    "typescript": "^5.5.0"
+  }
+}

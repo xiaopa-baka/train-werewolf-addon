@@ -1,0 +1,37 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "列车狼人杀-RP",
+        "description": "为列车地图制作的狼人杀玩法Addon\nBy Xiaopa",
+        "uuid": "464b6b06-b0fb-4162-bc58-2546dcec9b25",
+        "min_engine_version": [
+            1,
+            21,
+            120
+        ],
+        "version": [
+            1,
+            0,
+            0
+        ]
+    },
+    "modules": [
+        {
+            "type": "resources",
+            "description": "Resource Pack",
+            "uuid": "725ae54d-1e67-483e-aded-22e32c934f47",
+            "version": [
+                1,
+                0,
+                0
+            ]
+        }
+    ],
+    "metadata": {
+        "authors": [
+            "狮狼传奇_小怕",
+            "LW.狮狼传奇工作室",
+            "尘世之狼"
+        ]
+    }
+}

@@ -1,0 +1,41 @@
+{
+    "resource_pack_name": "vanilla",
+    "texture_name": "atlas.terrain",
+    "padding": 8,
+    "num_mip_levels": 4,
+    "texture_data": {
+        "vending_atlas": {
+            "textures": "textures/blocks/vending_atlas"
+        },
+        "food_tray": {
+            "textures": "textures/blocks/food_tray"
+        },
+        "food_tray_wood": {
+            "textures": "textures/blocks/food_tray_wood"
+        },
+        "food_tray_ceramic": {
+            "textures": "textures/blocks/food_tray_ceramic"
+        },
+        "food_tray_glass": {
+            "textures": "textures/blocks/food_tray_glass"
+        },
+        "keydoor_top": {
+            "textures": "textures/blocks/keydoor_top"
+        },
+        "keydoor_bottom": {
+            "textures": "textures/blocks/keydoor_bottom"
+        },
+        "keydoor_9_top": {
+            "textures": "textures/blocks/keydoor_9_top"
+        },
+        "keydoor_9_bottom": {
+            "textures": "textures/blocks/keydoor_9_bottom"
+        },
+        "keydoor_10_top": {
+            "textures": "textures/blocks/keydoor_10_top"
+        },
+        "keydoor_10_bottom": {
+            "textures": "textures/blocks/keydoor_10_bottom"
+        }
+    }
+}

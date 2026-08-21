@@ -1,0 +1,29 @@
+{
+    "format_version": "1.14.0",
+    "sound_definitions": {
+        "dagger_1": {
+            "category": "player",
+            "sounds": [
+                "sounds/dagger_1"
+            ]
+        },
+        "dagger_2": {
+            "category": "player",
+            "sounds": [
+                "sounds/dagger_2"
+            ]
+        },
+        "pistol": {
+            "category": "player",
+            "sounds": [
+                "sounds/pistol"
+            ]
+        },
+        "firecracker": {
+            "category": "neutral",
+            "sounds": [
+                "sounds/firecracker"
+            ]
+        }
+    }
+}

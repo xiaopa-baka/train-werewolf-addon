@@ -1,0 +1,294 @@
+{
+    "format_version": "1.21.0",
+    "minecraft:block": {
+        "description": {
+            "identifier": "lw_p1:keydoor_4",
+            "traits": {
+                "minecraft:placement_direction": {
+                    "enabled_states": [
+                        "minecraft:cardinal_direction"
+                    ],
+                    "y_rotation_offset": 180
+                }
+            },
+            "states": {
+                "lw_p1:is_open": [
+                    false,
+                    true
+                ],
+                "lw_p1:part": [
+                    "carried",
+                    "lower",
+                    "upper"
+                ]
+            },
+            "menu_category": {
+                "category": "construction",
+                "group": "itemGroup.name.door"
+            }
+        },
+        "components": {
+            "minecraft:material_instances": {
+                "*": {
+                    "texture": "keydoor_top",
+                    "render_method": "blend"
+                },
+                "top": {
+                    "texture": "keydoor_top",
+                    "render_method": "blend"
+                },
+                "bottom": {
+                    "texture": "keydoor_bottom",
+                    "render_method": "blend"
+                }
+            },
+            "minecraft:flammable": true,
+            "minecraft:light_dampening": 1,
+            "minecraft:destructible_by_mining": {
+                "seconds_to_destroy": 4
+            },
+            "minecraft:destructible_by_explosion": {
+                "explosion_resistance": 4
+            }
+        },
+        "permutations": [
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'north'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            180,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'south'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            0,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'west'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            -90,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'east'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            90,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('lw_p1:is_open') == false && q.block_state('lw_p1:part') == 'lower'",
+                "components": {
+                    "minecraft:geometry": {
+                        "identifier": "geometry.keydoor_close_bottom"
+                    },
+                    "minecraft:selection_box": {
+                        "origin": [
+                            -8,
+                            0,
+                            5
+                        ],
+                        "size": [
+                            16,
+                            16,
+                            3
+                        ]
+                    },
+                    "minecraft:collision_box": {
+                        "origin": [
+                            -8,
+                            0,
+                            5
+                        ],
+                        "size": [
+                            16,
+                            16,
+                            3
+                        ]
+                    },
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "keydoor_bottom",
+                            "render_method": "blend"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('lw_p1:is_open') == false && q.block_state('lw_p1:part') == 'upper'",
+                "components": {
+                    "minecraft:geometry": {
+                        "identifier": "geometry.keydoor_close_top"
+                    },
+                    "minecraft:selection_box": {
+                        "origin": [
+                            -8,
+                            0,
+                            5
+                        ],
+                        "size": [
+                            16,
+                            16,
+                            3
+                        ]
+                    },
+                    "minecraft:collision_box": {
+                        "origin": [
+                            -8,
+                            0,
+                            5
+                        ],
+                        "size": [
+                            16,
+                            16,
+                            3
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('lw_p1:is_open') == true && q.block_state('lw_p1:part') == 'lower'",
+                "components": {
+                    "minecraft:geometry": {
+                        "identifier": "geometry.keydoor_open_bottom"
+                    },
+                    "minecraft:selection_box": {
+                        "origin": [
+                            5,
+                            0,
+                            -8
+                        ],
+                        "size": [
+                            3,
+                            16,
+                            16
+                        ]
+                    },
+                    "minecraft:collision_box": {
+                        "origin": [
+                            5,
+                            0,
+                            -8
+                        ],
+                        "size": [
+                            3,
+                            16,
+                            16
+                        ]
+                    },
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "keydoor_bottom",
+                            "render_method": "blend"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('lw_p1:is_open') == true && q.block_state('lw_p1:part') == 'upper'",
+                "components": {
+                    "minecraft:geometry": {
+                        "identifier": "geometry.keydoor_open_top"
+                    },
+                    "minecraft:selection_box": {
+                        "origin": [
+                            5,
+                            0,
+                            -8
+                        ],
+                        "size": [
+                            3,
+                            16,
+                            16
+                        ]
+                    },
+                    "minecraft:collision_box": {
+                        "origin": [
+                            5,
+                            0,
+                            -8
+                        ],
+                        "size": [
+                            3,
+                            16,
+                            16
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('lw_p1:part') == 'lower'",
+                "components": {
+                    "minecraft:placement_filter": {
+                        "conditions": [
+                            {
+                                "block_filter": [
+                                    "lw_p1:keydoor_4"
+                                ],
+                                "allowed_faces": [
+                                    "down"
+                                ]
+                            }
+                        ]
+                    },
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "keydoor_bottom",
+                            "render_method": "blend"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('lw_p1:part') == 'upper'",
+                "components": {
+                    "minecraft:loot": "loot_tables/empty.json",
+                    "minecraft:placement_filter": {
+                        "conditions": [
+                            {
+                                "block_filter": [
+                                    "lw_p1:keydoor_4"
+                                ],
+                                "allowed_faces": [
+                                    "up"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('lw_p1:part') == 'carried'",
+                "components": {
+                    "minecraft:geometry": {
+                        "identifier": "geometry.keydoor_carried"
+                    }
+                }
+            }
+        ]
+    }
+}

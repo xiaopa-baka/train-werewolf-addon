@@ -1,0 +1,23 @@
+{
+    "format_version": "1.21.120",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "lw_p1:firecracker",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/firecracker"
+            },
+            "geometry": {
+                "default": "geometry.firecracker"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ],
+            "spawn_egg": {
+                "texture": "lw_p1:firecracker"
+            }
+        }
+    }
+}
