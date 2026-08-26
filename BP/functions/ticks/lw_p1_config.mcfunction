@@ -1,5 +1,8 @@
 # 该函数始终执行，用于预设一些游戏数据或状态（如果有）
 
+gamerule commandblockoutput false
+gamerule sendcommandfeedback false
+
 ## 游戏自动开始时间（秒）
 ## 默认为 10 秒，即当玩家进入游戏后 10 秒后自动开始游戏
 ## 以下示例为游戏自动开始时间设置为 20 秒

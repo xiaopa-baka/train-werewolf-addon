@@ -13,12 +13,12 @@ function itemIdToIconPath(itemId) {
 }
 
 
-// 使用物品 lw_p1:killer_shop 打开杀手商店界面
+// 使用物品 lw_p1:killer_store 打开杀手商店界面
 mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.afterEvents.itemUse.subscribe(event => {
         const player = event.source;
-        if (player && player.isValid && event.itemStack?.typeId === "lw_p1:killer_shop") {
-            openKillerShop(player);
+        if (player && player.isValid && event.itemStack?.typeId === "lw_p1:killer_store") {
+            openkillerStore(player);
         }
     });
 });
@@ -121,11 +121,11 @@ mc.system.runInterval(() => {
 
 
 // 杀手商店界面
-function openKillerShop(player) {
+function openkillerStore(player) {
     const config = getWorldConfig();
     const currentGold = getGoldScore(player);
     const form = new ActionFormData();
-    const items = Array.isArray(config.killerShopItems) ? config.killerShopItems : [];
+    const items = Array.isArray(config.killerStoreItems) ? config.killerStoreItems : [];
 
     form.title("杀手商店");
     form.header(`当前金币：${currentGold}`);

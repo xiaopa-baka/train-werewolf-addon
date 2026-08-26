@@ -13,6 +13,7 @@ import "./config/configUI.js";
 import { getWorldConfig } from "./config/worldConfig.js";
 import "./blocks/vending_machine.js";
 import { clearCrowbaredDoors } from "./blocks/keydoor.js";
+import "./guideBook.js";
 
 
 // 预创建全局所需计分板列表
@@ -147,7 +148,6 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
             const latestConfig = getWorldConfig();
             const coords = latestConfig.trainEngineCoordinates;
             if (!coords || typeof coords.x !== "number" || typeof coords.y !== "number" || typeof coords.z !== "number") {
-                console.warn("[tp_game] invalid trainEngineCoordinates:", coords);
                 return;
             }
             player.teleport(coords);
@@ -337,6 +337,18 @@ function startGameNow(allPlayers) {
         // 重置本局结束状态
         endTriggered = false;
         pendingEndMsg = null;
+        roleRewardsGiven = false;
+        gameStartTimer = null; // 重置倒计时，保证下一局可再次自动开始
+
+        // 重建被 gameOver 删除的计分项并归零，保证第二局起计时/结算正常
+        try {
+            ensureObjectives();
+            for (const name of ["lw_p1:游戏时间", "lw_p1:死亡加时", "lw_p1:任务中", "lw_p1:金币"]) {
+                const obj = mc.world.scoreboard.getObjective(name);
+                if (!obj) continue;
+                try { obj.setScore("lw_p1:全局", 0); } catch (e) { }
+            }
+        } catch (e) { }
 
         showTitle("§a游戏开始！");
         mc.system.runTimeout(() => {
@@ -345,9 +357,14 @@ function startGameNow(allPlayers) {
 
         for (const player of allPlayers) {
             if (!player.isValid) continue;
+            // 清除上一局残留的职业标签，保证每局角色重新随机分配
+            player.removeTag("lw_p1:杀手");
+            player.removeTag("lw_p1:警员");
             if (player.hasTag("lw_p1:位于列车")) {
                 player.addTag("lw_p1:游戏中");
             }
+            // 开局统一切到冒险模式（结算判定以冒险模式为存活）
+            try { player.setGameMode(mc.GameMode.Adventure); } catch (e) { }
         }
 
         teleportPlayersToRandomCoords(allPlayers);
@@ -439,20 +456,17 @@ mc.system.runInterval(() => {
 // 游戏开始后分配职业
 async function checkRoleAssign() {
     try {
-        const scoreboard = mc.world.scoreboard;
-        const objGameTime = scoreboard.getObjective("lw_p1:游戏时间");
-        if (!objGameTime) return;
-        const gameTime = objGameTime.getScore("lw_p1:全局") ?? 0;
-
-        if (!(gameTime > 0 && gameTime < 21)) return;
-
         const allPlayers = Array.from(mc.world.getPlayers());
-        const inGamePlayers = allPlayers.filter(p => p.hasTag("lw_p1:游戏中"));
-        if (inGamePlayers.length === 0) return;
+        const inGamePlayers = allPlayers.filter(p => p.isValid && p.hasTag("lw_p1:游戏中"));
+        if (inGamePlayers.length === 0) {
+            roleRewardsGiven = false;
+            return;
+        }
 
         const hasKiller = inGamePlayers.some(p => p.hasTag("lw_p1:杀手"));
         const hasPolice = inGamePlayers.some(p => p.hasTag("lw_p1:警员"));
 
+        // 职业分配
         if (!hasKiller) {
             const candidatesKiller = inGamePlayers.filter(p => !p.hasTag("lw_p1:警员"));
             if (candidatesKiller.length > 0) {
@@ -468,6 +482,17 @@ async function checkRoleAssign() {
                 target.addTag("lw_p1:警员");
             }
         }
+
+        // 只有本局首次分配完成时才发放物品
+        if (roleRewardsGiven) return;
+        roleRewardsGiven = true;
+
+        try {
+            for (const p of inGamePlayers) {
+                if (!p.isValid) continue;
+                p.runCommand(`clear @s`);
+            }
+        } catch (err) { }
 
         // 职业分配完成，发放初始金币
         try {
@@ -511,10 +536,18 @@ async function checkRoleAssign() {
                     if (chosenIndex === -1) chosenIndex = 0;
 
                     const keyNum = keyPool.splice(chosenIndex, 1)[0];
-                    const keyItem = new mc.ItemStack(`lw_p1:key_${keyNum}`, 1);
-                    p.getComponent("inventory").container.addItem(keyItem);
+                    p.runCommand(`give @s lw_p1:key_${keyNum} 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`);
                     p.setDynamicProperty("lw_p1:lastKey", keyNum);
                 }
+            }
+        } catch (err) { }
+
+        // 开局发放便条
+        try {
+            for (const p of inGamePlayers) {
+                if (!p.isValid) continue;
+                p.runCommand(`give @s lw_p1:guide_book 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`);
+                p.runCommand(`give @s lw_p1:note 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`);
             }
         } catch (err) { }
 
@@ -523,7 +556,7 @@ async function checkRoleAssign() {
             for (const p of inGamePlayers) {
                 if (!p.isValid) continue;
                 if (!p.hasTag("lw_p1:杀手")) continue;
-                p.runCommand(`replaceitem entity @s slot.hotbar 8 lw_p1:killer_shop 1 0 {"minecraft:item_lock":{"mode":"lock_in_slot"}}`);
+                p.runCommand(`replaceitem entity @s slot.hotbar 8 lw_p1:killer_store 1 0 {"minecraft:item_lock":{"mode":"lock_in_slot"}}`);
             }
         } catch (err) { }
 
@@ -592,10 +625,7 @@ mc.system.runInterval(() => {
 // 游戏结束，胜负判定、职业名单收集、结果广播
 let endTriggered = false;
 let pendingEndMsg = null;
-
-function isOut(player) {
-    try { return player.getGameMode() === mc.GameMode.Spectator; } catch { return false; }
-}
+let roleRewardsGiven = false;
 
 // 广播结束消息
 function broadcastEndMessage() {
@@ -617,55 +647,65 @@ function broadcastEndMessage() {
     pendingEndMsg = null;
 }
 
-// 胜负判定
+// 结算判定
+// 规则1：游戏中只存在杀手一个冒险模式，杀手胜利
+// 规则2：杀手的游戏模式不是冒险模式，平民胜利
+// 规则3：任务栏时间归零，平民胜利
 mc.system.runInterval(() => {
-    const allPlayers = Array.from(mc.world.getPlayers());
-    const inGame = allPlayers.filter(p => p.isValid && p.hasTag("lw_p1:游戏中"));
-    if (inGame.length === 0) return;
-    if (endTriggered) return;
+    try {
+        if (endTriggered) return;
 
-    const aliveKiller = inGame.some(p => p.hasTag("lw_p1:杀手") && !isOut(p));
-    const aliveCivil = inGame.some(p => !p.hasTag("lw_p1:杀手") && !isOut(p));
+        const allPlayers = Array.from(mc.world.getPlayers());
+        const inGame = allPlayers.filter(p => p.isValid && p.hasTag("lw_p1:游戏中"));
+        if (inGame.length === 0) return;
 
-    let endMsg = null;
+        const isAlive = (p) => {
+            try { return p.getGameMode() === mc.GameMode.Adventure; } catch { return false; }
+        };
 
-    // 杀手死亡，平民胜利
-    if (inGame.some(p => p.hasTag("lw_p1:杀手")) && !aliveKiller) {
-        endMsg = { winner: "平民", reason: "杀手死亡" };
-    }
-    // 平民全部死亡（含警员），杀手胜利
-    else if (!aliveCivil) {
-        endMsg = { winner: "杀手", reason: "平民全部死亡" };
-    }
-    // 倒计时结束，平民胜利
-    else {
-        const gameTimeObj = mc.world.scoreboard.getObjective("lw_p1:游戏时间");
-        const baseTimeObj = mc.world.scoreboard.getObjective("lw_p1:单局游戏基础时长");
-        const extraObj = mc.world.scoreboard.getObjective("lw_p1:死亡加时");
-        if (gameTimeObj && baseTimeObj) {
-            const elapsedSec = Math.floor((gameTimeObj.getScore("lw_p1:全局") ?? 0) / 20);
-            const baseSec = baseTimeObj.getScore("lw_p1:全局") ?? 600;
-            const extraSec = extraObj?.getScore("lw_p1:全局") ?? 0;
-            const remain = baseSec + extraSec - elapsedSec;
-            if (remain <= 0) {
+        const killers = inGame.filter(p => p.hasTag("lw_p1:杀手"));
+        const civils = inGame.filter(p => !p.hasTag("lw_p1:杀手"));
+        const hasKiller = killers.length > 0;
+        const killerDead = hasKiller && killers.every(p => !isAlive(p));
+        const civilsAllDead = civils.length > 0 && civils.every(p => !isAlive(p));
+
+        let endMsg = null;
+
+        if (killerDead) {
+            endMsg = { winner: "平民", reason: "杀手死亡" };
+        }
+        else if (hasKiller && civilsAllDead) {
+            endMsg = { winner: "杀手", reason: "平民全部死亡" };
+        }
+        else {
+            let elapsedSec = 0, baseSec = 600, extraSec = 0;
+            try {
+                const gameTimeObj = mc.world.scoreboard.getObjective("lw_p1:游戏时间");
+                const baseTimeObj = mc.world.scoreboard.getObjective("lw_p1:单局游戏基础时长");
+                const extraObj = mc.world.scoreboard.getObjective("lw_p1:死亡加时");
+                elapsedSec = Math.floor((gameTimeObj?.getScore("lw_p1:全局") ?? 0) / 20);
+                baseSec = baseTimeObj?.getScore("lw_p1:全局") ?? 600;
+                extraSec = extraObj?.getScore("lw_p1:全局") ?? 0;
+            } catch (e) { }
+            if (baseSec + extraSec - elapsedSec <= 0) {
                 endMsg = { winner: "平民", reason: "时间耗尽" };
             }
         }
-    }
 
-    if (endMsg) {
-        endTriggered = true;
-        // 收集本局职业名单
-        collectGameResult(endMsg.reason, endMsg.winner);
-        // 调用 gameover.mcaddon
-        for (const p of inGame) {
-            if (!p.hasTag("lw_p1:游戏结束")) p.addTag("lw_p1:游戏结束");
+        if (endMsg) {
+            endTriggered = true;
+            // 收集本局职业名单
+            collectGameResult(endMsg.reason, endMsg.winner);
+            // 调用 gameover.mcfunction
+            for (const p of inGame) {
+                if (!p.hasTag("lw_p1:游戏结束")) p.addTag("lw_p1:游戏结束");
+            }
+            // 广播结束消息
+            mc.system.runTimeout(() => {
+                broadcastEndMessage();
+            }, 20);
         }
-        // 广播结束消息
-        mc.system.runTimeout(() => {
-            broadcastEndMessage();
-        }, 20);
-    }
+    } catch (e) { }
 }, 1);
 
 // 收集本局全部玩家职业名单
@@ -692,35 +732,54 @@ mc.system.runInterval(() => {
     });
     if (!hasGameEndPlayer) return;
 
-    mc.world.getDimension("overworld").runCommand("function lw_p1_gameOver")
+    try {
+        try {
+            mc.world.getDimension("overworld").runCommand("function lw_p1_gameOver");
+        } catch (e) { }
 
-    // 清除所有撬棍锁定
-    clearCrowbaredDoors();
+        // 清除所有撬棍锁定
+        clearCrowbaredDoors();
 
-    for (const player of allPlayers) {
-        if (!player.isValid) continue;
-        try { player.setDynamicProperty("lw_p1:noteMessage", undefined); } catch (e) { }
-    }
-
-    setGameTime("day");
-
-    const latestConfig = getWorldConfig();
-    const trainStation = latestConfig.trainStationCoordinates;
-
-    if (trainStation && typeof trainStation.x === "number") {
         for (const player of allPlayers) {
             if (!player.isValid) continue;
-            try {
-                player.teleport(trainStation);
-            } catch (e) { }
+            try { player.setDynamicProperty("lw_p1:noteMessage", undefined); } catch (e) { }
+        }
+
+        setGameTime("day");
+
+        const latestConfig = getWorldConfig();
+        const trainStation = latestConfig.trainStationCoordinates;
+
+        if (trainStation && typeof trainStation.x === "number") {
+            for (const player of allPlayers) {
+                if (!player.isValid) continue;
+                try {
+                    player.teleport(trainStation);
+                } catch (e) { }
+            }
+        }
+    } finally {
+        for (const player of allPlayers) {
+            if (!player.isValid) continue;
+            if (!player.hasTag("lw_p1:游戏结束")) continue;
+            try { player.removeTag("lw_p1:游戏结束"); } catch (e) { }
         }
     }
-
-    for (const player of allPlayers) {
-        if (!player.hasTag("lw_p1:游戏结束")) continue;
-        player.removeTag("lw_p1:游戏结束")
-    }
 }, 1);
+
+
+// 既无游戏中玩家、也无游戏结束标记时，重置结束/发放标记，保证下一局从干净状态开始
+mc.system.runInterval(() => {
+    try {
+        const players = Array.from(mc.world.getPlayers());
+        const hasInGame = players.some(p => p.isValid && p.hasTag("lw_p1:游戏中"));
+        const hasEnd = players.some(p => p.isValid && p.hasTag("lw_p1:游戏结束"));
+        if (!hasInGame && !hasEnd) {
+            endTriggered = false;
+            roleRewardsGiven = false;
+        }
+    } catch (e) { }
+}, 20);
 
 
 // 防止中途退出又加入的刁民
@@ -740,7 +799,11 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
             player.addTag("lw_p1:任务失败");
         }
         else {
-            player.runCommand("function lw_p1_gameOver");
+            // 非游戏阶段加入：直接发放基础物品，不调用 gameOver 清理函数（避免误伤进行中的新一局）
+            try {
+                player.runCommand(`give @s lw_p1:guide_book 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`);
+                player.runCommand(`give @s lw_p1:tp_game 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`);
+            } catch (e) { }
         }
     });
 });

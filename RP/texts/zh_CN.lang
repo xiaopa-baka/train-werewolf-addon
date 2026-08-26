@@ -4,7 +4,8 @@ pack.description=为列车地图制作的狼人杀玩法Addon\nBy Xiaopa
 
 ## 物品
 item.lw_p1:tp_game=§e传送至车头
-item.lw_p1:killer_shop=§a打开商店
+item.lw_p1:guide_book=§b指南书
+item.lw_p1:killer_store=§a打开商店
 item.lw_p1:dagger=匕首
 item.lw_p1:pistol=左轮手枪
 item.lw_p1:pistol_mini=德林杰手枪

@@ -38,7 +38,7 @@ export function getEmptyConfig() {
         randomCoordinates: [],
 
         // 杀手商店物品列表
-        killerShopItems: [],
+        killerStoreItems: [],
 
         // 贩卖机物品列表
         vendingMachineItems: [],
@@ -49,6 +49,12 @@ export function getEmptyConfig() {
             "lw_p1:food_tray_ceramic": [],
             "lw_p1:food_tray_glass": [],
             "lw_p1:food_tray_wood": []
+        },
+
+        // 地图信息
+        worldInformation: {
+            mapName: "",
+            mapAuthor: ""
         },
     };
 }
@@ -61,7 +67,12 @@ function fillDefaultConfig(inputConfig) {
         ...inputConfig,
         vendingMachineItems: inputConfig.vendingMachineItems ?? inputConfig.VendingMachineItems ?? []
     };
-    return { ...defaults, ...normalizedConfig };
+    const result = { ...defaults, ...normalizedConfig };
+    // 确保 worldInformation 字段完整
+    if (!result.worldInformation) result.worldInformation = {};
+    const wiDefaults = defaults.worldInformation;
+    result.worldInformation = { ...wiDefaults, ...result.worldInformation };
+    return result;
 }
 
 

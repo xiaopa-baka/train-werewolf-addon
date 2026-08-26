@@ -5,8 +5,8 @@
         "lw_p1:tp_game": {
             "textures": "textures/items/tp_game"
         },
-        "lw_p1:killer_shop": {
-            "textures": "textures/items/killer_shop"
+        "lw_p1:killer_store": {
+            "textures": "textures/items/killer_store"
         },
         "lw_p1:dagger": {
             "textures": "textures/items/dagger"
@@ -82,6 +82,9 @@
         },
         "lw_p1:key_8": {
             "textures": "textures/items/door_key"
+        },
+        "lw_p1:guide_book": {
+            "textures": "textures/items/guide_book"
         }
     }
 }

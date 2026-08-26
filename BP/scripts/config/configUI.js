@@ -1025,7 +1025,7 @@ function showShopForm(player) {
         if (!player.isValid) return;
         if (res.canceled) { showMainForm(player); return; }
         switch (res.selection) {
-            case 0: showKillerShopForm(player); break;
+            case 0: showkillerStoreForm(player); break;
             case 1: showVendingMachineForm(player); break;
             case 2: showInitialCoinsForm(player); break;
             case 3: showMainForm(player); break;
@@ -1035,16 +1035,16 @@ function showShopForm(player) {
 
 
 // 主界面/商店配置/杀手商店配置
-function showKillerShopForm(player) {
+function showkillerStoreForm(player) {
     if (!player.isValid) return;
     const config = getWorldConfig();
     const form = new ActionFormData();
-    const items = config.killerShopItems;
+    const items = config.killerStoreItems;
 
     form.title("杀手商店配置");
     form.body("管理杀手商店物品列表");
 
-    config.killerShopItems.forEach(item => {
+    config.killerStoreItems.forEach(item => {
         const icon = itemIdToIconPath(item.id);
         form.button(`${item.displayName}：${item.price}金币`, icon);
     });
@@ -1103,10 +1103,10 @@ function showVendingMachineForm(player) {
 // 主界面/商店配置/杀手商店（贩卖机）/单项操作
 function showShopItemActionMenu(player, shopType, index) {
     const config = getWorldConfig();
-    const list = shopType === "killer" ? config.killerShopItems : config.vendingMachineItems;
+    const list = shopType === "killer" ? config.killerStoreItems : config.vendingMachineItems;
     const item = list[index];
     const form = new ActionFormData();
-    const backForm = () => shopType === "killer" ? showKillerShopForm(player) : showVendingMachineForm(player);
+    const backForm = () => shopType === "killer" ? showkillerStoreForm(player) : showVendingMachineForm(player);
 
     form.title(`操作：${item.displayName}`);
     form.button("编辑");
@@ -1131,10 +1131,10 @@ function showShopItemActionMenu(player, shopType, index) {
 // 主界面/商店配置/杀手商店（贩卖机）/单项操作/编辑
 function showEditShopItemModal(player, shopType, index) {
     const config = getWorldConfig();
-    const list = shopType === "killer" ? config.killerShopItems : config.vendingMachineItems;
+    const list = shopType === "killer" ? config.killerStoreItems : config.vendingMachineItems;
     const item = list[index];
     const form = new ModalFormData();
-    const backForm = () => shopType === "killer" ? showKillerShopForm(player) : showVendingMachineForm(player);
+    const backForm = () => shopType === "killer" ? showkillerStoreForm(player) : showVendingMachineForm(player);
 
     form.title("编辑商品信息");
     form.textField("商品显示名称", "请输入名称", { defaultValue: String(item.displayName) });
@@ -1162,8 +1162,8 @@ function showEditShopItemModal(player, shopType, index) {
 // 主界面/商店配置/杀手商店（贩卖机）/单项操作/新增
 function showAddShopItemModal(player, shopType) {
     const config = getWorldConfig();
-    const list = shopType === "killer" ? config.killerShopItems : config.vendingMachineItems;
-    const backForm = () => shopType === "killer" ? showKillerShopForm(player) : showVendingMachineForm(player);
+    const list = shopType === "killer" ? config.killerStoreItems : config.vendingMachineItems;
+    const backForm = () => shopType === "killer" ? showkillerStoreForm(player) : showVendingMachineForm(player);
     const form = new ModalFormData();
 
     form.title("新增商品");
@@ -1230,6 +1230,7 @@ function showOtherMenu(player) {
     const otherForm = new ActionFormData()
         .title("其他功能")
         .body("一些预留功能和关于信息")
+        .button("设置地图信息")
         .button("修改更多当前不可用配置")
         .button("关于本Addon")
         .button("赞助&加入我们")
@@ -1238,12 +1239,37 @@ function showOtherMenu(player) {
         if (!player.isValid) return;
         if (res.canceled) { showMainForm(player); return; }
         switch (res.selection) {
-            case 0: showUnusedConfigUI(player); break;
-            case 1: showDeveloperAboutUI(player); break;
-            case 2: showSponsorJoinUI(player); break;
-            case 3: showMainForm(player); break;
+            case 0: mc.system.run(() => showMapInfoForm(player)); break;
+            case 1: showUnusedConfigUI(player); break;
+            case 2: showDeveloperAboutUI(player); break;
+            case 3: showSponsorJoinUI(player); break;
+            case 4: showMainForm(player); break;
         }
     }).catch(() => { });
+}
+
+
+// 主界面/其他/设置地图信息
+function showMapInfoForm(player) {
+    if (!player.isValid) return;
+    const cfg = getWorldConfig();
+    const wi = cfg.worldInformation || {};
+    new ModalFormData()
+        .title("地图信息设置")
+        .textField("地图名称", "请输入地图名称", { defaultValue: String(wi.mapName ?? "") })
+        .textField("地图作者", "请输入作者名称", { defaultValue: String(wi.mapAuthor ?? "") })
+        .show(player).then(res => {
+            if (!player.isValid) return;
+            if (res.canceled) { showOtherMenu(player); return; }
+            const vals = res.formValues.filter(v => v !== null && v !== undefined);
+            cfg.worldInformation = {
+                mapName: String(vals[0] ?? "").trim(),
+                mapAuthor: String(vals[1] ?? "").trim(),
+            };
+            saveWorldConfig(cfg);
+            player.sendMessage("§a地图信息已保存");
+            showOtherMenu(player);
+        }).catch(() => { });
 }
 
 
