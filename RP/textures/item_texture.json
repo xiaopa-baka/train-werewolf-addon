@@ -85,6 +85,21 @@
         },
         "lw_p1:guide_book": {
             "textures": "textures/items/guide_book"
+        },
+        "lw_p1:old_fashioned": {
+            "textures": "textures/items/old_fashioned"
+        },
+        "lw_p1:mojito": {
+            "textures": "textures/items/mojito"
+        },
+        "lw_p1:martini": {
+            "textures": "textures/items/martini"
+        },
+        "lw_p1:cosmopolitan": {
+            "textures": "textures/items/cosmopolitan"
+        },
+        "lw_p1:champagne": {
+            "textures": "textures/items/champagne"
         }
     }
 }

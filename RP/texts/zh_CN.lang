@@ -30,13 +30,23 @@ item.lw_p1:note=便条
 item.lw_p1:magic_conch=神奇的海螺
 item.lw_p1:pocke_watch=父亲的怀表
 item.lw_p1:royal_jelly=野生蜂王浆
+item.lw_p1:old_fashioned=古典鸡尾酒
+item.lw_p1:mojito=莫吉托
+item.lw_p1:martini=马提尼
+item.lw_p1:cosmopolitan=大都会鸡尾酒
+item.lw_p1:champagne=香槟
+
+## 物品组
+lw_p1:itemGroup.name.keys=钥匙
+lw_p1:itemGroup.name.drinks=饮品
+lw_p1:itemGroup.name.doors=钥匙门
+lw_p1:itemGroup.name.trays=食物托盘
 
 ## 刷怪蛋
 item.spawn_egg.entity.lw_p1:firecracker.name=爆竹
 
 ## 方块
-tile.lw_p1:vending_machine_lower.name=自动贩卖机
-tile.lw_p1:vending_machine_upper.name=自动贩卖机（上）
+tile.lw_p1:vending_machine.name=自动贩卖机
 tile.lw_p1:food_tray.name=普通食物托盘
 tile.lw_p1:food_tray_wood.name=木制食物托盘
 tile.lw_p1:food_tray_ceramic.name=陶瓷食物托盘

@@ -1,16 +1,10 @@
-﻿// @ts-check
+// @ts-check
 // shopSystem.js - 商店系统
 
 import * as mc from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { getWorldConfig } from "./config/worldConfig.js";
-
-
-// 物品ID转贴图路径，物品贴图必须放在 textures/items/ 目录下才能正常显示
-function itemIdToIconPath(itemId) {
-    const itemName = itemId.includes(":") ? itemId.split(":")[1] : itemId;
-    return `textures/items/${itemName}`;
-}
+import { itemIdToIconPath } from "./config/configUI.js";
 
 
 // 使用物品 lw_p1:killer_store 打开杀手商店界面
@@ -30,7 +24,7 @@ mc.world.beforeEvents.playerInteractWithBlock.subscribe(event => {
     const player = event.player;
     if (!player || !player.isValid) return;
     const blockId = event.block.typeId;
-    if (blockId === "lw_p1:vending_machine_lower" || blockId === "lw_p1:vending_machine_upper") {
+    if (blockId === "lw_p1:vending_machine") {
         event.cancel = true;
         if (vendingUiLock.has(player.id)) return;
         vendingUiLock.add(player.id);
@@ -174,7 +168,12 @@ function openVendingMachine(player) {
     const config = getWorldConfig();
     const currentGold = getGoldScore(player);
     const form = new ActionFormData();
-    const items = Array.isArray(config.vendingMachineItems) ? config.vendingMachineItems : [];
+    let items = Array.isArray(config.vendingMachineItems) ? config.vendingMachineItems : [];
+
+    // 杀手打开贩卖机时，不显示左轮手枪
+    if (player.hasTag("lw_p1:杀手")) {
+        items = items.filter(item => item.id !== "lw_p1:pistol");
+    }
 
     form.title("贩卖机");
     form.header(`当前金币：${currentGold}`);

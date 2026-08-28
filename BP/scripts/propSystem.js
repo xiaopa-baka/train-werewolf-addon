@@ -685,6 +685,39 @@ mc.world.beforeEvents.itemUse.subscribe((event) => {
 });
 
 
+// 饮料
+const DRINK_IDS = new Set([
+    "lw_p1:royal_jelly",
+    "lw_p1:champagne",
+    "lw_p1:cosmopolitan",
+    "lw_p1:martini",
+    "lw_p1:mojito",
+    "lw_p1:old_fashioned",
+]);
+
+mc.world.afterEvents.itemCompleteUse.subscribe((event) => {
+    const player = event.source;
+    const item = event.itemStack;
+    if (!player?.isValid || !item) return;
+    if (!DRINK_IDS.has(item.typeId)) return;
+
+    const slot = player.selectedSlotIndex;
+    mc.system.run(() => {
+        try {
+            if (!player.isValid) return;
+            if (!isCreative(player)) {
+                const c = player.getComponent('inventory').container;
+                const it = c.getItem(slot);
+                if (it && it.typeId === item.typeId) {
+                    if (it.amount > 1) { it.amount -= 1; c.setItem(slot, it); }
+                    else { c.setItem(slot, undefined); }
+                }
+            };
+        } catch (e) { }
+    });
+});
+
+
 // 断电装置
 mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.beforeEvents.itemUse.subscribe((event) => {

@@ -8,10 +8,35 @@ import * as mc from "@minecraft/server";
 export function getEmptyConfig() {
     return {
         // 任务4 合法食物列表
-        allowedFoods: [],
-        
+        allowedFoods: [
+            "minecraft:apple",              // 苹果
+            "minecraft:melon_slice",        // 西瓜片
+            "minecraft:carrot",             // 胡萝卜
+            "minecraft:sweet_berries",      // 甜浆果
+            "minecraft:glow_berries",       // 发光浆果
+
+            "minecraft:bread",              // 面包
+            "minecraft:cookie",             // 曲奇
+            "minecraft:pumpkin_pie",        // 南瓜派
+            "minecraft:dried_kelp",         // 干海带
+            "minecraft:baked_potato",       // 烤马铃薯
+
+            "minecraft:cooked_beef",        // 熟牛排
+            "minecraft:cooked_chicken",     // 熟鸡肉
+            "minecraft:cooked_porkchop",    // 熟猪排
+            "minecraft:cooked_mutton",      // 熟羊肉
+            "minecraft:cooked_salmon",      // 熟鲑鱼
+        ],
+
         // 任务5 合法饮品列表
-        allowedDrinks: [],
+        allowedDrinks: [
+            "lw_p1:old_fashioned",          // 古典鸡尾酒
+            "lw_p1:mojito",                 // 莫吉托
+            "lw_p1:martini",                // 马提尼
+            "lw_p1:cosmopolitan",           // 大都会鸡尾酒
+            "lw_p1:champagne",              // 香槟
+            "lw_p1:mineral_water",          // 矿泉水
+        ],
 
         // 车头单点坐标
         trainEngineCoordinates: null,
@@ -38,17 +63,123 @@ export function getEmptyConfig() {
         randomCoordinates: [],
 
         // 杀手商店物品列表
-        killerStoreItems: [],
+        killerStoreItems: [
+            {
+                id: "lw_p1:dagger",
+                displayName: "匕首",
+                price: 100
+            },
+            {
+                id: "lw_p1:pistol_mini",
+                displayName: "德林杰手枪",
+                price: 250
+            },
+            {
+                id: "lw_p1:crowbar",
+                displayName: "撬棍",
+                price: 75
+            },
+            {
+                id: "lw_p1:lockpick",
+                displayName: "开锁器",
+                price: 100
+            },
+            {
+                id: "lw_p1:poison",
+                displayName: "毒药",
+                price: 100
+            },
+            {
+                id: "lw_p1:firecracker",
+                displayName: "爆竹",
+                price: 75
+            },
+            {
+                id: "lw_p1:grenade",
+                displayName: "手雷",
+                price: 250
+            },
+            {
+                id: "lw_p1:bat",
+                displayName: "球棒",
+                price: 300
+            },
+            {
+                id: "lw_p1:power_cut",
+                displayName: "断电装置",
+                price: 200
+            },
+        ],
 
         // 贩卖机物品列表
-        vendingMachineItems: [],
+        vendingMachineItems: [
+            {
+                id: "lw_p1:pistol",
+                displayName: "左轮手枪",
+                price: 250
+            },
+            {
+                id: "lw_p1:mineral_water",
+                displayName: "矿泉水",
+                price: 100
+            },
+            {
+                id: "lw_p1:cigarette",
+                displayName: "香烟",
+                price: 100
+            },
+            {
+                id: "minecraft:ender_pearl",
+                displayName: "末影珍珠",
+                price: 100
+            },
+            {
+                id: "lw_p1:magic_conch",
+                displayName: "神奇的海螺",
+                price: 100
+            },
+            {
+                id: "lw_p1:pocke_watch",
+                displayName: "父亲的怀表",
+                price: 125
+            },
+            {
+                id: "lw_p1:royal_jelly",
+                displayName: "野生蜂王浆",
+                price: 100
+            },
+        ],
 
         // 食物托盘物品列表
         foodTrayItems: {
-            "lw_p1:food_tray": [],
-            "lw_p1:food_tray_ceramic": [],
-            "lw_p1:food_tray_glass": [],
-            "lw_p1:food_tray_wood": []
+            "lw_p1:food_tray": [
+                "minecraft:apple",              // 苹果
+                "minecraft:melon_slice",        // 西瓜片
+                "minecraft:carrot",             // 胡萝卜
+                "minecraft:sweet_berries",      // 甜浆果
+                "minecraft:glow_berries",       // 发光浆果
+            ],
+            "lw_p1:food_tray_glass": [
+                "minecraft:bread",              // 面包
+                "minecraft:cookie",             // 曲奇
+                "minecraft:pumpkin_pie",        // 南瓜派
+                "minecraft:dried_kelp",         // 干海带
+                "minecraft:baked_potato",       // 烤马铃薯
+            ],
+            "lw_p1:food_tray_wood": [
+                "minecraft:cooked_beef",        // 熟牛排
+                "minecraft:cooked_chicken",     // 熟鸡肉
+                "minecraft:cooked_porkchop",    // 熟猪排
+                "minecraft:cooked_mutton",      // 熟羊肉
+                "minecraft:cooked_salmon",      // 熟鲑鱼
+            ],
+            "lw_p1:food_tray_ceramic": [
+                "lw_p1:old_fashioned",          // 古典鸡尾酒
+                "lw_p1:mojito",                 // 莫吉托
+                "lw_p1:martini",                // 马提尼
+                "lw_p1:cosmopolitan",           // 大都会鸡尾酒
+                "lw_p1:champagne",              // 香槟
+            ]
         },
 
         // 地图信息
@@ -68,7 +199,6 @@ function fillDefaultConfig(inputConfig) {
         vendingMachineItems: inputConfig.vendingMachineItems ?? inputConfig.VendingMachineItems ?? []
     };
     const result = { ...defaults, ...normalizedConfig };
-    // 确保 worldInformation 字段完整
     if (!result.worldInformation) result.worldInformation = {};
     const wiDefaults = defaults.worldInformation;
     result.worldInformation = { ...wiDefaults, ...result.worldInformation };

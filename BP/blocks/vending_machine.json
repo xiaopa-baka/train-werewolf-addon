@@ -1,0 +1,194 @@
+{
+    "format_version": "1.21.0",
+    "minecraft:block": {
+        "description": {
+            "identifier": "lw_p1:vending_machine",
+            "traits": {
+                "minecraft:placement_direction": {
+                    "enabled_states": [
+                        "minecraft:cardinal_direction"
+                    ],
+                    "y_rotation_offset": 180
+                }
+            },
+            "states": {
+                "lw_p1:part": [
+                    "carried",
+                    "lower",
+                    "upper"
+                ]
+            },
+            "menu_category": {
+                "category": "construction"
+            }
+        },
+        "components": {
+            "minecraft:material_instances": {
+                "*": {
+                    "texture": "vending_atlas",
+                    "render_method": "opaque"
+                }
+            },
+            "minecraft:geometry": {
+                "identifier": "geometry.vending_machine_carried"
+            },
+            "minecraft:flammable": true,
+            "minecraft:light_dampening": 1,
+            "minecraft:destructible_by_mining": {
+                "seconds_to_destroy": 4
+            },
+            "minecraft:destructible_by_explosion": {
+                "explosion_resistance": 4
+            },
+            "minecraft:map_color": "#4A5568"
+        },
+        "permutations": [
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'north'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            180,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'south'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            0,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'east'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            90,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'west'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            -90,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('lw_p1:part') == 'lower'",
+                "components": {
+                    "minecraft:geometry": {
+                        "identifier": "geometry.vending_machine_lower"
+                    },
+                    "minecraft:collision_box": {
+                        "origin": [
+                            -8,
+                            0,
+                            -8
+                        ],
+                        "size": [
+                            16,
+                            16,
+                            16
+                        ]
+                    },
+                    "minecraft:selection_box": {
+                        "origin": [
+                            -8,
+                            0,
+                            -8
+                        ],
+                        "size": [
+                            16,
+                            16,
+                            16
+                        ]
+                    },
+                    "minecraft:placement_filter": {
+                        "conditions": [
+                            {
+                                "block_filter": [
+                                    "lw_p1:vending_machine"
+                                ],
+                                "allowed_faces": [
+                                    "down"
+                                ]
+                            }
+                        ]
+                    },
+                    "minecraft:loot": "loot_tables/empty.json"
+                }
+            },
+            {
+                "condition": "q.block_state('lw_p1:part') == 'upper'",
+                "components": {
+                    "minecraft:geometry": {
+                        "identifier": "geometry.vending_machine_upper"
+                    },
+                    "minecraft:collision_box": {
+                        "origin": [
+                            -8,
+                            0,
+                            -8
+                        ],
+                        "size": [
+                            16,
+                            16,
+                            16
+                        ]
+                    },
+                    "minecraft:selection_box": {
+                        "origin": [
+                            -8,
+                            0,
+                            -8
+                        ],
+                        "size": [
+                            16,
+                            16,
+                            16
+                        ]
+                    },
+                    "minecraft:loot": "loot_tables/empty.json",
+                    "minecraft:placement_filter": {
+                        "conditions": [
+                            {
+                                "block_filter": [
+                                    "lw_p1:vending_machine"
+                                ],
+                                "allowed_faces": [
+                                    "up"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('lw_p1:part') == 'carried'",
+                "components": {
+                    "minecraft:geometry": {
+                        "identifier": "geometry.vending_machine_carried"
+                    }
+                }
+            }
+        ]
+    }
+}

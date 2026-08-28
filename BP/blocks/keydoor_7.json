@@ -23,8 +23,7 @@
                 ]
             },
             "menu_category": {
-                "category": "construction",
-                "group": "itemGroup.name.door"
+                "category": "construction"
             }
         },
         "components": {
@@ -243,6 +242,7 @@
             {
                 "condition": "q.block_state('lw_p1:part') == 'lower'",
                 "components": {
+                    "minecraft:loot": "loot_tables/empty.json",
                     "minecraft:placement_filter": {
                         "conditions": [
                             {

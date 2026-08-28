@@ -9,11 +9,11 @@ import * as mc from "@minecraft/server";
 import "./taskSystem.js";
 import "./shopSystem.js";
 import "./propSystem.js";
+import "./guideBook.js";
 import "./config/configUI.js";
 import { getWorldConfig } from "./config/worldConfig.js";
 import "./blocks/vending_machine.js";
 import { clearCrowbaredDoors } from "./blocks/keydoor.js";
-import "./guideBook.js";
 
 
 // 预创建全局所需计分板列表
@@ -338,7 +338,7 @@ function startGameNow(allPlayers) {
         endTriggered = false;
         pendingEndMsg = null;
         roleRewardsGiven = false;
-        gameStartTimer = null; // 重置倒计时，保证下一局可再次自动开始
+        gameStartTimer = null;
 
         // 重建被 gameOver 删除的计分项并归零，保证第二局起计时/结算正常
         try {
@@ -596,7 +596,6 @@ mc.system.runInterval(() => {
 
 // 杀手活动栏显示剩余游戏时长倒计时（每秒更新，格式 分:秒）
 mc.system.runInterval(() => {
-    // 仅每个整秒更新
     if (mc.system.currentTick % 20 !== 0) return;
 
     const gameTimeObj = mc.world.scoreboard.getObjective("lw_p1:游戏时间");
@@ -724,7 +723,7 @@ function collectGameResult(reason, winner) {
 }
 
 
-// 全局游戏结束,调用 lw_p1_gameOver.mcfunction ,设置时间为白天、传送至站台
+// 全局游戏结束,调用 gameOver.mcfunction ,设置时间为白天、传送至站台
 mc.system.runInterval(() => {
     const allPlayers = Array.from(mc.world.getPlayers());
     const hasGameEndPlayer = allPlayers.some(player => {

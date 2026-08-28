@@ -1,0 +1,77 @@
+{
+    "format_version": "1.21.60",
+    "minecraft:crafting_items_catalog": {
+        "categories": [
+            {
+                "category_name": "equipment",
+                "groups": [
+                    {
+                        "group_identifier": {
+                            "icon": "lw_p1:key_1",
+                            "name": "lw_p1:itemGroup.name.keys"
+                        },
+                        "items": [
+                            "lw_p1:key_1",
+                            "lw_p1:key_2",
+                            "lw_p1:key_3",
+                            "lw_p1:key_4",
+                            "lw_p1:key_5",
+                            "lw_p1:key_6",
+                            "lw_p1:key_7",
+                            "lw_p1:key_8"
+                        ]
+                    },
+                    {
+                        "group_identifier": {
+                            "icon": "lw_p1:champagne",
+                            "name": "lw_p1:itemGroup.name.drinks"
+                        },
+                        "items": [
+                            "lw_p1:old_fashioned",
+                            "lw_p1:mojito",
+                            "lw_p1:martini",
+                            "lw_p1:cosmopolitan",
+                            "lw_p1:champagne",
+                            "lw_p1:mineral_water"
+                        ]
+                    }
+                ]
+            },
+            {
+                "category_name": "construction",
+                "groups": [
+                    {
+                        "group_identifier": {
+                            "icon": "lw_p1:keydoor_1",
+                            "name": "lw_p1:itemGroup.name.doors"
+                        },
+                        "items": [
+                            "lw_p1:keydoor_1",
+                            "lw_p1:keydoor_2",
+                            "lw_p1:keydoor_3",
+                            "lw_p1:keydoor_4",
+                            "lw_p1:keydoor_5",
+                            "lw_p1:keydoor_6",
+                            "lw_p1:keydoor_7",
+                            "lw_p1:keydoor_8",
+                            "lw_p1:keydoor_9",
+                            "lw_p1:keydoor_10"
+                        ]
+                    },
+                    {
+                        "group_identifier": {
+                            "icon": "lw_p1:food_tray_ceramic",
+                            "name": "lw_p1:itemGroup.name.trays"
+                        },
+                        "items": [
+                            "lw_p1:food_tray",
+                            "lw_p1:food_tray_ceramic",
+                            "lw_p1:food_tray_glass",
+                            "lw_p1:food_tray_wood"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

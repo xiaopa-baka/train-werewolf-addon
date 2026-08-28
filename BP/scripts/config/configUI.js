@@ -707,10 +707,34 @@ function confirmClearAllCoord(player) {
 }
 
 
-// 物品ID转贴图路径，物品贴图必须放在 textures/items/ 目录下才能正常显示
-function itemIdToIconPath(itemId) {
-    const itemName = itemId.includes(":") ? itemId.split(":")[1] : itemId;
-    return `textures/items/${itemName}`;
+// 物品ID转贴图路径；支持两类输入：
+//   1. 完整贴图路径（含任意层级子目录，如 "textures/items/饮品/champagne"）-> 直接原样返回
+//   2. 物品ID（如 "minecraft:cooked_beef" / "lw_p1:pistol"）-> 查询特判映射，查不到则用 textures/items/ 下同名
+// 若添加新的特殊物品，直接在 ITEM_ICON_MAP 追加一行即可
+const ITEM_ICON_MAP = {
+    cooked_beef: "beef_cooked",
+    cooked_salmon: "fish_salmon_cooked",
+    cooked_porkchop: "porkchop_cooked",
+    cooked_chicken: "chicken_cooked",
+    cooked_mutton: "mutton_cooked",
+    cooked_rabbit: "rabbit_cooked",
+    cooked_cod: "cod_cooked",
+    baked_potato: "potato_baked",
+    poisonous_potato: "potato_poisonous",
+    golden_apple: "apple_golden",
+    enchanted_golden_apple: "apple_golden",
+    golden_carrot: "carrot_golden",
+    melon_slice: "melon",
+};
+
+export function itemIdToIconPath(itemId) {
+    const rawName = itemId.includes(":") ? itemId.split(":")[1] : itemId;
+
+    // 输入本身是完整路径（含路径分隔符，非纯物品名）则直接返回，支持任意子目录
+    if (rawName.includes("/")) return itemId;
+
+    // 命中特判映射则用之，否则用 textures/items/ 下同名贴图
+    return `textures/items/${ITEM_ICON_MAP[rawName] ?? rawName}`;
 }
 
 
@@ -723,6 +747,7 @@ function showFoodDrinkForm(player) {
         form.button("配置合法食物");
         form.button("配置合法饮品");
         form.button("食物托盘配置");
+        form.button("恢复默认");
         form.button("§c返回");
 
     form.show(player).then(res => {
@@ -732,9 +757,37 @@ function showFoodDrinkForm(player) {
             case 0: showFoodListForm(player); break;
             case 1: showDrinkListForm(player); break;
             case 2: showFoodTrayMenu(player); break;
-            case 3: showMainForm(player); break;
+            case 3: confirmResetFoodDrink(player); break;
+            case 4: showMainForm(player); break;
         }
     });
+}
+
+
+// 确认恢复合法食物/饮品/食物托盘默认配置
+function confirmResetFoodDrink(player) {
+    if (!player.isValid) return;
+    new MessageFormData()
+        .title("恢复默认")
+        .body("§c确定恢复合法食物、饮品和食物托盘的默认列表吗？当前的自定义项将被覆盖！")
+        .button1("取消")
+        .button2("§c确认恢复")
+        .show(player).then(res => {
+            if (!player.isValid) return;
+            if (res.selection === 1) {
+                const config = getWorldConfig();
+                const defaults = getEmptyConfig();
+                config.allowedFoods = [...defaults.allowedFoods];
+                config.allowedDrinks = [...defaults.allowedDrinks];
+                config.foodTrayItems = {};
+                for (const id of Object.keys(defaults.foodTrayItems)) {
+                    config.foodTrayItems[id] = [...defaults.foodTrayItems[id]];
+                }
+                saveWorldConfig(config);
+                player.sendMessage("§a已恢复合法食物/饮品/食物托盘的默认配置");
+            }
+            showFoodDrinkForm(player);
+        });
 }
 
 
@@ -1019,6 +1072,7 @@ function showShopForm(player) {
     form.button("杀手商店配置");
     form.button("贩卖机配置");
     form.button("初始金币")
+    form.button("恢复默认");
     form.button("§c返回");
 
     form.show(player).then(res => {
@@ -1028,9 +1082,33 @@ function showShopForm(player) {
             case 0: showkillerStoreForm(player); break;
             case 1: showVendingMachineForm(player); break;
             case 2: showInitialCoinsForm(player); break;
-            case 3: showMainForm(player); break;
+            case 3: confirmResetShop(player); break;
+            case 4: showMainForm(player); break;
         }
     });
+}
+
+
+// 确认恢复商店默认配置
+function confirmResetShop(player) {
+    if (!player.isValid) return;
+    new MessageFormData()
+        .title("恢复默认")
+        .body("§c确定恢复杀手商店和贩卖机的默认商品列表吗？当前的自定义项将被覆盖！")
+        .button1("取消")
+        .button2("§c确认恢复")
+        .show(player).then(res => {
+            if (!player.isValid) return;
+            if (res.selection === 1) {
+                const config = getWorldConfig();
+                const defaults = getEmptyConfig();
+                config.killerStoreItems = defaults.killerStoreItems.map(i => ({ ...i }));
+                config.vendingMachineItems = defaults.vendingMachineItems.map(i => ({ ...i }));
+                saveWorldConfig(config);
+                player.sendMessage("§a已恢复商店的默认配置");
+            }
+            showShopForm(player);
+        });
 }
 
 

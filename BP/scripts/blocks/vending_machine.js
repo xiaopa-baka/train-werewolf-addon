@@ -1,105 +1,119 @@
 // @ts-check
-// vendingMachine.js - 自动贩卖机逻辑
+// vendingMachine.js - 自动贩卖机逻辑（对齐钥匙门多方块门结构）
 
 import * as mc from "@minecraft/server";
 
 
-const LOWER_ID = "lw_p1:vending_machine_lower";
-const UPPER_ID = "lw_p1:vending_machine_upper";
+const VENDING_ID = "lw_p1:vending_machine";
 /** @type {any} */
-const STATE_CARDINAL = "lw_p1:cardinal_direction";
+const S_CARDINAL = "minecraft:cardinal_direction";
+/** @type {any} */
+const S_PART = "lw_p1:part";
 
 
-// 使方块被放置时正面始终朝向玩家
-function yawToCardinal(yaw) {
-    if (yaw >= -45 && yaw < 45) return "north";
-    if (yaw >= 45 && yaw < 135) return "east";
-    if (yaw >= 135 || yaw < -135) return "south";
-    return "west";
+function isVending(block) {
+    return !!block && block.typeId === VENDING_ID;
+}
+
+// 贩卖机的另一半
+function halfMachine(block) {
+    const up = block.above();
+    const down = block.below();
+    if (up && isVending(up) && up.permutation.getState(S_PART) === "upper") return up;
+    if (down && isVending(down) && down.permutation.getState(S_PART) === "lower") return down;
+    return null;
 }
 
 
-// 多方快结构逻辑，方块朝向修正
+// 放置时，设置 part=lower，并在上方生成 part=upper
 mc.world.afterEvents.playerPlaceBlock.subscribe((event) => {
     const { block, player } = event;
-    const cardinal = player ? yawToCardinal(player.getRotation().y) : "south";
+    if (!block || !isVending(block)) return;
+    if (!player?.isValid) return;
 
-    if (block.typeId === UPPER_ID) {
+    const aboveBlock = block.above();
+    if (!aboveBlock || (!aboveBlock.isAir && !aboveBlock.isLiquid)) {
+        try { block.setType("minecraft:air"); } catch (e) { }
+        return;
+    }
+
+    const placedCardinal = block.permutation.getState(S_CARDINAL);
+    mc.system.run(() => {
         try {
-            const upperPerm = block.permutation.withState(STATE_CARDINAL, cardinal);
-            block.setPermutation(upperPerm);
+            const dim = block.dimension;
+            const loc = { x: block.x, y: block.y, z: block.z };
+            const upLoc = { x: block.x, y: block.y + 1, z: block.z };
+            const cardinal = String(placedCardinal) || "north";
+            const lower = mc.BlockPermutation.resolve(block.typeId)
+                .withState(S_CARDINAL, cardinal)
+                .withState(S_PART, "lower");
+            const upper = mc.BlockPermutation.resolve(block.typeId)
+                .withState(S_CARDINAL, cardinal)
+                .withState(S_PART, "upper");
+            dim.getBlock(loc)?.setPermutation(lower);
+            dim.getBlock(upLoc)?.setPermutation(upper);
         } catch (e) { }
-        return;
-    }
-
-    if (block.typeId !== LOWER_ID) return;
-
-    try {
-        const lowerPerm = block.permutation.withState(STATE_CARDINAL, cardinal);
-        block.setPermutation(lowerPerm);
-    } catch (e) { }
-
-    const above = block.above();
-    if (!above) return;
-    if (!above.isAir) {
-        block.setType("minecraft:air");
-        return;
-    }
-
-    try {
-        const upperBase = mc.BlockPermutation.resolve(UPPER_ID);
-        const upperPerm = upperBase.withState(STATE_CARDINAL, cardinal);
-        above.setPermutation(upperPerm);
-    } catch (e) { }
+    });
 });
 
 
-// 多方快结构掉落物修正
+// 记录“整台贩卖机被破坏”的掉落信息（被破坏格 -> 完整结构信息）
+// 不 cancel 以保留引擎破坏粒子，掉落与另一半移除在 after 事件处理
+const pendingBreaks = new Map();
+
 mc.world.beforeEvents.playerBreakBlock.subscribe((event) => {
     const block = event.block;
-    const typeId = block.typeId;
-    if (typeId !== LOWER_ID && typeId !== UPPER_ID) return;
+    if (!block || !isVending(block)) return;
 
-    let isFullStructure = false;
+    const part = block.permutation.getState(S_PART);
     let lowerBlock = null;
     let upperBlock = null;
 
-    if (typeId === LOWER_ID) {
+    if (part === "lower") {
         lowerBlock = block;
         const a = block.above();
-        if (a && a.typeId === UPPER_ID) {
-            upperBlock = a;
-            isFullStructure = true;
-        }
-    } else {
+        if (a && isVending(a) && a.permutation.getState(S_PART) === "upper") upperBlock = a;
+    } else if (part === "upper") {
         upperBlock = block;
         const b = block.below();
-        if (b && b.typeId === LOWER_ID) {
-            lowerBlock = b;
-            isFullStructure = true;
-        }
+        if (b && isVending(b) && b.permutation.getState(S_PART) === "lower") lowerBlock = b;
     }
 
-    if (!isFullStructure) {
-        return;
-    }
+    // 非完整结构（孤立的一半）按普通方块破坏处理，不拦截
+    if (!lowerBlock || !upperBlock) return;
 
-    event.cancel = true;
+    const brokenKey = `${block.x},${block.y},${block.z}`;
+    pendingBreaks.set(brokenKey, {
+        lowerLoc: { x: lowerBlock.x, y: lowerBlock.y, z: lowerBlock.z },
+        upperLoc: { x: upperBlock.x, y: upperBlock.y, z: upperBlock.z },
+    });
+});
 
-    const lowerLoc = { x: lowerBlock.x, y: lowerBlock.y, z: lowerBlock.z };
-    const upperLoc = { x: upperBlock.x, y: upperBlock.y, z: upperBlock.z };
-    const dim = lowerBlock.dimension;
+mc.world.afterEvents.playerBreakBlock.subscribe((event) => {
+    const block = event.block;
+    const player = event.player;
+    if (!block) return;
 
+    const brokenKey = `${block.x},${block.y},${block.z}`;
+    const info = pendingBreaks.get(brokenKey);
+    if (!info) return;
+    pendingBreaks.delete(brokenKey);
+
+    const dim = event.dimension;
     mc.system.run(() => {
-        try {
-            dim.getBlock(lowerLoc)?.setType("minecraft:air");
-        } catch (e) { }
-        try {
-            dim.getBlock(upperLoc)?.setType("minecraft:air");
-        } catch (e) { }
-        try {
-            const drop = new mc.ItemStack(LOWER_ID, 1);
-            dim.spawnItem(drop, lowerLoc);
-        } catch (e) { }
+        // 移除另一半（被破坏格已由引擎移除）
+        for (const loc of [info.lowerLoc, info.upperLoc]) {
+            try {
+                const b = dim.getBlock(loc);
+                if (b && isVending(b)) b.setType("minecraft:air");
+            } catch (e) { }
+        }
+        // 创造模式破坏不掉落物品
+        const isCreative = player?.isValid && player.getGameMode() === mc.GameMode.Creative;
+        if (!isCreative) {
+            try {
+                dim.spawnItem(new mc.ItemStack(VENDING_ID, 1), info.lowerLoc);
+            } catch (e) { }
+        }
     });
 });

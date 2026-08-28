@@ -56,6 +56,69 @@ function halfDoor(block) {
     return null;
 }
 
+
+// 记录“整扇门被破坏”的掉落信息（被破坏格 -> 完整结构信息）
+// 不 cancel 以保留引擎破坏粒子，掉落与另一半移除在 after 事件处理
+const pendingBreaks = new Map();
+
+mc.world.beforeEvents.playerBreakBlock.subscribe((event) => {
+    const block = event.block;
+    if (!block || !isDoor(block)) return;
+
+    const part = block.permutation.getState(S_PART);
+    let lowerBlock = null;
+    let upperBlock = null;
+
+    if (part === "lower") {
+        lowerBlock = block;
+        const a = block.above();
+        if (a && isDoor(a) && a.permutation.getState(S_PART) === "upper") upperBlock = a;
+    } else if (part === "upper") {
+        upperBlock = block;
+        const b = block.below();
+        if (b && isDoor(b) && b.permutation.getState(S_PART) === "lower") lowerBlock = b;
+    }
+
+    // 非完整结构（孤立的一半）按普通方块破坏处理，不拦截
+    if (!lowerBlock || !upperBlock) return;
+
+    const brokenKey = `${block.x},${block.y},${block.z}`;
+    pendingBreaks.set(brokenKey, {
+        lowerLoc: { x: lowerBlock.x, y: lowerBlock.y, z: lowerBlock.z },
+        upperLoc: { x: upperBlock.x, y: upperBlock.y, z: upperBlock.z },
+        typeId: block.typeId,
+    });
+});
+
+mc.world.afterEvents.playerBreakBlock.subscribe((event) => {
+    const block = event.block;
+    const player = event.player;
+    if (!block) return;
+
+    const brokenKey = `${block.x},${block.y},${block.z}`;
+    const info = pendingBreaks.get(brokenKey);
+    if (!info) return;
+    pendingBreaks.delete(brokenKey);
+
+    const dim = event.dimension;
+    mc.system.run(() => {
+        // 移除另一半（被破坏格已由引擎移除）
+        for (const loc of [info.lowerLoc, info.upperLoc]) {
+            try {
+                const b = dim.getBlock(loc);
+                if (b && isDoor(b)) b.setType("minecraft:air");
+            } catch (e) { }
+        }
+        // 创造模式破坏不掉落物品
+        const isCreative = player?.isValid && player.getGameMode() === mc.GameMode.Creative;
+        if (!isCreative) {
+            try {
+                dim.spawnItem(new mc.ItemStack(info.typeId, 1), info.lowerLoc);
+            } catch (e) { }
+        }
+    });
+});
+
 // 获取当前手持物品 typeId
 function getHandTypeId(player) {
     try {
