@@ -8,6 +8,7 @@
             }
         },
         "components": {
+            "lw_p1:food_tray_interact": {},
             "minecraft:geometry": "geometry.food_tray",
             "minecraft:material_instances": {
                 "*": {

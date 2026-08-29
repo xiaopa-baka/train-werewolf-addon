@@ -773,6 +773,10 @@ function getGrenadeVelocity(player) {
     };
 }
 
+// 手榴弹投掷防抖
+const grenadeThrowCooldown = new Map();
+const GRENADE_THROW_INTERVAL = 10;
+
 // 使用手榴弹
 mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.beforeEvents.itemUse.subscribe((event) => {
@@ -780,6 +784,11 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
         const item = event.itemStack;
         if (!player?.isValid || !item) return;
         if (item.typeId !== 'lw_p1:grenade') return;
+
+        // 投掷防抖
+        const lastThrow = grenadeThrowCooldown.get(player.id) ?? 0;
+        if (mc.system.currentTick - lastThrow < GRENADE_THROW_INTERVAL) return;
+        grenadeThrowCooldown.set(player.id, mc.system.currentTick);
 
         event.cancel = true;
 
@@ -1088,13 +1097,23 @@ const POISONED_EATERS = new Map();
 // 记录玩家已吃下被下毒食物且毒药生效中
 const ACTIVE_POISONS = new Map();
 
-mc.world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
-    const player = event.player;
-    const block = event.block;
+// 交互去重,同一 tick 内同一玩家对同一方块只处理一次
+// （国际版 beforeEvents.playerInteractWithBlock 与自定义组件 onPlayerInteract 会同时触发）
+const interactDedup = new Map();
+
+function tryClaimInteract(player, block) {
+    const now = mc.system.currentTick;
+    const key = `${player.id}@${block.dimension.id}:${block.x},${block.y},${block.z}`;
+    if (interactDedup.get(key) === now) return false;
+    interactDedup.set(key, now);
+    return true;
+}
+
+// 食物托盘交互核心逻辑（被 playerInteractWithBlock 与自定义组件 onPlayerInteract 共用）
+export function handleFoodTrayInteract(player, block) {
     if (!player?.isValid || !block) return;
     if (!FOOD_TRAY_IDS.includes(block.typeId)) return;
-
-    event.cancel = true;
+    if (!tryClaimInteract(player, block)) return;
 
     // 获取玩家当前手持物品
     let hand = null;
@@ -1189,6 +1208,17 @@ mc.world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
             }
         } catch (e) { }
     });
+}
+
+mc.world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
+    const player = event.player;
+    const block = event.block;
+    if (!player?.isValid || !block) return;
+    if (!FOOD_TRAY_IDS.includes(block.typeId)) return;
+
+    event.cancel = true;
+
+    handleFoodTrayInteract(player, block);
 });
 
 mc.world.afterEvents.worldLoad.subscribe(() => {

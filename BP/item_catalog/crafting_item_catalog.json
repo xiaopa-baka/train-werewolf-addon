@@ -60,7 +60,7 @@
                     },
                     {
                         "group_identifier": {
-                            "icon": "lw_p1:food_tray_ceramic",
+                            "icon": "lw_p1:food_tray",
                             "name": "lw_p1:itemGroup.name.trays"
                         },
                         "items": [

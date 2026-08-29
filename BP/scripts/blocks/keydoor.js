@@ -57,8 +57,7 @@ function halfDoor(block) {
 }
 
 
-// 记录“整扇门被破坏”的掉落信息（被破坏格 -> 完整结构信息）
-// 不 cancel 以保留引擎破坏粒子，掉落与另一半移除在 after 事件处理
+// 记录整扇门被破坏的掉落信息
 const pendingBreaks = new Map();
 
 mc.world.beforeEvents.playerBreakBlock.subscribe((event) => {
@@ -199,14 +198,22 @@ mc.world.afterEvents.playerPlaceBlock.subscribe((event) => {
 });
 
 
-// 只有手持对应钥匙才能切换开/关
-mc.world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
-    const player = event.player;
-    const block = event.block;
-    if (!player?.isValid || !block || !isDoor(block)) return;
+// 交互去重：同一 tick 内同一玩家对同一方块只处理一次
+// （国际版 beforeEvents.playerInteractWithBlock 与自定义组件 onPlayerInteract 会同时触发）
+const interactDedup = new Map();
 
-    // 拦截门本身的交互
-    event.cancel = true;
+function tryClaimInteract(player, block) {
+    const now = mc.system.currentTick;
+    const key = `${player.id}@${block.dimension.id}:${block.x},${block.y},${block.z}`;
+    if (interactDedup.get(key) === now) return false;
+    interactDedup.set(key, now);
+    return true;
+}
+
+// 门交互核心逻辑（被 playerInteractWithBlock 与自定义组件 onPlayerInteract 共用）
+export function handleKeydoorInteract(player, block) {
+    if (!player?.isValid || !block || !isDoor(block)) return;
+    if (!tryClaimInteract(player, block)) return;
 
     const hand = getHandTypeId(player);
 
@@ -316,18 +323,28 @@ mc.world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
             } catch (e) { }
         }, 60);
     }
+}
+
+// 只有手持对应钥匙才能切换开/关
+mc.world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
+    const player = event.player;
+    const block = event.block;
+    if (!player?.isValid || !block || !isDoor(block)) return;
+
+    // 拦截门本身的交互
+    event.cancel = true;
+
+    handleKeydoorInteract(player, block);
 });
 
 
-// ============ 按钮检测自动开门：门上半后方/前方一格左右两边有激活按钮则开门 ============
-// 门朝向 -> 后方（cardinal 方向）偏移
+// 按钮检测自动开门,门上半后方/前方一格左右两边有激活按钮则开门
 const CARDINAL_BACK = {
     "north": [0, 0, -1],
     "south": [0, 0, 1],
     "east": [1, 0, 0],
     "west": [-1, 0, 0],
 };
-// 后方格的左右两边（垂直于门朝向的水平两侧）
 const CARDINAL_SIDES = {
     "north": [[1, 0, 0], [-1, 0, 0]],
     "south": [[1, 0, 0], [-1, 0, 0]],
@@ -347,7 +364,7 @@ function isPressedButton(block) {
     }
 }
 
-// 检查门（任意一格）上半 前方/后方 一格左右两边是否有激活按钮（两个方向都检测）
+// 检查门（任意一格）上半 前方/后方 一格左右两边是否有激活按钮
 function doorHasPressedButton(block) {
     try {
         const dim = block.dimension;

@@ -14,6 +14,7 @@ import "./config/configUI.js";
 import { getWorldConfig } from "./config/worldConfig.js";
 import "./blocks/vending_machine.js";
 import { clearCrowbaredDoors } from "./blocks/keydoor.js";
+import "./blocks/blockComponents.js";
 
 
 // 预创建全局所需计分板列表
@@ -880,5 +881,3 @@ mc.system.runInterval(() => {
         }
     } catch (err) { }
 }, 10);
-
-

@@ -20,17 +20,37 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 
 // 点击方块 lw_p1:vending_machine 打开贩卖机界面
 const vendingUiLock = new Set();
+
+// 交互去重：同一 tick 内同一玩家对同一方块只处理一次
+// （国际版 beforeEvents.playerInteractWithBlock 与自定义组件 onPlayerInteract 会同时触发）
+const interactDedup = new Map();
+
+function tryClaimInteract(player, block) {
+    const now = mc.system.currentTick;
+    const key = `${player.id}@${block.dimension.id}:${block.x},${block.y},${block.z}`;
+    if (interactDedup.get(key) === now) return false;
+    interactDedup.set(key, now);
+    return true;
+}
+
+// 贩卖机交互核心逻辑（被 playerInteractWithBlock 与自定义组件 onPlayerInteract 共用）
+export function handleVendingMachineInteract(player, block) {
+    if (!player?.isValid || !block) return;
+    if (block.typeId !== "lw_p1:vending_machine") return;
+    if (!tryClaimInteract(player, block)) return;
+    if (vendingUiLock.has(player.id)) return;
+    vendingUiLock.add(player.id);
+    mc.system.run(() => {
+        openVendingMachine(player);
+    });
+}
+
 mc.world.beforeEvents.playerInteractWithBlock.subscribe(event => {
     const player = event.player;
     if (!player || !player.isValid) return;
-    const blockId = event.block.typeId;
-    if (blockId === "lw_p1:vending_machine") {
+    if (event.block?.typeId === "lw_p1:vending_machine") {
         event.cancel = true;
-        if (vendingUiLock.has(player.id)) return;
-        vendingUiLock.add(player.id);
-        mc.system.run(() => {
-            openVendingMachine(player);
-        });
+        handleVendingMachineInteract(player, event.block);
     }
 });
 

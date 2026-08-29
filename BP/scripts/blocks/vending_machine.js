@@ -1,5 +1,5 @@
 // @ts-check
-// vendingMachine.js - 自动贩卖机逻辑（对齐钥匙门多方块门结构）
+// vendingMachine.js - 自动贩卖机逻辑
 
 import * as mc from "@minecraft/server";
 
@@ -57,8 +57,7 @@ mc.world.afterEvents.playerPlaceBlock.subscribe((event) => {
 });
 
 
-// 记录“整台贩卖机被破坏”的掉落信息（被破坏格 -> 完整结构信息）
-// 不 cancel 以保留引擎破坏粒子，掉落与另一半移除在 after 事件处理
+// 记录整台贩卖机被破坏的掉落信息
 const pendingBreaks = new Map();
 
 mc.world.beforeEvents.playerBreakBlock.subscribe((event) => {

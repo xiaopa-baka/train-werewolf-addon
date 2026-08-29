@@ -23,6 +23,7 @@
             }
         },
         "components": {
+            "minecraft:custom_components": ["lw_p1:vending_machine_interact"],
             "minecraft:material_instances": {
                 "*": {
                     "texture": "vending_atlas",
