@@ -39,7 +39,11 @@ export function getEmptyConfig() {
         ],
 
         // 车头单点坐标
-        trainEngineCoordinates: null,
+        trainEngineCoordinates: {
+            x: 0,
+            y: 0,
+            z: 0
+        },
 
         // 站台单点坐标
         trainStationCoordinates: null,
@@ -52,8 +56,14 @@ export function getEmptyConfig() {
 
         // 透气区 对角坐标
         ventilationAreas: {
-            trainEngine: { start: null, end: null },
-            trainTail: { start: null, end: null }
+            trainEngine: {
+                start: null,
+                end: null
+            },
+            trainTail: {
+                start: null,
+                end: null
+            }
         },
 
         // 蹲坑坐标数组

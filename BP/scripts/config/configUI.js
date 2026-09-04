@@ -489,7 +489,7 @@ function showToiletList(player) {
 
         const itemIndex = res.selection - 1;
         if (itemIndex >= 0 && itemIndex < cfg.toiletCoordinates.length) {
-            showToiletItemActionMenu(player, itemIndex);
+            editToiletCoordinate(player, itemIndex);
             return;
         }
 
@@ -498,41 +498,7 @@ function showToiletList(player) {
 }
 
 
-// 主界面/地图区域配置/蹲坑坐标管理/单项操作
-function showToiletItemActionMenu(player, index) {
-    if (!player.isValid) return;
-    const cfg = getWorldConfig();
-    const item = cfg.toiletCoordinates[index];
-    if (!item) { showToiletList(player); return; }
-
-    new ActionFormData()
-        .title(`蹲坑坐标 ${index + 1}`)
-        .body(`坐标：${Math.floor(item.x)} ${Math.floor(item.y)} ${Math.floor(item.z)}`)
-        .button("编辑")
-        .button("删除")
-        .button("§c返回")
-        .show(player).then(res => {
-            if (!player.isValid) { showToiletList(player); return; }
-            if (res.canceled) { showToiletList(player); return; }
-            switch (res.selection) {
-                case 0:
-                    editToiletCoordinate(player, index);
-                    break;
-                case 1:
-                    cfg.toiletCoordinates.splice(index, 1);
-                    saveWorldConfig(cfg);
-                    player.sendMessage("§c已删除蹲坑坐标");
-                    showToiletList(player);
-                    break;
-                default:
-                    showToiletList(player);
-                    break;
-            }
-        });
-}
-
-
-// 主界面/地图区域配置/蹲坑坐标管理/单项操作/编辑
+// 主界面/地图区域配置/蹲坑坐标管理/编辑
 function editToiletCoordinate(player, index) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -540,20 +506,28 @@ function editToiletCoordinate(player, index) {
     if (!item) { showToiletList(player); return; }
 
     new ModalFormData()
-        .title(`编辑蹲坑坐标 ${index + 1}`)
+        .title(`编辑 蹲坑坐标 ${index + 1}`)
         .textField("X坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.x)) })
         .textField("Y坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.y)) })
         .textField("Z坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.z)) })
+        .toggle("§c删除此项", { defaultValue: false })
         .show(player).then(res => {
             if (!player.isValid) { showToiletList(player); return; }
-            if (res.canceled) { showToiletItemActionMenu(player, index); return; }
+            if (res.canceled) { showToiletList(player); return; }
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
+            if (vals[3] === true) {
+                cfg.toiletCoordinates.splice(index, 1);
+                saveWorldConfig(cfg);
+                player.sendMessage("§c已删除蹲坑坐标");
+                showToiletList(player);
+                return;
+            }
             const x = parseInt(String(vals[0]));
             const y = parseInt(String(vals[1]));
             const z = parseInt(String(vals[2]));
             if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {
                 player.sendMessage("§c坐标输入不合法，保存失败");
-                showToiletItemActionMenu(player, index);
+                showToiletList(player);
                 return;
             }
             cfg.toiletCoordinates[index] = intPosToCenter(x, y, z);
@@ -593,7 +567,7 @@ function showRandomList(player) {
 
         const itemIndex = res.selection - 1;
         if (itemIndex >= 0 && itemIndex < cfg.randomCoordinates.length) {
-            showRandomItemActionMenu(player, itemIndex);
+            editRandomCoordinate(player, itemIndex);
             return;
         }
 
@@ -602,41 +576,7 @@ function showRandomList(player) {
 }
 
 
-// 主界面/地图区域配置/随机传送坐标管理/单项操作
-function showRandomItemActionMenu(player, index) {
-    if (!player.isValid) return;
-    const cfg = getWorldConfig();
-    const item = cfg.randomCoordinates[index];
-    if (!item) { showRandomList(player); return; }
-
-    new ActionFormData()
-        .title(`随机传送坐标 ${index + 1}`)
-        .body(`坐标：${Math.floor(item.x)} ${Math.floor(item.y)} ${Math.floor(item.z)}`)
-        .button("编辑")
-        .button("删除")
-        .button("§c返回")
-        .show(player).then(res => {
-            if (!player.isValid) { showRandomList(player); return; }
-            if (res.canceled) { showRandomList(player); return; }
-            switch (res.selection) {
-                case 0:
-                    editRandomCoordinate(player, index);
-                    break;
-                case 1:
-                    cfg.randomCoordinates.splice(index, 1);
-                    saveWorldConfig(cfg);
-                    player.sendMessage("§c已删除随机传送坐标");
-                    showRandomList(player);
-                    break;
-                default:
-                    showRandomList(player);
-                    break;
-            }
-        });
-}
-
-
-// 主界面/地图区域配置/随机传送坐标管理/单项操作/编辑
+// 主界面/地图区域配置/随机传送坐标管理/编辑
 function editRandomCoordinate(player, index) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -644,20 +584,28 @@ function editRandomCoordinate(player, index) {
     if (!item) { showRandomList(player); return; }
 
     new ModalFormData()
-        .title(`编辑随机传送坐标 ${index + 1}`)
+        .title(`编辑 随机传送坐标 ${index + 1}`)
         .textField("X坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.x)) })
         .textField("Y坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.y)) })
         .textField("Z坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.z)) })
+        .toggle("§c删除此项", { defaultValue: false })
         .show(player).then(res => {
             if (!player.isValid) { showRandomList(player); return; }
-            if (res.canceled) { showRandomItemActionMenu(player, index); return; }
+            if (res.canceled) { showRandomList(player); return; }
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
+            if (vals[3] === true) {
+                cfg.randomCoordinates.splice(index, 1);
+                saveWorldConfig(cfg);
+                player.sendMessage("§c已删除随机传送坐标");
+                showRandomList(player);
+                return;
+            }
             const x = parseInt(String(vals[0]));
             const y = parseInt(String(vals[1]));
             const z = parseInt(String(vals[2]));
             if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {
                 player.sendMessage("§c坐标输入不合法，保存失败");
-                showRandomItemActionMenu(player, index);
+                showRandomList(player);
                 return;
             }
             cfg.randomCoordinates[index] = intPosToCenter(x, y, z);
@@ -708,8 +656,8 @@ function confirmClearAllCoord(player) {
 
 
 // 物品ID转贴图路径；支持两类输入：
-//   1. 完整贴图路径（含任意层级子目录，如 "textures/items/饮品/champagne"）-> 直接原样返回
-//   2. 物品ID（如 "minecraft:cooked_beef" / "lw_p1:pistol"）-> 查询特判映射，查不到则用 textures/items/ 下同名
+// 1. 完整贴图路径（含任意层级子目录，如 "textures/items/饮品/champagne"）-> 直接原样返回
+// 2. 物品ID（如 "minecraft:cooked_beef" / "lw_p1:pistol"）-> 查询特判映射，查不到则用 textures/items/ 下同名
 // 若添加新的特殊物品，直接在 ITEM_ICON_MAP 追加一行即可
 const ITEM_ICON_MAP = {
     cooked_beef: "beef_cooked",
@@ -747,7 +695,7 @@ function showFoodDrinkForm(player) {
         form.button("配置合法食物");
         form.button("配置合法饮品");
         form.button("食物托盘配置");
-        form.button("恢复默认");
+        form.button("§6恢复默认配置");
         form.button("§c返回");
 
     form.show(player).then(res => {
@@ -814,7 +762,7 @@ function showFoodListForm(player) {
         } else if (idx === config.allowedFoods.length + 1) {
             showFoodDrinkForm(player);
         } else {
-            showItemActionForm(player, "food", idx);
+            showEditModal(player, "food", idx);
         }
     });
 }
@@ -843,62 +791,39 @@ function showDrinkListForm(player) {
         } else if (idx === config.allowedDrinks.length + 1) {
             showFoodDrinkForm(player);
         } else {
-            showItemActionForm(player, "drink", idx);
+            showEditModal(player, "drink", idx);
         }
     });
 }
 
 
-// 主界面/食物&饮品配置/管理合法食物（饮品）/单项操作
-function showItemActionForm(player, type, index) {
-    if (!player.isValid) return;
-    const config = getWorldConfig();
-    const list = type === "food" ? config.allowedFoods : config.allowedDrinks;
-    const itemName = list[index];
-    const form = new ActionFormData();
-        form.title(`操作：${itemName}`);
-        form.body("请选择要进行的操作");
-        form.button("编辑");
-        form.button("删除");
-        form.button("§c返回");
-
-    form.show(player).then(res => {
-        const backList = () => type === "food" ? showFoodListForm(player) : showDrinkListForm(player);
-        if (res.canceled) return backList();
-
-        switch (res.selection) {
-            case 0: showEditModal(player, type, index); break;
-            case 1: list.splice(index, 1);
-            saveWorldConfig(config);
-            backList(); break;
-            case 2: backList(); break;
-        }
-    });
-}
-
-
-// 主界面/食物&饮品配置/管理合法食物（饮品）/单项操作/修改
+// 主界面/食物&饮品配置/管理合法食物（饮品）/编辑
 function showEditModal(player, type, index) {
     if (!player.isValid) return;
     const config = getWorldConfig();
     const list = type === "food" ? config.allowedFoods : config.allowedDrinks;
     const oldValue = list[index];
-    const label = type === "food" ? "食物" : "饮品";
     const form = new ModalFormData();
-        form.title(`编辑${label}`);
+        form.title(`编辑 ${oldValue}`);
         form.textField("请输入物品完整标识符，示例：minecraft:apple", "请输入物品ID", { defaultValue: String(oldValue) });
+        form.toggle("§c删除此项", { defaultValue: false });
 
     form.show(player).then(res => {
-        const backAction = () => type === "food" ? showFoodListForm(player) : showDrinkListForm(player);
-        if (res.canceled) return backAction();
+        const backList = () => type === "food" ? showFoodListForm(player) : showDrinkListForm(player);
+        if (res.canceled) return backList();
 
         const vals = res.formValues.filter(v => v !== null && v !== undefined);
+        if (vals[1] === true) {
+            list.splice(index, 1);
+            saveWorldConfig(config);
+            return backList();
+        }
         const newValue = (String(vals[0]) || "").trim();
         if (newValue) {
             list[index] = newValue;
             saveWorldConfig(config);
         }
-        backAction();
+        backList();
     });
 }
 
@@ -988,41 +913,13 @@ function showFoodTrayItemList(player, trayId) {
         } else if (res.selection === items.length + 1) {
             showFoodTrayMenu(player);
         } else {
-            showFoodTrayItemAction(player, trayId, res.selection);
+            showFoodTrayEditModal(player, trayId, res.selection);
         }
     });
 }
 
 
-// 主界面/食物&饮品配置/食物托盘配置/物品列表/单项操作
-function showFoodTrayItemAction(player, trayId, index) {
-    if (!player.isValid) return;
-    const config = getWorldConfig();
-    const items = config.foodTrayItems[trayId];
-    const itemName = items[index];
-
-    new ActionFormData()
-        .title(`操作：${itemName}`)
-        .body("请选择要进行的操作")
-        .button("编辑")
-        .button("删除")
-        .button("§c返回")
-        .show(player).then(res => {
-            if (res.canceled) { showFoodTrayItemList(player, trayId); return; }
-            switch (res.selection) {
-                case 0: showFoodTrayEditModal(player, trayId, index); break;
-                case 1:
-                    items.splice(index, 1);
-                    saveWorldConfig(config);
-                    showFoodTrayItemList(player, trayId);
-                    break;
-                default: showFoodTrayItemList(player, trayId); break;
-            }
-        });
-}
-
-
-// 主界面/食物&饮品配置/食物托盘配置/物品列表/单项操作/新增
+// 主界面/食物&饮品配置/食物托盘配置/物品列表/新增
 function showFoodTrayAddModal(player, trayId) {
     if (!player.isValid) return;
     new ModalFormData()
@@ -1042,17 +939,24 @@ function showFoodTrayAddModal(player, trayId) {
 }
 
 
-// 主界面/食物&饮品配置/食物托盘配置/物品列表/单项操作/编辑
+// 主界面/食物&饮品配置/食物托盘配置/物品列表/编辑
 function showFoodTrayEditModal(player, trayId, index) {
     if (!player.isValid) return;
     const config = getWorldConfig();
     const oldValue = config.foodTrayItems[trayId][index];
     new ModalFormData()
-        .title(`编辑 ${FOOD_TRAY_NAMES[trayId]} 物品`)
+        .title(`编辑 ${oldValue}`)
         .textField("物品完整标识符", "物品ID", { defaultValue: String(oldValue) })
+        .toggle("§c删除此项", { defaultValue: false })
         .show(player).then(res => {
             if (res.canceled) { showFoodTrayItemList(player, trayId); return; }
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
+            if (vals[1] === true) {
+                config.foodTrayItems[trayId].splice(index, 1);
+                saveWorldConfig(config);
+                showFoodTrayItemList(player, trayId);
+                return;
+            }
             const newValue = String(vals[0]).trim();
             if (newValue) {
                 config.foodTrayItems[trayId][index] = newValue;
@@ -1072,7 +976,7 @@ function showShopForm(player) {
     form.button("杀手商店配置");
     form.button("贩卖机配置");
     form.button("初始金币")
-    form.button("恢复默认");
+    form.button("§6恢复默认配置");
     form.button("§c返回");
 
     form.show(player).then(res => {
@@ -1139,7 +1043,7 @@ function showkillerStoreForm(player) {
         } else if (idx === items.length + 1) {
             showShopForm(player);
         } else {
-            showShopItemActionMenu(player, "killer", idx);
+            showEditShopItemModal(player, "killer", idx);
         }
     });
 }
@@ -1172,41 +1076,13 @@ function showVendingMachineForm(player) {
         } else if (idx === items.length + 1) {
             showShopForm(player);
         } else {
-            showShopItemActionMenu(player, "vending", idx);
+            showEditShopItemModal(player, "vending", idx);
         }
     });
 }
 
 
-// 主界面/商店配置/杀手商店（贩卖机）/单项操作
-function showShopItemActionMenu(player, shopType, index) {
-    const config = getWorldConfig();
-    const list = shopType === "killer" ? config.killerStoreItems : config.vendingMachineItems;
-    const item = list[index];
-    const form = new ActionFormData();
-    const backForm = () => shopType === "killer" ? showkillerStoreForm(player) : showVendingMachineForm(player);
-
-    form.title(`操作：${item.displayName}`);
-    form.button("编辑");
-    form.button("删除");
-    form.button("§c返回");
-
-    form.show(player).then(res => {
-        if (res.canceled) return backForm();
-
-        switch (res.selection) {
-            case 0: showEditShopItemModal(player, shopType, index); break;
-            case 1:
-                list.splice(index, 1);
-                saveWorldConfig(config);
-                backForm(); break;
-            case 2: backForm(); break;
-        }
-    });
-}
-
-
-// 主界面/商店配置/杀手商店（贩卖机）/单项操作/编辑
+// 主界面/商店配置/杀手商店（贩卖机）/编辑
 function showEditShopItemModal(player, shopType, index) {
     const config = getWorldConfig();
     const list = shopType === "killer" ? config.killerStoreItems : config.vendingMachineItems;
@@ -1214,14 +1090,20 @@ function showEditShopItemModal(player, shopType, index) {
     const form = new ModalFormData();
     const backForm = () => shopType === "killer" ? showkillerStoreForm(player) : showVendingMachineForm(player);
 
-    form.title("编辑商品信息");
+    form.title(`编辑 ${item.displayName}`);
     form.textField("商品显示名称", "请输入名称", { defaultValue: String(item.displayName) });
     form.textField("物品标识符", "如 minecraft:apple", { defaultValue: String(item.id) });
     form.textField("价格", "请输入正整数", { defaultValue: String(item.price) });
+    form.toggle("§c删除此项", { defaultValue: false });
 
     form.show(player).then(res => {
         if (res.canceled) return backForm();
         const vals = res.formValues.filter(v => v !== null && v !== undefined);
+        if (vals[3] === true) {
+            list.splice(index, 1);
+            saveWorldConfig(config);
+            return backForm();
+        }
         const [newName, newId, priceStr] = vals;
         const newPrice = parseInt(String(priceStr));
 
@@ -1284,7 +1166,7 @@ function showInitialCoinsForm(player) {
         .header("\n杀手金币成长")
         .slider("游戏开始后，杀手玩家每 10 秒自然获得的金币数。\n默认 15\n每10秒金币", 0, 30, { valueStep: 5, defaultValue: val3 })
         .header("\n平民金币成长")
-        .slider("游戏开始后，平民/警员玩家每 10 秒自然获得的金币数。\n默认 0\n每10秒金币", 0, 10, { valueStep: 2, defaultValue: val4 })
+        .slider("游戏开始后，非杀手玩家每 10 秒自然获得的金币数。\n默认 0\n每10秒金币", 0, 10, { valueStep: 2, defaultValue: val4 })
         .show(player).then(res => {
             if (res.canceled) { showShopForm(player); return; }
             try {
@@ -1354,9 +1236,9 @@ function showMapInfoForm(player) {
 // 主界面/其他/修改更多当前不可用配置
 function showUnusedConfigUI(player) {
     if (!player.isValid) return;
-    new ActionFormData().title("功能预留配置").body("若您想要增加更多任务、预设游戏数据或状态，修改底层数据，可解包修改\n" +
-        "我们在行为包文件中为玩家预留了配置入口，留有详细注释\n" +
-        "您可以解包后查看行为包源代码，进行学习、修改、二次开发\n\n" +
+    new ActionFormData().title("功能预留配置").body("若您想要增加更多任务、预设游戏数据或状态，修改底层数据，可访问以下网址查看项目源代码\n" +
+        "https://github.com/xiaopa-baka/train-werewolf-addon\n" +
+        "您可以访问项目仓库后查看行为包源代码，进行学习、修改、创建分支二次开发\n\n" +
         "注意：\n" +
         "进行二次开发后，请注明原作者和修改内容，禁止恶意篡改后传播！\n" +
         "二次开发不得用于商业用途，禁止私自售卖原版或修改后的版本！\n" +

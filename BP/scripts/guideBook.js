@@ -64,8 +64,8 @@ function getGuidePages() {
                 "§f每人开局获得一张便条，绑定背包。\n" +
                 "· 对空白处使用 → 编辑内容\n" +
                 " 对玩家使用 → 发送便条\n" +
-                "· 死亡后内容留在尸体上\n\n" +
-                "§7便条是游戏里唯一的通讯方式！\n\n\n\n"
+                "· 死亡后内容留在尸体上\n\n\n\n\n" +
+                "§7便条是游戏里唯一的通讯方式！\n"
         },
         {
             title: "§l修改配置",
@@ -124,13 +124,13 @@ function showGuidePage(player, pageIndex) {
 
 function giveGuideBook(player) {
     if (!player.isValid) return;
-    if (player.hasTag("lw_p1:已领取指南书")) return;
+    if (player.hasTag("lw_p1:已领取物品")) return;
 
     try {
-        player.runCommand(`give @s "lw_p1:guide_book" 1 0`);
-        player.addTag("lw_p1:已领取指南书");
-    } catch (e) {
-    }
+        player.runCommand(`give @s lw_p1:guide_book`);
+        player.runCommand(`give @s lw_p1:tp_game`)
+        player.addTag("lw_p1:已领取物品");
+    } catch (e) { }
 }
 
 mc.system.runInterval(() => {

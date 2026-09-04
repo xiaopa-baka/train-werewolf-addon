@@ -74,7 +74,6 @@ function deductGold(player, amount) {
         if (before < amount) return false;
         objective.addScore(player, -amount);
         const after = objective.getScore(player) ?? 0;
-        try { player.sendMessage(`§e扣除金币：${amount}，余额 ${before} -> ${after}`); } catch { }
         return true;
     } catch (e) { }
 }
@@ -170,7 +169,7 @@ function openkillerStore(player) {
             return;
         }
         if (giveItem(player, target.id)) {
-            player.sendMessage(`§a成功购买 ${target.displayName}，扣除 ${target.price} 金币`);
+            player.sendMessage(`§a成功购买 ${target.displayName}`);
             purchaseLock.delete(player.name);
         } else {
             try {
@@ -225,7 +224,7 @@ function openVendingMachine(player) {
             return;
         }
         if (giveItem(player, target.id)) {
-            player.sendMessage(`§a成功购买 ${target.displayName} ，扣除 ${target.price} 金币`);
+            player.sendMessage(`§a成功购买 ${target.displayName}`);
             purchaseLock.delete(player.name);
         } else {
             try {

@@ -39,6 +39,7 @@ kill @e[type=lw_p1:corpes]
 kill @e[type=lw_p1:player_name]
 kill @e[type=lw_p1:firecracker]
 kill @e[type=lw_p1:pistol]
+kill @e[type=minecraft:item]
 
 gamemode adventure @a
 
@@ -46,5 +47,5 @@ clear @a
 
 effect @a clear
 
-give @a lw_p1:guide_book 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}
-give @a lw_p1:tp_game 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}
+give @a lw_p1:guide_book
+give @a lw_p1:tp_game

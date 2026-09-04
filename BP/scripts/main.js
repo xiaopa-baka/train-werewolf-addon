@@ -798,13 +798,6 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
         if (gameIsRunning) {
             player.addTag("lw_p1:任务失败");
         }
-        else {
-            // 非游戏阶段加入：直接发放基础物品，不调用 gameOver 清理函数（避免误伤进行中的新一局）
-            try {
-                player.runCommand(`give @s lw_p1:guide_book 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`);
-                player.runCommand(`give @s lw_p1:tp_game 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`);
-            } catch (e) { }
-        }
     });
 });
 
