@@ -295,9 +295,9 @@ lw_p1.ui.mapInfo.author=地图作者
 lw_p1.ui.mapInfo.authorPh=请输入作者名称
 lw_p1.ui.mapInfo.saved=§a地图信息已保存
 lw_p1.ui.unused.title=功能预留配置
-lw_p1.ui.unused.body=若您想要增加更多任务、预设游戏数据或状态，修改底层数据，可访问以下网址查看项目源代码\nhttps://github.com/xiaopa-baka/train-werewolf-addon\n您可以访问项目仓库后查看行为包源代码，进行学习、修改、创建分支二次开发\n\n注意：\n进行二次开发后，请注明原作者和修改内容，禁止恶意篡改后传播！\n二次开发不得用于商业用途，禁止私自售卖原版或修改后的版本！\n二次开发后不得修改或删除整个“其他”板块的内容，包括开发者信息和赞助信息等\n二次开发过程中如有任何问题欢迎联系开发者\n\n§6敬请期待后续版本更新！
+lw_p1.ui.unused.body=若您想要增加更多任务、预设游戏数据或状态，修改底层数据，可访问以下网址查看项目源代码\n§bhttps://github.com/xiaopa-baka/train-werewolf-addon§r\n您可以访问项目仓库后查看行为包源代码，进行学习、修改、创建分支二次开发\n\n注意：\n进行二次开发后，请注明原作者和修改内容，禁止恶意篡改后传播！\n二次开发不得用于商业用途，禁止私自售卖原版或修改后的版本！\n二次开发后不得修改或删除整个“其他”板块的内容，包括开发者信息和赞助信息等\n二次开发过程中如有任何问题欢迎联系开发者\n\n§6敬请期待后续版本更新！
 lw_p1.ui.about.title=关于本Addon
-lw_p1.ui.about.body=§b列车狼人杀Addon\n§f版本：正式版 1.0\n§f适配：我的世界基岩版 1.21.120+\n§f开发模式：原生Script API\n\n§a开发者简介：\n工作室：LW.狮狼传奇工作室\n项目策划：狮狼传奇_小怕\nAddon作者：狮狼传奇_小怕\n工作室交流群：180568043
+lw_p1.ui.about.body=§b列车狼人杀Addon\n§f版本：正式版 1.0\n§f适配：我的世界基岩版 1.26.50+\n§f开发模式：原生Script API\n\n§a开发者简介：\n工作室：LW.狮狼传奇工作室\n项目策划：狮狼传奇_小怕\nAddon作者：狮狼传奇_小怕\n工作室交流群：180568043
 lw_p1.ui.sponsor.title=赞助 & 团队招募
 lw_p1.ui.sponsor.body=§b欢迎支持本项目开发！\n\n§f【赞助说明】\n如果您喜欢本Addon，愿意支持我们，可以通过以下方式赞助：\n• 在社交媒体上宣传此Addon\n• 为此Addon制作玩法地图并发布\n\n工作室正在积极招新中，欢迎热爱MC的你加入我们！\n§f【招募岗位】\n• 地图建筑\n• 项目策划\n• 运营及宣传\n• 指令设计、模组与插件开发\n• 贴图与建模制作\n• 皮肤设计\n\n\n工作室交流群：180568043\n§a欢迎热爱MC的小伙伴加入！\n加入我们，一起创造更精彩的MC冒险体验！
 
@@ -338,7 +338,8 @@ lw_p1.common.listSep=、
 lw_p1.msg.boarded=已登车 %s / %s 人
 lw_p1.msg.gameStart=§a游戏开始！
 lw_p1.msg.notEnoughPlayers=§c人数不足，无法开始游戏（当前 %s / 最低 %s）
-lw_p1.msg.autoStart=§e%s 秒后游戏开始
+lw_p1.msg.autoStart.title=§e%s
+lw_p1.msg.autoStart.subtitle=§f秒后游戏开始
 
 ## 结算
 lw_p1.end.winner.killer=§c游戏结束，杀手胜利！
@@ -352,10 +353,12 @@ lw_p1.end.message=§6【游戏结束】\n%s\n§f结束原因：%s\n§f杀手：%
 lw_p1.door.crowbarLocked=§c这扇门被撬开了，无法关闭
 lw_p1.door.crowbarCooldown=§c这扇门被撬棍卡住了，稍后才能打开
 
-## 身份提示（mcfunction）
-lw_p1.roleRemind.killer=欢迎登车 §c§l杀手
-lw_p1.roleRemind.officer=欢迎登车 §b§l警员
-lw_p1.roleRemind.passenger=欢迎登车 §a§l乘客
+## 身份提示（mcfunction：title 放短核心词，subtitle 放长句，避免文本溢出屏幕）
+lw_p1.roleWelcome=欢迎登车
+lw_p1.roleTitle.killer=§c§l杀手
+lw_p1.roleTitle.officer=§b§l警员
+lw_p1.roleTitle.passenger=§a§l乘客
+lw_p1.roleGoalTitle=你的目标
 lw_p1.roleGoal.killer=隐藏身份，解决所有人
 lw_p1.roleGoal.officer=保护乘客，找出杀手
 lw_p1.roleGoal.passenger=配合警员，安全下车

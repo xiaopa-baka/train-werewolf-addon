@@ -295,9 +295,9 @@ lw_p1.ui.mapInfo.author=Map author
 lw_p1.ui.mapInfo.authorPh=Enter the author name
 lw_p1.ui.mapInfo.saved=§aMap information saved
 lw_p1.ui.unused.title=Reserved Config
-lw_p1.ui.unused.body=To add more tasks, preset game data or states, or change the underlying data, see the project source code at\nhttps://github.com/xiaopa-baka/train-werewolf-addon\nYou can browse the behavior pack source to learn from it, modify it, or fork it\n\nNotes:\nIf you build on this project, credit the original author and describe your changes. Malicious tampering and redistribution are prohibited!\nSecondary development must not be used commercially. Selling the original or a modified version is prohibited!\nDo not modify or remove anything in the "Other" section, including developer and sponsor information\nIf you run into any issues, feel free to contact the developer\n\n§6Stay tuned for future updates!
+lw_p1.ui.unused.body=To add more tasks, preset game data or states, or change the underlying data, see the project source code at\n§bhttps://github.com/xiaopa-baka/train-werewolf-addon§r\nYou can browse the behavior pack source to learn from it, modify it, or fork it\n\nNotes:\nIf you build on this project, credit the original author and describe your changes. Malicious tampering and redistribution are prohibited!\nSecondary development must not be used commercially. Selling the original or a modified version is prohibited!\nDo not modify or remove anything in the "Other" section, including developer and sponsor information\nIf you run into any issues, feel free to contact the developer\n\n§6Stay tuned for future updates!
 lw_p1.ui.about.title=About this addon
-lw_p1.ui.about.body=§bTrain Werewolf Addon\n§fVersion: 1.0\n§fCompatible: Minecraft Bedrock 1.21.120+\n§fBuilt with: native Script API\n\n§aAbout the developer:\nStudio: LW Realm Studio\nDesign: Xiaopa baka\nAddon author: Xiaopa baka\nStudio group(QQ): 180568043
+lw_p1.ui.about.body=§bTrain Werewolf Addon\n§fVersion: 1.0\n§fCompatible: Minecraft Bedrock 1.26.50+\n§fBuilt with: native Script API\n\n§aAbout the developer:\nStudio: LW Realm Studio\nDesign: Xiaopa baka\nAddon author: Xiaopa baka\nStudio group(QQ): 180568043
 lw_p1.ui.sponsor.title=Sponsorship & Recruitment
 lw_p1.ui.sponsor.body=§bThanks for supporting this project!\n\n§f[How to support]\nIf you enjoy this addon and would like to support us:\n• Share this addon on social media\n• Build and publish a gameplay map for it\n\nOur studio is actively recruiting — if you love MC, join us!\n§f[Open roles]\n• Map building\n• Project design\n• Operations & promotion\n• Command design, mod and plugin development\n• Textures and modeling\n• Skin design\n\n\nStudio group: 180568043\n§aEvery MC fan is welcome!\nJoin us and create even better MC adventures together!
 
@@ -338,7 +338,8 @@ lw_p1.common.listSep=,
 lw_p1.msg.boarded=Boarded %s / %s
 lw_p1.msg.gameStart=§aGame start!
 lw_p1.msg.notEnoughPlayers=§cNot enough players to start (current %s / minimum %s)
-lw_p1.msg.autoStart=§eGame starts in %s seconds
+lw_p1.msg.autoStart.title=§e%s
+lw_p1.msg.autoStart.subtitle=§funtil the game starts
 
 ## Results
 lw_p1.end.winner.killer=§cGame over — the Killer wins!
@@ -352,10 +353,12 @@ lw_p1.end.message=§6[Game Over]\n%s\n§fReason: %s\n§fKiller: %s\n§fOfficer: 
 lw_p1.door.crowbarLocked=§cThis door was pried open and can no longer be closed
 lw_p1.door.crowbarCooldown=§cThis door is jammed by a crowbar, try again later
 
-## Role titles (mcfunction)
-lw_p1.roleRemind.killer=Welcome aboard, §c§lKiller
-lw_p1.roleRemind.officer=Welcome aboard, §b§lOfficer
-lw_p1.roleRemind.passenger=Welcome aboard, §a§lPassenger
+## Role titles (mcfunction: short core in title, long line in subtitle, so English does not overflow)
+lw_p1.roleWelcome=Welcome aboard
+lw_p1.roleTitle.killer=§c§lKiller
+lw_p1.roleTitle.officer=§b§lOfficer
+lw_p1.roleTitle.passenger=§a§lPassenger
+lw_p1.roleGoalTitle=Your goal
 lw_p1.roleGoal.killer=Stay hidden and eliminate everyone
 lw_p1.roleGoal.officer=Protect the passengers and find the Killer
 lw_p1.roleGoal.passenger=Work with the Officer and get off safely

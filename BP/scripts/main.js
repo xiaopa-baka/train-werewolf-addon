@@ -264,14 +264,16 @@ function clearCountdown() {
     clearTitle();
 }
 
-function showTitle(text) {
+// subtitle 用于承载长文案：title 是特大号字且不会换行，长句必须放 subtitle 才不会溢出屏幕
+function showTitle(text, subtitle) {
     const allPlayers = mc.world.getPlayers();
     for (const player of allPlayers) {
         if (!player.isValid) continue;
         player.onScreenDisplay.setTitle(text, {
             fadeInDuration: 5,
             stayDuration: 30,
-            fadeOutDuration: 10
+            fadeOutDuration: 10,
+            subtitle: subtitle
         });
     }
 }
@@ -438,13 +440,13 @@ mc.system.runInterval(() => {
 
         if (gameStartTimer === null) {
             gameStartTimer = timeObj.getScore("lw_p1:全局") ?? 10;
-            showTitle(t("lw_p1.msg.autoStart", gameStartTimer));
+            showTitle(t("lw_p1.msg.autoStart.title", gameStartTimer), t("lw_p1.msg.autoStart.subtitle"));
         }
 
         if (mc.system.currentTick % 20 === 0) {
             if (gameStartTimer > 0) {
                 gameStartTimer--;
-                showTitle(t("lw_p1.msg.autoStart", gameStartTimer));
+                showTitle(t("lw_p1.msg.autoStart.title", gameStartTimer), t("lw_p1.msg.autoStart.subtitle"));
             } else if (gameStartTimer === 0) {
                 gameStartTimer = -1;
                 startGameNow(allPlayers);

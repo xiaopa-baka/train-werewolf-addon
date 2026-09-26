@@ -2,6 +2,7 @@
 
 gamerule commandblockoutput false
 gamerule sendcommandfeedback false
+gamerule showtags false
 
 ## 游戏自动开始时间（秒）
 ## 默认为 10 秒，即当玩家进入游戏后 10 秒后自动开始游戏
