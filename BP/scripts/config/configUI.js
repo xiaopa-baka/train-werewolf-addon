@@ -674,6 +674,8 @@ const ITEM_ICON_MAP = {
     enchanted_golden_apple: "apple_golden",
     golden_carrot: "carrot_golden",
     melon_slice: "melon",
+    // 刷怪蛋没有自己的物品贴图（外观由客户端实体定义的 spawn_egg 配色生成），复用其对应实体的图标
+    firecracker_spawn_egg: "firecracker",
 };
 
 export function itemIdToIconPath(itemId) {
