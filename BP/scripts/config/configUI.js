@@ -4,6 +4,7 @@
 import * as mc from "@minecraft/server";
 import {ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
 import { getWorldConfig, saveWorldConfig, getEmptyConfig } from "./worldConfig.js";
+import { t, tBlock, tConfigName } from "../i18n/i18n.js";
 
 
 // 将玩家位置转换为方块坐标，并提供一个函数将方块坐标转换为方块中心坐标，方便UI输入输出
@@ -51,14 +52,14 @@ function showMainForm(player) {
     if (!player.isValid) return;
 
     const mainForm = new ActionFormData()
-        .title("主配置面板")
-        .body("请选择配置分类")
-        .button("全局游戏配置")
-        .button("地图区域配置")
-        .button("食物&饮品配置")
-        .button("商店配置")
-        .button("其他")
-        .button("§c关闭");
+        .title(t("lw_p1.ui.main.title"))
+        .body(t("lw_p1.ui.main.body"))
+        .button(t("lw_p1.ui.main.game"))
+        .button(t("lw_p1.ui.main.map"))
+        .button(t("lw_p1.ui.main.food"))
+        .button(t("lw_p1.ui.main.shop"))
+        .button(t("lw_p1.ui.main.other"))
+        .button(t("lw_p1.ui.close"));
 
     mainForm.show(player).then(res => {
         if (!player.isValid || res.canceled) return;
@@ -78,12 +79,12 @@ function showGameSettingForm(player) {
     if (!player.isValid) return;
 
     const gameForm = new ActionFormData()
-        .title("全局游戏配置")
-        .body("调整游戏全局数值参数")
-        .button("游戏相关配置")
-        .button("任务相关配置")
-        .button("§6恢复默认配置")
-        .button("§c返回");
+        .title(t("lw_p1.ui.game.title"))
+        .body(t("lw_p1.ui.game.body"))
+        .button(t("lw_p1.ui.game.settings"))
+        .button(t("lw_p1.ui.game.task"))
+        .button(t("lw_p1.ui.resetDefault"))
+        .button(t("lw_p1.ui.back"));
 
     gameForm.show(player).then(res => {
         if (!player.isValid) return;
@@ -106,14 +107,14 @@ function showGameConfigModal(player) {
     const val2 = getSco("lw_p1:最低开局人数", 5);
     const val3 = getSco("lw_p1:单局游戏基础时长", 600);
     new ModalFormData()
-        .title("游戏相关配置")
-        .header("自动开始时间")
-        .slider("当所有玩家都位于列车时，游戏自动开始倒计时。\n也可通过以下指令手动开始游戏\n/function lw_p1:gameStart\n默认 10\n自动开始时间（秒）", 0, 60, { valueStep: 5, defaultValue: val1 })
-        .toggle("启用自动开始游戏", { defaultValue: val0 !== 0 })
-        .header("\n最低开局人数")
-        .slider("当列车内玩家数量达到此值时，游戏可以开始。\n默认 5\n最低开局人数（个）", 5, 15, { valueStep: 1, defaultValue: val2 })
-        .header("\n游戏基础时长")
-        .slider("单局游戏的基础时长，每死亡一位平民时长加60秒。\n默认 600\n游戏时长（秒）", 300, 1200, { valueStep: 20, defaultValue: val3 })
+        .title(t("lw_p1.ui.game.settingsTitle"))
+        .header(t("lw_p1.ui.game.autoHeader"))
+        .slider(t("lw_p1.ui.game.autoDesc"), 0, 60, { valueStep: 5, defaultValue: val1 })
+        .toggle(t("lw_p1.ui.game.autoToggle"), { defaultValue: val0 !== 0 })
+        .header(t("lw_p1.ui.game.minHeader"))
+        .slider(t("lw_p1.ui.game.minDesc"), 5, 15, { valueStep: 1, defaultValue: val2 })
+        .header(t("lw_p1.ui.game.baseHeader"))
+        .slider(t("lw_p1.ui.game.baseDesc"), 300, 1200, { valueStep: 20, defaultValue: val3 })
         .show(player).then(res => {
             if (res.canceled) { showGameSettingForm(player); return; }
             try {
@@ -122,9 +123,9 @@ function showGameConfigModal(player) {
                 mc.world.scoreboard.getObjective("lw_p1:是否自动开始").setScore("lw_p1:全局", vals[1] ? 1 : 0);
                 mc.world.scoreboard.getObjective("lw_p1:最低开局人数").setScore("lw_p1:全局", Number(vals[2]));
                 mc.world.scoreboard.getObjective("lw_p1:单局游戏基础时长").setScore("lw_p1:全局", Number(vals[3]));
-                player.sendMessage("§a游戏配置已保存");
+                player.sendMessage(t("lw_p1.ui.game.saved"));
             } catch (e) {
-                player.sendMessage("§c保存失败: " + e);
+                player.sendMessage(t("lw_p1.ui.saveFail", String(e)));
             }
             showGameSettingForm(player);
         }).catch(() => { });
@@ -140,17 +141,17 @@ function showTaskConfigModal(player) {
     const val4 = getSco("lw_p1:杀手虚假任务限时", 50);
     const val5 = getSco("lw_p1:任务完成奖励", 25);
     new ModalFormData()
-        .title("任务相关配置")
-        .header("任务分配概率")
-        .slider("每秒给未分配任务玩家发布任务的概率。\n默认 3\n分配概率（百分比）", 0, 20, { valueStep: 1, defaultValue: val1 })
-        .header("\n任务开始发布时间")
-        .slider("游戏开始后，首次尝试发布任务的时间。\n默认 20\n首个任务发布时间（秒）", 0, 60, { valueStep: 10, defaultValue: val2 })
-        .header("\n单个任务限时")
-        .slider("单个任务必须在该时间内完成，超时视为任务失败。\n默认 100\n单个任务限时（秒）", 60, 180, { valueStep: 10, defaultValue: val3 })
-        .header("\n杀手虚假任务限时")
-        .slider("杀手虚假任务可选择完成的限时，超过该时间未完成则虚假任务结束。\n默认 50\n虚假任务限时（秒）", 20, 60, { valueStep: 10, defaultValue: val4 })
-        .header("\n任务完成奖励")
-        .slider("平民/警员每完成一个任务获得的金币数。\n默认 25\n任务完成奖励（金币）", 10, 50, { valueStep: 5, defaultValue: val5 })
+        .title(t("lw_p1.ui.task.title"))
+        .header(t("lw_p1.ui.task.probHeader"))
+        .slider(t("lw_p1.ui.task.probDesc"), 0, 20, { valueStep: 1, defaultValue: val1 })
+        .header(t("lw_p1.ui.task.startHeader"))
+        .slider(t("lw_p1.ui.task.startDesc"), 0, 60, { valueStep: 10, defaultValue: val2 })
+        .header(t("lw_p1.ui.task.limitHeader"))
+        .slider(t("lw_p1.ui.task.limitDesc"), 60, 180, { valueStep: 10, defaultValue: val3 })
+        .header(t("lw_p1.ui.task.fakeHeader"))
+        .slider(t("lw_p1.ui.task.fakeDesc"), 20, 60, { valueStep: 10, defaultValue: val4 })
+        .header(t("lw_p1.ui.task.rewardHeader"))
+        .slider(t("lw_p1.ui.task.rewardDesc"), 10, 50, { valueStep: 5, defaultValue: val5 })
         .show(player).then(res => {
             if (res.canceled) { showGameSettingForm(player); return; }
             try {
@@ -160,9 +161,9 @@ function showTaskConfigModal(player) {
                 mc.world.scoreboard.getObjective("lw_p1:单个任务限时").setScore("lw_p1:全局", Number(vals[2]));
                 mc.world.scoreboard.getObjective("lw_p1:杀手虚假任务限时").setScore("lw_p1:全局", Number(vals[3]));
                 mc.world.scoreboard.getObjective("lw_p1:任务完成奖励").setScore("lw_p1:全局", Number(vals[4]));
-                player.sendMessage("§a任务配置已保存");
+                player.sendMessage(t("lw_p1.ui.task.saved"));
             } catch (e) {
-                player.sendMessage("§c保存失败: " + e);
+                player.sendMessage(t("lw_p1.ui.saveFail", String(e)));
             }
             showGameSettingForm(player);
         }).catch(() => { });
@@ -174,10 +175,10 @@ function resetAllScoresToDefault(player) {
     if (!player.isValid) return;
 
     new MessageFormData()
-        .title("恢复默认配置")
-        .body("§c确定要将所有游戏配置恢复为默认值吗？\n此操作会覆盖当前所有设置！")
-        .button1("取消")
-        .button2("§c确认恢复")
+        .title(t("lw_p1.ui.reset.title"))
+        .body(t("lw_p1.ui.reset.body"))
+        .button1(t("lw_p1.ui.cancel"))
+        .button2(t("lw_p1.ui.confirmReset"))
         .show(player).then(res => {
             if (res.selection === 1) {
                 const fakePlayer = "lw_p1:全局";
@@ -204,7 +205,7 @@ function resetAllScoresToDefault(player) {
                     } catch (e) { }
                 }
 
-                player.sendMessage("§a已成功恢复所有任务/游戏配置为默认值！");
+                player.sendMessage(t("lw_p1.ui.reset.done"));
             }
 
             showGameSettingForm(player);
@@ -217,17 +218,17 @@ function showMapSettingForm(player) {
     if (!player.isValid) return;
 
     const mapForm = new ActionFormData()
-        .title("地图区域配置")
-        .body("坐标管理")
-        .button("站台&车头坐标")
-        .button("列车区域坐标")
-        .button("车头透气区坐标")
-        .button("车尾透气区坐标")
-        .button("蹲坑坐标管理")
-        .button("随机传送坐标管理")
-        .button("房间数配置")
-        .button("§6清空所有地图坐标")
-        .button("§c返回");
+        .title(t("lw_p1.ui.map.title"))
+        .body(t("lw_p1.ui.map.body"))
+        .button(t("lw_p1.ui.map.stationEngine"))
+        .button(t("lw_p1.ui.map.trainArea"))
+        .button(t("lw_p1.ui.map.engineVent"))
+        .button(t("lw_p1.ui.map.tailVent"))
+        .button(t("lw_p1.ui.map.toilet"))
+        .button(t("lw_p1.ui.map.randomTp"))
+        .button(t("lw_p1.ui.map.roomCount"))
+        .button(t("lw_p1.ui.map.clearAll"))
+        .button(t("lw_p1.ui.back"));
 
     mapForm.show(player).then(res => {
         if (!player.isValid) return;
@@ -274,15 +275,15 @@ function showStationEngineCoordModal(player) {
     }
 
     new ModalFormData()
-        .title("站台&车头坐标配置")
-        .header("站台坐标")
-        .textField("每局结束后玩家传送至该坐标（开始屋）\n\n站台X坐标", "", { defaultValue: String(station.x) })
-        .textField("站台Y坐标", "", { defaultValue: String(station.y) })
-        .textField("站台Z坐标", "", { defaultValue: String(station.z) })
-        .header("\n车头坐标")
-        .textField("使用“传送至车头”物品后传送的坐标\n\n车头X坐标", "", { defaultValue: String(engine.x) })
-        .textField("车头Y坐标", "", { defaultValue: String(engine.y) })
-        .textField("车头Z坐标", "", { defaultValue: String(engine.z) })
+        .title(t("lw_p1.ui.stationEngine.title"))
+        .header(t("lw_p1.ui.stationEngine.stationHeader"))
+        .textField(t("lw_p1.ui.stationEngine.stationX"), "", { defaultValue: String(station.x) })
+        .textField(t("lw_p1.ui.stationEngine.stationY"), "", { defaultValue: String(station.y) })
+        .textField(t("lw_p1.ui.stationEngine.stationZ"), "", { defaultValue: String(station.z) })
+        .header(t("lw_p1.ui.stationEngine.engineHeader"))
+        .textField(t("lw_p1.ui.stationEngine.engineX"), "", { defaultValue: String(engine.x) })
+        .textField(t("lw_p1.ui.stationEngine.engineY"), "", { defaultValue: String(engine.y) })
+        .textField(t("lw_p1.ui.stationEngine.engineZ"), "", { defaultValue: String(engine.z) })
         .show(player).then(res => {
             if (!player.isValid) return;
             if (res.canceled) { showMapSettingForm(player); return; }
@@ -295,14 +296,14 @@ function showStationEngineCoordModal(player) {
             const ez = parseInt(String(vals[5]));
             if (!Number.isFinite(sx) || !Number.isFinite(sy) || !Number.isFinite(sz)
                 || !Number.isFinite(ex) || !Number.isFinite(ey) || !Number.isFinite(ez)) {
-                player.sendMessage("§c坐标输入不合法，保存失败");
+                player.sendMessage(t("lw_p1.ui.coordInvalid"));
                 showMapSettingForm(player);
                 return;
             }
             cfg.trainStationCoordinates = intPosToCenter(sx, sy, sz);
             cfg.trainEngineCoordinates = intPosToCenter(ex, ey, ez);
             saveWorldConfig(cfg);
-            player.sendMessage("§a站台&车头坐标已保存");
+            player.sendMessage(t("lw_p1.ui.stationEngine.saved"));
             showMapSettingForm(player);
         }).catch(() => { });
 }
@@ -323,15 +324,15 @@ function showTrainAreaCoordModal(player) {
         : { x: playerPos.x, y: playerPos.y, z: playerPos.z };
 
     new ModalFormData()
-        .title("列车区域坐标配置")
-        .header("列车区域 起点")
-        .textField("对角线起点坐标\n\n起点X坐标", "", { defaultValue: String(start.x) })
-        .textField("起点Y坐标", "", { defaultValue: String(start.y) })
-        .textField("起点Z坐标", "", { defaultValue: String(start.z) })
-        .header("\n列车区域 终点")
-        .textField("对角线终点坐标\n\n终点X坐标", "", { defaultValue: String(end.x) })
-        .textField("终点Y坐标", "", { defaultValue: String(end.y) })
-        .textField("终点Z坐标", "", { defaultValue: String(end.z) })
+        .title(t("lw_p1.ui.trainArea.title"))
+        .header(t("lw_p1.ui.trainArea.startHeader"))
+        .textField(t("lw_p1.ui.coord.diagStartX"), "", { defaultValue: String(start.x) })
+        .textField(t("lw_p1.ui.coord.startY"), "", { defaultValue: String(start.y) })
+        .textField(t("lw_p1.ui.coord.startZ"), "", { defaultValue: String(start.z) })
+        .header(t("lw_p1.ui.trainArea.endHeader"))
+        .textField(t("lw_p1.ui.coord.diagEndX"), "", { defaultValue: String(end.x) })
+        .textField(t("lw_p1.ui.coord.endY"), "", { defaultValue: String(end.y) })
+        .textField(t("lw_p1.ui.coord.endZ"), "", { defaultValue: String(end.z) })
         .show(player).then(res => {
             if (!player.isValid) return;
             if (res.canceled) { showMapSettingForm(player); return; }
@@ -344,7 +345,7 @@ function showTrainAreaCoordModal(player) {
             const ez = parseInt(String(vals[5]));
             if (!Number.isFinite(sx) || !Number.isFinite(sy) || !Number.isFinite(sz)
                 || !Number.isFinite(ex) || !Number.isFinite(ey) || !Number.isFinite(ez)) {
-                player.sendMessage("§c坐标输入不合法，保存失败");
+                player.sendMessage(t("lw_p1.ui.coordInvalid"));
                 showMapSettingForm(player);
                 return;
             }
@@ -352,7 +353,7 @@ function showTrainAreaCoordModal(player) {
             cfg.trainCoordinates.start = { x: sx, y: sy, z: sz };
             cfg.trainCoordinates.end = { x: ex, y: ey, z: ez };
             saveWorldConfig(Object.assign({}, cfg));
-            player.sendMessage("§a列车区域坐标已保存");
+            player.sendMessage(t("lw_p1.ui.trainArea.saved"));
             showMapSettingForm(player);
         }).catch(() => { });
 }
@@ -375,15 +376,15 @@ function showEngineVentCoordModal(player) {
         : { x: playerPos.x, y: playerPos.y, z: playerPos.z };
 
     new ModalFormData()
-        .title("车头透气区坐标配置")
-        .header("车头透气区 起点")
-        .textField("对角线起点坐标\n\n起点X坐标", "", { defaultValue: String(start.x) })
-        .textField("起点Y坐标", "", { defaultValue: String(start.y) })
-        .textField("起点Z坐标", "", { defaultValue: String(start.z) })
-        .header("\n车头透气区 终点")
-        .textField("对角线终点坐标\n\n终点X坐标", "", { defaultValue: String(end.x) })
-        .textField("终点Y坐标", "", { defaultValue: String(end.y) })
-        .textField("终点Z坐标", "", { defaultValue: String(end.z) })
+        .title(t("lw_p1.ui.engineVent.title"))
+        .header(t("lw_p1.ui.engineVent.startHeader"))
+        .textField(t("lw_p1.ui.coord.diagStartX"), "", { defaultValue: String(start.x) })
+        .textField(t("lw_p1.ui.coord.startY"), "", { defaultValue: String(start.y) })
+        .textField(t("lw_p1.ui.coord.startZ"), "", { defaultValue: String(start.z) })
+        .header(t("lw_p1.ui.engineVent.endHeader"))
+        .textField(t("lw_p1.ui.coord.diagEndX"), "", { defaultValue: String(end.x) })
+        .textField(t("lw_p1.ui.coord.endY"), "", { defaultValue: String(end.y) })
+        .textField(t("lw_p1.ui.coord.endZ"), "", { defaultValue: String(end.z) })
         .show(player).then(res => {
             if (!player.isValid) return;
             if (res.canceled) { showMapSettingForm(player); return; }
@@ -396,14 +397,14 @@ function showEngineVentCoordModal(player) {
             const ez = parseInt(String(vals[5]));
             if (!Number.isFinite(sx) || !Number.isFinite(sy) || !Number.isFinite(sz)
                 || !Number.isFinite(ex) || !Number.isFinite(ey) || !Number.isFinite(ez)) {
-                player.sendMessage("§c坐标输入不合法，保存失败");
+                player.sendMessage(t("lw_p1.ui.coordInvalid"));
                 showMapSettingForm(player);
                 return;
             }
             cfg.ventilationAreas.trainEngine.start = { x: sx, y: sy, z: sz };
             cfg.ventilationAreas.trainEngine.end = { x: ex, y: ey, z: ez };
             saveWorldConfig(Object.assign({}, cfg));
-            player.sendMessage("§a车头透气区坐标已保存");
+            player.sendMessage(t("lw_p1.ui.engineVent.saved"));
             showMapSettingForm(player);
         }).catch(() => { });
 }
@@ -426,15 +427,15 @@ function showTailVentCoordModal(player) {
         : { x: playerPos.x, y: playerPos.y, z: playerPos.z };
 
     new ModalFormData()
-        .title("车尾透气区坐标配置")
-        .header("车尾透气区 起点")
-        .textField("对角线起点坐标\n\n起点X坐标", "", { defaultValue: String(start.x) })
-        .textField("起点Y坐标", "", { defaultValue: String(start.y) })
-        .textField("起点Z坐标", "", { defaultValue: String(start.z) })
-        .header("\n车尾透气区 终点")
-        .textField("对角线终点坐标\n\n终点X坐标", "", { defaultValue: String(end.x) })
-        .textField("终点Y坐标", "", { defaultValue: String(end.y) })
-        .textField("终点Z坐标", "", { defaultValue: String(end.z) })
+        .title(t("lw_p1.ui.tailVent.title"))
+        .header(t("lw_p1.ui.tailVent.startHeader"))
+        .textField(t("lw_p1.ui.coord.diagStartX"), "", { defaultValue: String(start.x) })
+        .textField(t("lw_p1.ui.coord.startY"), "", { defaultValue: String(start.y) })
+        .textField(t("lw_p1.ui.coord.startZ"), "", { defaultValue: String(start.z) })
+        .header(t("lw_p1.ui.tailVent.endHeader"))
+        .textField(t("lw_p1.ui.coord.diagEndX"), "", { defaultValue: String(end.x) })
+        .textField(t("lw_p1.ui.coord.endY"), "", { defaultValue: String(end.y) })
+        .textField(t("lw_p1.ui.coord.endZ"), "", { defaultValue: String(end.z) })
         .show(player).then(res => {
             if (!player.isValid) return;
             if (res.canceled) { showMapSettingForm(player); return; }
@@ -447,14 +448,14 @@ function showTailVentCoordModal(player) {
             const ez = parseInt(String(vals[5]));
             if (!Number.isFinite(sx) || !Number.isFinite(sy) || !Number.isFinite(sz)
                 || !Number.isFinite(ex) || !Number.isFinite(ey) || !Number.isFinite(ez)) {
-                player.sendMessage("§c坐标输入不合法，保存失败");
+                player.sendMessage(t("lw_p1.ui.coordInvalid"));
                 showMapSettingForm(player);
                 return;
             }
             cfg.ventilationAreas.trainTail.start = { x: sx, y: sy, z: sz };
             cfg.ventilationAreas.trainTail.end = { x: ex, y: ey, z: ez };
             saveWorldConfig(Object.assign({}, cfg));
-            player.sendMessage("§a车尾透气区坐标已保存");
+            player.sendMessage(t("lw_p1.ui.tailVent.saved"));
             showMapSettingForm(player);
         }).catch(() => { });
 }
@@ -465,24 +466,24 @@ function showToiletList(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
     const form = new ActionFormData()
-        .title("蹲坑坐标管理")
-        .body("玩家在以下坐标位置潜行一段时间可完成蹲坑任务。\n至少设置一个坐标")
-        .button("添加当前位置");
+        .title(t("lw_p1.ui.toilet.title"))
+        .body(t("lw_p1.ui.toilet.body"))
+        .button(t("lw_p1.ui.addCurrent"));
 
     cfg.toiletCoordinates.forEach((pos) => {
         const label = pos && pos.x !== undefined
             ? `${Math.floor(pos.x)} ${Math.floor(pos.y)} ${Math.floor(pos.z)}`
-            : "未设置";
+            : t("lw_p1.ui.unset");
         form.button(label);
     });
 
-    form.button("§c返回").show(player).then(res => {
+    form.button(t("lw_p1.ui.back")).show(player).then(res => {
         if (!player.isValid || res.canceled) { showMapSettingForm(player); return; }
         if (res.selection === 0) {
             const intPos = getPlayerBlockIntPos(player);
             cfg.toiletCoordinates.push(intPosToCenter(intPos.x, intPos.y, intPos.z));
             saveWorldConfig(cfg);
-            player.sendMessage("§a蹲坑坐标已添加");
+            player.sendMessage(t("lw_p1.ui.toilet.added"));
             showToiletList(player);
             return;
         }
@@ -506,11 +507,11 @@ function editToiletCoordinate(player, index) {
     if (!item) { showToiletList(player); return; }
 
     new ModalFormData()
-        .title(`编辑 蹲坑坐标 ${index + 1}`)
-        .textField("X坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.x)) })
-        .textField("Y坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.y)) })
-        .textField("Z坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.z)) })
-        .toggle("§c删除此项", { defaultValue: false })
+        .title(t("lw_p1.ui.toilet.edit", index + 1))
+        .textField(t("lw_p1.ui.coordX"), t("lw_p1.ui.inputInt"), { defaultValue: String(Math.floor(item.x)) })
+        .textField(t("lw_p1.ui.coordY"), t("lw_p1.ui.inputInt"), { defaultValue: String(Math.floor(item.y)) })
+        .textField(t("lw_p1.ui.coordZ"), t("lw_p1.ui.inputInt"), { defaultValue: String(Math.floor(item.z)) })
+        .toggle(t("lw_p1.ui.deleteItem"), { defaultValue: false })
         .show(player).then(res => {
             if (!player.isValid) { showToiletList(player); return; }
             if (res.canceled) { showToiletList(player); return; }
@@ -518,7 +519,7 @@ function editToiletCoordinate(player, index) {
             if (vals[3] === true) {
                 cfg.toiletCoordinates.splice(index, 1);
                 saveWorldConfig(cfg);
-                player.sendMessage("§c已删除蹲坑坐标");
+                player.sendMessage(t("lw_p1.ui.toilet.deleted"));
                 showToiletList(player);
                 return;
             }
@@ -526,13 +527,13 @@ function editToiletCoordinate(player, index) {
             const y = parseInt(String(vals[1]));
             const z = parseInt(String(vals[2]));
             if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {
-                player.sendMessage("§c坐标输入不合法，保存失败");
+                player.sendMessage(t("lw_p1.ui.coordInvalid"));
                 showToiletList(player);
                 return;
             }
             cfg.toiletCoordinates[index] = intPosToCenter(x, y, z);
             saveWorldConfig(cfg);
-            player.sendMessage("§a蹲坑坐标已更新");
+            player.sendMessage(t("lw_p1.ui.toilet.updated"));
             showToiletList(player);
         });
 }
@@ -543,24 +544,24 @@ function showRandomList(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
     const form = new ActionFormData()
-        .title("随机传送坐标管理")
-        .body("开局后玩家将随机传送到以下坐标。\n至少设置数目为最大玩家数的坐标数。")
-        .button("添加当前位置");
+        .title(t("lw_p1.ui.random.title"))
+        .body(t("lw_p1.ui.random.body"))
+        .button(t("lw_p1.ui.addCurrent"));
 
     cfg.randomCoordinates.forEach((pos) => {
         const label = pos && pos.x !== undefined
             ? `${Math.floor(pos.x)} ${Math.floor(pos.y)} ${Math.floor(pos.z)}`
-            : "未设置";
+            : t("lw_p1.ui.unset");
         form.button(label);
     });
 
-    form.button("§c返回").show(player).then(res => {
+    form.button(t("lw_p1.ui.back")).show(player).then(res => {
         if (!player.isValid || res.canceled) { showMapSettingForm(player); return; }
         if (res.selection === 0) {
             const intPos = getPlayerBlockIntPos(player);
             cfg.randomCoordinates.push(intPosToCenter(intPos.x, intPos.y, intPos.z));
             saveWorldConfig(cfg);
-            player.sendMessage("§a随机坐标已添加");
+            player.sendMessage(t("lw_p1.ui.random.added"));
             showRandomList(player);
             return;
         }
@@ -584,11 +585,11 @@ function editRandomCoordinate(player, index) {
     if (!item) { showRandomList(player); return; }
 
     new ModalFormData()
-        .title(`编辑 随机传送坐标 ${index + 1}`)
-        .textField("X坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.x)) })
-        .textField("Y坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.y)) })
-        .textField("Z坐标", "输入整型坐标", { defaultValue: String(Math.floor(item.z)) })
-        .toggle("§c删除此项", { defaultValue: false })
+        .title(t("lw_p1.ui.random.edit", index + 1))
+        .textField(t("lw_p1.ui.coordX"), t("lw_p1.ui.inputInt"), { defaultValue: String(Math.floor(item.x)) })
+        .textField(t("lw_p1.ui.coordY"), t("lw_p1.ui.inputInt"), { defaultValue: String(Math.floor(item.y)) })
+        .textField(t("lw_p1.ui.coordZ"), t("lw_p1.ui.inputInt"), { defaultValue: String(Math.floor(item.z)) })
+        .toggle(t("lw_p1.ui.deleteItem"), { defaultValue: false })
         .show(player).then(res => {
             if (!player.isValid) { showRandomList(player); return; }
             if (res.canceled) { showRandomList(player); return; }
@@ -596,7 +597,7 @@ function editRandomCoordinate(player, index) {
             if (vals[3] === true) {
                 cfg.randomCoordinates.splice(index, 1);
                 saveWorldConfig(cfg);
-                player.sendMessage("§c已删除随机传送坐标");
+                player.sendMessage(t("lw_p1.ui.random.deleted"));
                 showRandomList(player);
                 return;
             }
@@ -604,13 +605,13 @@ function editRandomCoordinate(player, index) {
             const y = parseInt(String(vals[1]));
             const z = parseInt(String(vals[2]));
             if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {
-                player.sendMessage("§c坐标输入不合法，保存失败");
+                player.sendMessage(t("lw_p1.ui.coordInvalid"));
                 showRandomList(player);
                 return;
             }
             cfg.randomCoordinates[index] = intPosToCenter(x, y, z);
             saveWorldConfig(cfg);
-            player.sendMessage("§a随机传送坐标已更新");
+            player.sendMessage(t("lw_p1.ui.random.updated"));
             showRandomList(player);
         });
 }
@@ -621,16 +622,16 @@ function showRoomCountModal(player) {
     if (!player.isValid) return;
     const current = getSco("lw_p1:房间数", 8);
     new ModalFormData()
-        .title("房间数配置")
-        .header("房间数量")
-        .slider("游戏开始时，钥匙数量（1-N），若玩家数超过房间数则循环分配。\n默认 8\n房间数量", 1, 8, { valueStep: 1, defaultValue: current })
+        .title(t("lw_p1.ui.room.title"))
+        .header(t("lw_p1.ui.room.header"))
+        .slider(t("lw_p1.ui.room.desc"), 1, 8, { valueStep: 1, defaultValue: current })
         .show(player).then(res => {
             if (res.canceled) { showMapSettingForm(player); return; }
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             const n = Number(vals[0]);
             if (Number.isFinite(n) && n >= 1 && n <= 8) {
                 mc.world.scoreboard.getObjective("lw_p1:房间数")?.setScore("lw_p1:全局", n);
-                player.sendMessage(`§a房间数已设为 ${n}`);
+                player.sendMessage(t("lw_p1.ui.room.set", n));
             }
             showMapSettingForm(player);
         });
@@ -641,14 +642,14 @@ function showRoomCountModal(player) {
 function confirmClearAllCoord(player) {
     if (!player.isValid) return;
     new MessageFormData()
-        .title("确认清空")
-        .body("§c确定清空所有地图坐标？不可恢复！")
-        .button1("取消")
-        .button2("§c确认清空")
+        .title(t("lw_p1.ui.clear.title"))
+        .body(t("lw_p1.ui.clear.body"))
+        .button1(t("lw_p1.ui.cancel"))
+        .button2(t("lw_p1.ui.confirmClear"))
         .show(player).then(res => {
             if (res.selection === 1) {
                 saveWorldConfig(getEmptyConfig());
-                player.sendMessage("§c所有地图坐标已清空");
+                player.sendMessage(t("lw_p1.ui.clear.done"));
             }
             showMapSettingForm(player);
         });
@@ -690,13 +691,13 @@ export function itemIdToIconPath(itemId) {
 function showFoodDrinkForm(player) {
     if (!player.isValid) return;
     const form = new ActionFormData();
-        form.title("物品配置管理");
-        form.body("管理进食/补水任务的合法物品列表");
-        form.button("配置合法食物");
-        form.button("配置合法饮品");
-        form.button("食物托盘配置");
-        form.button("§6恢复默认配置");
-        form.button("§c返回");
+        form.title(t("lw_p1.ui.food.title"));
+        form.body(t("lw_p1.ui.food.body"));
+        form.button(t("lw_p1.ui.food.foods"));
+        form.button(t("lw_p1.ui.food.drinks"));
+        form.button(t("lw_p1.ui.food.trays"));
+        form.button(t("lw_p1.ui.resetDefault"));
+        form.button(t("lw_p1.ui.back"));
 
     form.show(player).then(res => {
         if (!player.isValid) return;
@@ -716,10 +717,10 @@ function showFoodDrinkForm(player) {
 function confirmResetFoodDrink(player) {
     if (!player.isValid) return;
     new MessageFormData()
-        .title("恢复默认")
-        .body("§c确定恢复合法食物、饮品和食物托盘的默认列表吗？当前的自定义项将被覆盖！")
-        .button1("取消")
-        .button2("§c确认恢复")
+        .title(t("lw_p1.ui.resetTitle"))
+        .body(t("lw_p1.ui.resetFood.body"))
+        .button1(t("lw_p1.ui.cancel"))
+        .button2(t("lw_p1.ui.confirmReset"))
         .show(player).then(res => {
             if (!player.isValid) return;
             if (res.selection === 1) {
@@ -732,7 +733,7 @@ function confirmResetFoodDrink(player) {
                     config.foodTrayItems[id] = [...defaults.foodTrayItems[id]];
                 }
                 saveWorldConfig(config);
-                player.sendMessage("§a已恢复合法食物/饮品/食物托盘的默认配置");
+                player.sendMessage(t("lw_p1.ui.resetFood.done"));
             }
             showFoodDrinkForm(player);
         });
@@ -743,15 +744,15 @@ function confirmResetFoodDrink(player) {
 function showFoodListForm(player) {
     const config = getWorldConfig();
     const form = new ActionFormData();
-    form.title("合法食物管理");
-    form.body("管理进食任务的合法物品列表");
+    form.title(t("lw_p1.ui.foodList.title"));
+    form.body(t("lw_p1.ui.foodList.body"));
 
     config.allowedFoods.forEach(itemId => {
         const icon = itemIdToIconPath(itemId);
         form.button(itemId, icon);
     });
-    form.button("新增食物");
-    form.button("§c返回");
+    form.button(t("lw_p1.ui.foodList.add"));
+    form.button(t("lw_p1.ui.back"));
 
     form.show(player).then(res => {
         if (res.canceled) return showFoodDrinkForm(player);
@@ -772,15 +773,15 @@ function showFoodListForm(player) {
 function showDrinkListForm(player) {
     const config = getWorldConfig();
     const form = new ActionFormData();
-    form.title("合法饮品管理");
-    form.body("管理补水任务的合法物品列表");
+    form.title(t("lw_p1.ui.drinkList.title"));
+    form.body(t("lw_p1.ui.drinkList.body"));
 
     config.allowedDrinks.forEach(itemId => {
         const icon = itemIdToIconPath(itemId);
         form.button(itemId, icon);
     });
-    form.button("新增饮品");
-    form.button("§c返回");
+    form.button(t("lw_p1.ui.drinkList.add"));
+    form.button(t("lw_p1.ui.back"));
 
     form.show(player).then(res => {
         if (res.canceled) return showFoodDrinkForm(player);
@@ -804,9 +805,9 @@ function showEditModal(player, type, index) {
     const list = type === "food" ? config.allowedFoods : config.allowedDrinks;
     const oldValue = list[index];
     const form = new ModalFormData();
-        form.title(`编辑 ${oldValue}`);
-        form.textField("请输入物品完整标识符，示例：minecraft:apple", "请输入物品ID", { defaultValue: String(oldValue) });
-        form.toggle("§c删除此项", { defaultValue: false });
+        form.title(t("lw_p1.ui.edit", oldValue));
+        form.textField(t("lw_p1.ui.itemId.label"), t("lw_p1.ui.itemId.ph"), { defaultValue: String(oldValue) });
+        form.toggle(t("lw_p1.ui.deleteItem"), { defaultValue: false });
 
     form.show(player).then(res => {
         const backList = () => type === "food" ? showFoodListForm(player) : showDrinkListForm(player);
@@ -832,11 +833,10 @@ function showEditModal(player, type, index) {
 function showAddModal(player, type) {
     if (!player.isValid) return;
     const config = getWorldConfig();
-    const label = type === "food" ? "食物" : "饮品";
     const form = new ModalFormData();
 
-    form.title(`新增${label}`);
-    form.textField("请输入物品完整标识符，示例：minecraft:apple", "请输入物品ID", { defaultValue: "" });
+    form.title(type === "food" ? t("lw_p1.ui.foodList.add") : t("lw_p1.ui.drinkList.add"));
+    form.textField(t("lw_p1.ui.itemId.label"), t("lw_p1.ui.itemId.ph"), { defaultValue: "" });
 
     form.show(player).then(res => {
         const backList = () => type === "food" ? showFoodListForm(player) : showDrinkListForm(player);
@@ -853,32 +853,31 @@ function showAddModal(player, type) {
 }
 
 
-// 食物托盘名称映射
-const FOOD_TRAY_NAMES = {
-    "lw_p1:food_tray": "普通食物托盘",
-    "lw_p1:food_tray_ceramic": "陶瓷食物托盘",
-    "lw_p1:food_tray_glass": "玻璃食物托盘",
-    "lw_p1:food_tray_wood": "木制食物托盘"
-};
+// 食物托盘 ID 列表（显示名取自各自方块的译名）
+const FOOD_TRAY_IDS = [
+    "lw_p1:food_tray",
+    "lw_p1:food_tray_ceramic",
+    "lw_p1:food_tray_glass",
+    "lw_p1:food_tray_wood"
+];
 
 // 主界面/食物&饮品配置/食物托盘配置
 function showFoodTrayMenu(player) {
     if (!player.isValid) return;
     const form = new ActionFormData();
-    form.title("食物托盘配置");
-    form.body("选择要配置的托盘类型，交互后可随机获得配置中的物品");
+    form.title(t("lw_p1.ui.tray.title"));
+    form.body(t("lw_p1.ui.tray.body"));
 
-    const trayIds = Object.keys(FOOD_TRAY_NAMES);
-    trayIds.forEach(id => {
-        form.button(FOOD_TRAY_NAMES[id]);
+    FOOD_TRAY_IDS.forEach(id => {
+        form.button(tBlock(id));
     });
-    form.button("§c返回");
+    form.button(t("lw_p1.ui.back"));
 
     form.show(player).then(res => {
         if (!player.isValid) return;
         if (res.canceled) { showFoodDrinkForm(player); return; }
-        if (res.selection < trayIds.length) {
-            showFoodTrayItemList(player, trayIds[res.selection]);
+        if (res.selection < FOOD_TRAY_IDS.length) {
+            showFoodTrayItemList(player, FOOD_TRAY_IDS[res.selection]);
         } else {
             showFoodDrinkForm(player);
         }
@@ -895,15 +894,15 @@ function showFoodTrayItemList(player, trayId) {
     const items = config.foodTrayItems[trayId];
 
     const form = new ActionFormData();
-    form.title(`${FOOD_TRAY_NAMES[trayId]} 物品`);
-    form.body("交互后可随机获得以下物品之一");
+    form.title(t("lw_p1.ui.tray.items", tBlock(trayId)));
+    form.body(t("lw_p1.ui.tray.itemsBody"));
 
     items.forEach(itemId => {
         const icon = itemIdToIconPath(itemId);
         form.button(itemId, icon);
     });
-    form.button("新增物品");
-    form.button("§c返回");
+    form.button(t("lw_p1.ui.addItem"));
+    form.button(t("lw_p1.ui.back"));
 
     form.show(player).then(res => {
         if (!player.isValid) return;
@@ -923,8 +922,8 @@ function showFoodTrayItemList(player, trayId) {
 function showFoodTrayAddModal(player, trayId) {
     if (!player.isValid) return;
     new ModalFormData()
-        .title(`新增 ${FOOD_TRAY_NAMES[trayId]} 物品`)
-        .textField("请输入物品完整标识符，示例：minecraft:apple", "物品ID", { defaultValue: "" })
+        .title(t("lw_p1.ui.tray.addTitle", tBlock(trayId)))
+        .textField(t("lw_p1.ui.itemId.label"), t("lw_p1.ui.itemId.phShort"), { defaultValue: "" })
         .show(player).then(res => {
             if (res.canceled) { showFoodTrayItemList(player, trayId); return; }
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
@@ -945,9 +944,9 @@ function showFoodTrayEditModal(player, trayId, index) {
     const config = getWorldConfig();
     const oldValue = config.foodTrayItems[trayId][index];
     new ModalFormData()
-        .title(`编辑 ${oldValue}`)
-        .textField("物品完整标识符", "物品ID", { defaultValue: String(oldValue) })
-        .toggle("§c删除此项", { defaultValue: false })
+        .title(t("lw_p1.ui.edit", oldValue))
+        .textField(t("lw_p1.ui.itemId.labelShort"), t("lw_p1.ui.itemId.phShort"), { defaultValue: String(oldValue) })
+        .toggle(t("lw_p1.ui.deleteItem"), { defaultValue: false })
         .show(player).then(res => {
             if (res.canceled) { showFoodTrayItemList(player, trayId); return; }
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
@@ -971,13 +970,13 @@ function showFoodTrayEditModal(player, trayId, index) {
 function showShopForm(player) {
     if (!player.isValid) return;
     const form = new ActionFormData();
-    form.title("商店配置");
-    form.body("管理商店物品列表与初始金币");
-    form.button("杀手商店配置");
-    form.button("贩卖机配置");
-    form.button("初始金币")
-    form.button("§6恢复默认配置");
-    form.button("§c返回");
+    form.title(t("lw_p1.ui.shop.title"));
+    form.body(t("lw_p1.ui.shop.body"));
+    form.button(t("lw_p1.ui.shop.killer"));
+    form.button(t("lw_p1.ui.shop.vending"));
+    form.button(t("lw_p1.ui.shop.initialCoins"))
+    form.button(t("lw_p1.ui.resetDefault"));
+    form.button(t("lw_p1.ui.back"));
 
     form.show(player).then(res => {
         if (!player.isValid) return;
@@ -997,10 +996,10 @@ function showShopForm(player) {
 function confirmResetShop(player) {
     if (!player.isValid) return;
     new MessageFormData()
-        .title("恢复默认")
-        .body("§c确定恢复杀手商店和贩卖机的默认商品列表吗？当前的自定义项将被覆盖！")
-        .button1("取消")
-        .button2("§c确认恢复")
+        .title(t("lw_p1.ui.resetTitle"))
+        .body(t("lw_p1.ui.resetShop.body"))
+        .button1(t("lw_p1.ui.cancel"))
+        .button2(t("lw_p1.ui.confirmReset"))
         .show(player).then(res => {
             if (!player.isValid) return;
             if (res.selection === 1) {
@@ -1009,7 +1008,7 @@ function confirmResetShop(player) {
                 config.killerStoreItems = defaults.killerStoreItems.map(i => ({ ...i }));
                 config.vendingMachineItems = defaults.vendingMachineItems.map(i => ({ ...i }));
                 saveWorldConfig(config);
-                player.sendMessage("§a已恢复商店的默认配置");
+                player.sendMessage(t("lw_p1.ui.resetShop.done"));
             }
             showShopForm(player);
         });
@@ -1023,15 +1022,15 @@ function showkillerStoreForm(player) {
     const form = new ActionFormData();
     const items = config.killerStoreItems;
 
-    form.title("杀手商店配置");
-    form.body("管理杀手商店物品列表");
+    form.title(t("lw_p1.ui.killerForm.title"));
+    form.body(t("lw_p1.ui.killerForm.body"));
 
     config.killerStoreItems.forEach(item => {
         const icon = itemIdToIconPath(item.id);
-        form.button(`${item.displayName}：${item.price}金币`, icon);
+        form.button(t("lw_p1.shop.button", tConfigName(item), item.price), icon);
     });
-    form.button("新增商品");
-    form.button("§c返回");
+    form.button(t("lw_p1.ui.addProduct"));
+    form.button(t("lw_p1.ui.back"));
 
     form.show(player).then(res => {
         if (!player.isValid) return;
@@ -1056,15 +1055,15 @@ function showVendingMachineForm(player) {
     const form = new ActionFormData();
     const items = config.vendingMachineItems;
 
-    form.title("贩卖机配置");
-    form.body("管理贩卖机物品列表");
+    form.title(t("lw_p1.ui.vendingForm.title"));
+    form.body(t("lw_p1.ui.vendingForm.body"));
 
     config.vendingMachineItems.forEach(item => {
         const icon = itemIdToIconPath(item.id);
-        form.button(`${item.displayName}：${item.price}金币`, icon);
+        form.button(t("lw_p1.shop.button", tConfigName(item), item.price), icon);
     });
-    form.button("新增商品");
-    form.button("§c返回");
+    form.button(t("lw_p1.ui.addProduct"));
+    form.button(t("lw_p1.ui.back"));
 
     form.show(player).then(res => {
         if (!player.isValid) return;
@@ -1090,11 +1089,11 @@ function showEditShopItemModal(player, shopType, index) {
     const form = new ModalFormData();
     const backForm = () => shopType === "killer" ? showkillerStoreForm(player) : showVendingMachineForm(player);
 
-    form.title(`编辑 ${item.displayName}`);
-    form.textField("商品显示名称", "请输入名称", { defaultValue: String(item.displayName) });
-    form.textField("物品标识符", "如 minecraft:apple", { defaultValue: String(item.id) });
-    form.textField("价格", "请输入正整数", { defaultValue: String(item.price) });
-    form.toggle("§c删除此项", { defaultValue: false });
+    form.title(t("lw_p1.ui.edit", tConfigName(item)));
+    form.textField(t("lw_p1.ui.shopItem.name"), t("lw_p1.ui.shopItem.namePh"), { defaultValue: String(item.displayName) });
+    form.textField(t("lw_p1.ui.shopItem.id"), t("lw_p1.ui.shopItem.idPh"), { defaultValue: String(item.id) });
+    form.textField(t("lw_p1.ui.shopItem.price"), t("lw_p1.ui.shopItem.pricePh"), { defaultValue: String(item.price) });
+    form.toggle(t("lw_p1.ui.deleteItem"), { defaultValue: false });
 
     form.show(player).then(res => {
         if (res.canceled) return backForm();
@@ -1126,10 +1125,10 @@ function showAddShopItemModal(player, shopType) {
     const backForm = () => shopType === "killer" ? showkillerStoreForm(player) : showVendingMachineForm(player);
     const form = new ModalFormData();
 
-    form.title("新增商品");
-    form.textField("商品显示名称", "请输入名称", { defaultValue: "" });
-    form.textField("物品标识符", "如 minecraft:apple", { defaultValue: "" });
-    form.textField("价格", "请输入正整数", { defaultValue: "" });
+    form.title(t("lw_p1.ui.addProduct"));
+    form.textField(t("lw_p1.ui.shopItem.name"), t("lw_p1.ui.shopItem.namePh"), { defaultValue: "" });
+    form.textField(t("lw_p1.ui.shopItem.id"), t("lw_p1.ui.shopItem.idPh"), { defaultValue: "" });
+    form.textField(t("lw_p1.ui.shopItem.price"), t("lw_p1.ui.shopItem.pricePh"), { defaultValue: "" });
 
     form.show(player).then(res => {
         if (res.canceled) return backForm();
@@ -1158,15 +1157,15 @@ function showInitialCoinsForm(player) {
     const val3 = getSco("lw_p1:杀手金币增速", 15);
     const val4 = getSco("lw_p1:平民金币增速", 0);
     new ModalFormData()
-        .title("初始金币设置")
-        .header("杀手初始金币")
-        .slider("游戏开始后，杀手玩家持有的初始金币数。\n默认 100\n杀手初始金币", 0, 500, { valueStep: 50, defaultValue: val })
-        .header("\n平民初始金币")
-        .slider("游戏开始后，非杀手玩家持有的初始金币数。\n默认 0\n平民初始金币", 0, 500, { valueStep: 50, defaultValue: val2 })
-        .header("\n杀手金币成长")
-        .slider("游戏开始后，杀手玩家每 10 秒自然获得的金币数。\n默认 15\n每10秒金币", 0, 30, { valueStep: 5, defaultValue: val3 })
-        .header("\n平民金币成长")
-        .slider("游戏开始后，非杀手玩家每 10 秒自然获得的金币数。\n默认 0\n每10秒金币", 0, 10, { valueStep: 2, defaultValue: val4 })
+        .title(t("lw_p1.ui.initialCoins.title"))
+        .header(t("lw_p1.ui.initialCoins.killerHeader"))
+        .slider(t("lw_p1.ui.initialCoins.killerDesc"), 0, 500, { valueStep: 50, defaultValue: val })
+        .header(t("lw_p1.ui.initialCoins.civilHeader"))
+        .slider(t("lw_p1.ui.initialCoins.civilDesc"), 0, 500, { valueStep: 50, defaultValue: val2 })
+        .header(t("lw_p1.ui.initialCoins.killerRateHeader"))
+        .slider(t("lw_p1.ui.initialCoins.killerRateDesc"), 0, 30, { valueStep: 5, defaultValue: val3 })
+        .header(t("lw_p1.ui.initialCoins.civilRateHeader"))
+        .slider(t("lw_p1.ui.initialCoins.civilRateDesc"), 0, 10, { valueStep: 2, defaultValue: val4 })
         .show(player).then(res => {
             if (res.canceled) { showShopForm(player); return; }
             try {
@@ -1176,7 +1175,7 @@ function showInitialCoinsForm(player) {
                 mc.world.scoreboard.getObjective("lw_p1:杀手金币增速").setScore("lw_p1:全局", Number(vals[2]));
                 mc.world.scoreboard.getObjective("lw_p1:平民金币增速").setScore("lw_p1:全局", Number(vals[3]));
             } catch (e) {
-                player.sendMessage("§c初始金币保存失败: " + e);
+                player.sendMessage(t("lw_p1.ui.initialCoins.fail", String(e)));
             }
             showShopForm(player);
         }).catch(() => { });
@@ -1188,13 +1187,13 @@ function showInitialCoinsForm(player) {
 function showOtherMenu(player) {
     if (!player.isValid) return;
     const otherForm = new ActionFormData()
-        .title("其他功能")
-        .body("一些预留功能和关于信息")
-        .button("设置地图信息")
-        .button("修改更多当前不可用配置")
-        .button("关于本Addon")
-        .button("赞助&加入我们")
-        .button("§c返回");
+        .title(t("lw_p1.ui.other.title"))
+        .body(t("lw_p1.ui.other.body"))
+        .button(t("lw_p1.ui.other.mapInfo"))
+        .button(t("lw_p1.ui.other.unused"))
+        .button(t("lw_p1.ui.other.about"))
+        .button(t("lw_p1.ui.other.sponsor"))
+        .button(t("lw_p1.ui.back"));
     otherForm.show(player).then(res => {
         if (!player.isValid) return;
         if (res.canceled) { showMainForm(player); return; }
@@ -1215,9 +1214,9 @@ function showMapInfoForm(player) {
     const cfg = getWorldConfig();
     const wi = cfg.worldInformation || {};
     new ModalFormData()
-        .title("地图信息设置")
-        .textField("地图名称", "请输入地图名称", { defaultValue: String(wi.mapName ?? "") })
-        .textField("地图作者", "请输入作者名称", { defaultValue: String(wi.mapAuthor ?? "") })
+        .title(t("lw_p1.ui.mapInfo.title"))
+        .textField(t("lw_p1.ui.mapInfo.name"), t("lw_p1.ui.mapInfo.namePh"), { defaultValue: String(wi.mapName ?? "") })
+        .textField(t("lw_p1.ui.mapInfo.author"), t("lw_p1.ui.mapInfo.authorPh"), { defaultValue: String(wi.mapAuthor ?? "") })
         .show(player).then(res => {
             if (!player.isValid) return;
             if (res.canceled) { showOtherMenu(player); return; }
@@ -1227,7 +1226,7 @@ function showMapInfoForm(player) {
                 mapAuthor: String(vals[1] ?? "").trim(),
             };
             saveWorldConfig(cfg);
-            player.sendMessage("§a地图信息已保存");
+            player.sendMessage(t("lw_p1.ui.mapInfo.saved"));
             showOtherMenu(player);
         }).catch(() => { });
 }
@@ -1236,15 +1235,7 @@ function showMapInfoForm(player) {
 // 主界面/其他/修改更多当前不可用配置
 function showUnusedConfigUI(player) {
     if (!player.isValid) return;
-    new ActionFormData().title("功能预留配置").body("若您想要增加更多任务、预设游戏数据或状态，修改底层数据，可访问以下网址查看项目源代码\n" +
-        "https://github.com/xiaopa-baka/train-werewolf-addon\n" +
-        "您可以访问项目仓库后查看行为包源代码，进行学习、修改、创建分支二次开发\n\n" +
-        "注意：\n" +
-        "进行二次开发后，请注明原作者和修改内容，禁止恶意篡改后传播！\n" +
-        "二次开发不得用于商业用途，禁止私自售卖原版或修改后的版本！\n" +
-        "二次开发后不得修改或删除整个“其他”板块的内容，包括开发者信息和赞助信息等\n" +
-        "二次开发过程中如有任何问题欢迎联系开发者\n\n" +
-        "§6敬请期待后续版本更新！").button("§c返回")
+    new ActionFormData().title(t("lw_p1.ui.unused.title")).body(t("lw_p1.ui.unused.body")).button(t("lw_p1.ui.back"))
         .show(player).then(r => r.selection === 0 && showOtherMenu(player));
 }
 
@@ -1252,15 +1243,7 @@ function showUnusedConfigUI(player) {
 // 主界面/其他/关于Addon开发者
 function showDeveloperAboutUI(player) {
     if (!player.isValid) return;
-    new ActionFormData().title("关于本Addon").body("§b列车狼人杀Addon\n" +
-        "§f版本：正式版 1.0\n" +
-        "§f适配：我的世界基岩版 1.21.120+\n" +
-        "§f开发模式：原生Script API\n\n" +
-        "§a开发者简介：\n" +
-        "工作室：LW.狮狼传奇工作室\n" +
-        "项目策划：狮狼传奇_小怕\n" +
-        "Addon作者：狮狼传奇_小怕\n" +
-        "工作室交流群：180568043").button("§c返回")
+    new ActionFormData().title(t("lw_p1.ui.about.title")).body(t("lw_p1.ui.about.body")).button(t("lw_p1.ui.back"))
         .show(player).then(r => r.selection === 0 && showOtherMenu(player));
 }
 
@@ -1268,21 +1251,6 @@ function showDeveloperAboutUI(player) {
 // 主界面/其他/赞助&加入我们
 function showSponsorJoinUI(player) {
     if (!player.isValid) return;
-    new ActionFormData().title("赞助 & 团队招募").body("§b欢迎支持本项目开发！\n\n" +
-        "§f【赞助说明】\n" +
-        "如果您喜欢本Addon，愿意支持我们，可以通过以下方式赞助：\n" +
-        "• 在社交媒体上宣传此Addon\n" +
-        "• 为此Addon制作玩法地图并发布\n\n" +
-        "工作室正在积极招新中，欢迎热爱MC的你加入我们！\n" +
-        "§f【招募岗位】\n" +
-        "• 地图建筑\n" +
-        "• 项目策划\n" +
-        "• 运营及宣传\n" +
-        "• 指令设计、模组与插件开发\n" +
-        "• 贴图与建模制作\n" +
-        "• 皮肤设计\n\n\n" +
-        "工作室交流群：180568043\n" +
-        "§a欢迎热爱MC的小伙伴加入！\n" +
-        "加入我们，一起创造更精彩的MC冒险体验！").button("§c返回")
+    new ActionFormData().title(t("lw_p1.ui.sponsor.title")).body(t("lw_p1.ui.sponsor.body")).button(t("lw_p1.ui.back"))
         .show(player).then(r => r.selection === 0 && showOtherMenu(player));
 }

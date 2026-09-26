@@ -1,0 +1,388 @@
+## ADDON-RP en_US.lang
+pack.name=Train Werewolf
+pack.description=A werewolf-style game addon for the train map.\nBy Xiaopa
+
+## Items
+item.lw_p1:tp_game=§eTeleport to Train Head
+item.lw_p1:guide_book=§bGuide Book
+item.lw_p1:killer_store=§aOpen Shop
+item.lw_p1:dagger=Dagger
+item.lw_p1:pistol=Revolver
+item.lw_p1:pistol_mini=Derringer
+item.lw_p1:key_1=Key 1
+item.lw_p1:key_2=Key 2
+item.lw_p1:key_3=Key 3
+item.lw_p1:key_4=Key 4
+item.lw_p1:key_5=Key 5
+item.lw_p1:key_6=Key 6
+item.lw_p1:key_7=Key 7
+item.lw_p1:key_8=Key 8
+item.lw_p1:crowbar=Crowbar
+item.lw_p1:lockpick=Lockpick
+item.lw_p1:poison=Poison
+item.lw_p1:grenade=Grenade
+item.lw_p1:bat=Baseball Bat
+item.lw_p1:power_cut=Power Cutter
+item.lw_p1:mineral_water=Mineral Water
+item.lw_p1:mineral_water_bottle=Mineral Water Bottle
+item.lw_p1:cigarette=Cigarette
+item.lw_p1:note=Note
+item.lw_p1:magic_conch=Magic Conch
+item.lw_p1:pocke_watch=Father's Pocket Watch
+item.lw_p1:royal_jelly=Wild Royal Jelly
+item.lw_p1:old_fashioned=Old Fashioned
+item.lw_p1:mojito=Mojito
+item.lw_p1:martini=Martini
+item.lw_p1:cosmopolitan=Cosmopolitan
+item.lw_p1:champagne=Champagne
+
+## Item groups
+lw_p1:itemGroup.name.keys=Keys
+lw_p1:itemGroup.name.drinks=Drinks
+lw_p1:itemGroup.name.doors=Key Doors
+lw_p1:itemGroup.name.trays=Food Trays
+
+## Spawn eggs
+item.spawn_egg.entity.lw_p1:firecracker.name=Firecracker
+
+## Blocks
+tile.lw_p1:vending_machine.name=Vending Machine
+tile.lw_p1:food_tray.name=Food Tray
+tile.lw_p1:food_tray_wood.name=Wooden Food Tray
+tile.lw_p1:food_tray_ceramic.name=Ceramic Food Tray
+tile.lw_p1:food_tray_glass.name=Glass Food Tray
+tile.lw_p1:keydoor_1.name=Door 1
+tile.lw_p1:keydoor_2.name=Door 2
+tile.lw_p1:keydoor_3.name=Door 3
+tile.lw_p1:keydoor_4.name=Door 4
+tile.lw_p1:keydoor_5.name=Door 5
+tile.lw_p1:keydoor_6.name=Door 6
+tile.lw_p1:keydoor_7.name=Door 7
+tile.lw_p1:keydoor_8.name=Door 8
+tile.lw_p1:keydoor_9.name=Train Door
+tile.lw_p1:keydoor_10.name=Carriage Door
+
+## Entities
+entity.lw_p1:firecracker.name=Firecracker
+entity.lw_p1:pistol.name=Revolver
+entity.lw_p1:bullet.name=Bullet
+entity.lw_p1:grenade.name=Grenade
+entity.lw_p1:corpes.name=Corpse
+entity.lw_p1:player_name.name=Player Name
+
+## Common
+lw_p1.common.notSet=Not set
+
+## Roles
+lw_p1.role.killer=§cKiller
+lw_p1.role.officer=§bOfficer
+lw_p1.role.passenger=§aPassenger
+
+## Guide book
+lw_p1.guide.title=§l§6Train Passenger Handbook
+lw_p1.guide.indexHint=§7Select a chapter§r
+lw_p1.guide.prev=← Previous
+lw_p1.guide.next=Next →
+lw_p1.guide.ch.overview=§lOverview
+lw_p1.guide.ch.roles=§lRoles
+lw_p1.guide.ch.tasks=§lTasks
+lw_p1.guide.ch.items=§lItems & Shop
+lw_p1.guide.ch.note=§lNote
+lw_p1.guide.ch.config=§lConfig
+lw_p1.guide.overview.body=§fA speeding train, a journey hiding murder.\nWill you reach the station alive?\n§fTrain Werewolf is a multiplayer deduction game.\n§e5-15 players§f, about §e10 minutes§f per round.\n\n§lRules§r\n§f1. Once everyone boards, the train departs\n2. Roles are assigned at random: §cKiller§f, §bOfficer§f, §aPassenger§f\n3. The Killer eliminates passengers in secret while passengers try to expose them\n\n§lWin conditions§r\n§aPassengers§f: the Killer dies / the train arrives\n§cKiller§f: all passengers die\n\n§7Map name: %s\n§7Map author: %s\n§7Addon author: Xiaopa baka (LW Realm Studio)
+lw_p1.guide.roles.body=· §c§lKiller§r\n§fHides among the passengers and aims to eliminate them all. Owns the §eKiller Shop§f.\n\n· §b§lOfficer§r\n§fThe only law enforcer, armed with a §eRevolver§f.\n\n· §a§lPassenger§r\n§fNo weapons, no privileges, and the largest group on board.\n\n\n
+lw_p1.guide.tasks.body=§fTasks are given out at random after the game starts. The timer shows on the XP bar.\n§cFailing to finish in time kills you§f\n\n§b§lTask list§r\n§eVentilation§f: go to the train head or tail to get some air\n§eSleep§f: lie down on a bed\n§eEat§f: eat any food\n§eDrink§f: drink anything - §7a Cigarette completes it instantly§f\n§eToilet§f: crouch at the toilet - §7a Mineral Water Bottle completes it instantly§f\n§eSocialize§f: stand near another player for a while
+lw_p1.guide.items.body=§c§lKiller Shop items:§r\n§fDagger · Derringer · Crowbar · Lockpick · Poison · Baseball Bat · Grenade · Power Cutter\n\n§b§lCommon items§r\n§fNote · Revolver (Officer) · Mineral Water · Mineral Water Bottle · Magic Conch · Father's Pocket Watch · Wild Royal Jelly\n\n§eKiller Shop§f: killers carry their own shop with exclusive items\n§eVending Machine§f: buy special items from the vending machines on the train
+lw_p1.guide.note.body=§lNote system§r\n§fEveryone starts with one Note, locked to the inventory.\n· Use on empty space → edit the message\n Use on a player → send the note\n· On death the message stays on your corpse\n\n\n\n\n§7The note is the only way to communicate in this game!\n
+lw_p1.guide.config.body=Use a §eStick§f to open the config menu and change game settings\n\n\n\n\n\n\n\n\n\n\n\n\n
+
+## Shop
+lw_p1.shop.title.killer=Killer Shop
+lw_p1.shop.title.vending=Vending Machine
+lw_p1.shop.gold=Gold: %s
+lw_p1.shop.button=%s: %s coins
+lw_p1.shop.close=§cClose
+lw_p1.shop.busy=§cProcessing, please do not click again
+lw_p1.shop.notEnough=§cNot enough gold, purchase failed!
+lw_p1.shop.fail=§cPurchase failed, please try again
+lw_p1.shop.success=§aPurchased %s
+lw_p1.shop.invFull=§cInventory full, gold refunded
+lw_p1.shop.noScoreboard=§cInternal error: gold scoreboard not found
+
+## Config UI - common
+lw_p1.ui.close=§cClose
+lw_p1.ui.back=§cBack
+lw_p1.ui.cancel=Cancel
+lw_p1.ui.confirmReset=§cConfirm reset
+lw_p1.ui.confirmClear=§cConfirm clear
+lw_p1.ui.resetDefault=§6Restore defaults
+lw_p1.ui.resetTitle=Restore defaults
+lw_p1.ui.deleteItem=§cDelete this entry
+lw_p1.ui.unset=Not set
+lw_p1.ui.coordInvalid=§cInvalid coordinates, save failed
+lw_p1.ui.saveFail=§cSave failed: %s
+lw_p1.ui.addItem=Add item
+lw_p1.ui.addProduct=Add product
+lw_p1.ui.edit=Edit %s
+lw_p1.ui.addCurrent=Add current position
+lw_p1.ui.coordX=X coordinate
+lw_p1.ui.coordY=Y coordinate
+lw_p1.ui.coordZ=Z coordinate
+lw_p1.ui.inputInt=Enter an integer coordinate
+lw_p1.ui.coord.diagStartX=Diagonal start corner\n\nStart X
+lw_p1.ui.coord.startY=Start Y
+lw_p1.ui.coord.startZ=Start Z
+lw_p1.ui.coord.diagEndX=Diagonal end corner\n\nEnd X
+lw_p1.ui.coord.endY=End Y
+lw_p1.ui.coord.endZ=End Z
+lw_p1.ui.itemId.label=Enter the full item identifier, e.g. minecraft:apple
+lw_p1.ui.itemId.labelShort=Full item identifier
+lw_p1.ui.itemId.ph=Enter item ID
+lw_p1.ui.itemId.phShort=Item ID
+
+## Config UI - main menu
+lw_p1.ui.main.title=Main Config Panel
+lw_p1.ui.main.body=Select a category
+lw_p1.ui.main.game=Global Game Config
+lw_p1.ui.main.map=Map Area Config
+lw_p1.ui.main.food=Food & Drink Config
+lw_p1.ui.main.shop=Shop Config
+lw_p1.ui.main.other=Other
+
+## Config UI - global game config
+lw_p1.ui.game.title=Global Game Config
+lw_p1.ui.game.body=Tune the global game parameters
+lw_p1.ui.game.settings=Game settings
+lw_p1.ui.game.task=Task settings
+lw_p1.ui.game.settingsTitle=Game settings
+lw_p1.ui.game.autoHeader=Auto start time
+lw_p1.ui.game.autoDesc=When every player is on the train, the auto start countdown begins.\nYou can also start manually with\n/function lw_p1:gameStart\nDefault 10\nAuto start time (s)
+lw_p1.ui.game.autoToggle=Enable auto start
+lw_p1.ui.game.minHeader=\nMinimum players
+lw_p1.ui.game.minDesc=The game can start once this many players are on the train.\nDefault 5\nMinimum players
+lw_p1.ui.game.baseHeader=\nBase round length
+lw_p1.ui.game.baseDesc=Base length of one round. Each civilian death adds 60 seconds.\nDefault 600\nRound length (s)
+lw_p1.ui.game.saved=§aGame settings saved
+lw_p1.ui.task.title=Task settings
+lw_p1.ui.task.probHeader=Task assignment chance
+lw_p1.ui.task.probDesc=Chance per second to assign a task to a player without one.\nDefault 3\nChance (percent)
+lw_p1.ui.task.startHeader=\nFirst task time
+lw_p1.ui.task.startDesc=When the first task assignment is attempted after the game starts.\nDefault 20\nFirst task time (s)
+lw_p1.ui.task.limitHeader=\nTask time limit
+lw_p1.ui.task.limitDesc=A task must be completed within this time, otherwise it fails.\nDefault 100\nTask time limit (s)
+lw_p1.ui.task.fakeHeader=\nKiller fake task limit
+lw_p1.ui.task.fakeDesc=How long a killer may complete a fake task before it disappears.\nDefault 50\nFake task limit (s)
+lw_p1.ui.task.rewardHeader=\nTask reward
+lw_p1.ui.task.rewardDesc=Gold earned by civilians/officers for each completed task.\nDefault 25\nTask reward (gold)
+lw_p1.ui.task.saved=§aTask settings saved
+lw_p1.ui.reset.title=Restore defaults
+lw_p1.ui.reset.body=§cRestore all game settings to their defaults?\nThis overwrites every current setting!
+lw_p1.ui.reset.done=§aAll task/game settings have been restored to defaults!
+
+## Config UI - map area config
+lw_p1.ui.map.title=Map Area Config
+lw_p1.ui.map.body=Coordinate management
+lw_p1.ui.map.stationEngine=Station & Train Head
+lw_p1.ui.map.trainArea=Train Area
+lw_p1.ui.map.engineVent=Head Vent Area
+lw_p1.ui.map.tailVent=Tail Vent Area
+lw_p1.ui.map.toilet=Toilet Coordinates
+lw_p1.ui.map.randomTp=Random Teleport Points
+lw_p1.ui.map.roomCount=Room Count
+lw_p1.ui.map.clearAll=§6Clear all map coordinates
+lw_p1.ui.stationEngine.title=Station & Train Head Coordinates
+lw_p1.ui.stationEngine.stationHeader=Station coordinates
+lw_p1.ui.stationEngine.stationX=Players teleport here after each round (start room)\n\nStation X
+lw_p1.ui.stationEngine.stationY=Station Y
+lw_p1.ui.stationEngine.stationZ=Station Z
+lw_p1.ui.stationEngine.engineHeader=\nTrain head coordinates
+lw_p1.ui.stationEngine.engineX=Destination of the "Teleport to Train Head" item\n\nHead X
+lw_p1.ui.stationEngine.engineY=Train head Y
+lw_p1.ui.stationEngine.engineZ=Train head Z
+lw_p1.ui.stationEngine.saved=§aStation & train head coordinates saved
+lw_p1.ui.trainArea.title=Train Area Coordinates
+lw_p1.ui.trainArea.startHeader=Train area start
+lw_p1.ui.trainArea.endHeader=\nTrain area end
+lw_p1.ui.trainArea.saved=§aTrain area coordinates saved
+lw_p1.ui.engineVent.title=Head Vent Area Coordinates
+lw_p1.ui.engineVent.startHeader=Head vent area start
+lw_p1.ui.engineVent.endHeader=\nHead vent area end
+lw_p1.ui.engineVent.saved=§aHead vent area coordinates saved
+lw_p1.ui.tailVent.title=Tail Vent Area Coordinates
+lw_p1.ui.tailVent.startHeader=Tail vent area start
+lw_p1.ui.tailVent.endHeader=\nTail vent area end
+lw_p1.ui.tailVent.saved=§aTail vent area coordinates saved
+lw_p1.ui.toilet.title=Toilet Coordinates
+lw_p1.ui.toilet.body=Sneaking at these coordinates for a while completes the toilet task.\nSet at least one coordinate
+lw_p1.ui.toilet.added=§aToilet coordinate added
+lw_p1.ui.toilet.deleted=§cToilet coordinate deleted
+lw_p1.ui.toilet.updated=§aToilet coordinate updated
+lw_p1.ui.toilet.edit=Edit toilet coordinate %s
+lw_p1.ui.random.title=Random Teleport Points
+lw_p1.ui.random.body=Players are teleported randomly to these coordinates at the start.\nSet at least as many as the maximum player count.
+lw_p1.ui.random.added=§aRandom coordinate added
+lw_p1.ui.random.deleted=§cRandom teleport coordinate deleted
+lw_p1.ui.random.updated=§aRandom teleport coordinate updated
+lw_p1.ui.random.edit=Edit random teleport coordinate %s
+lw_p1.ui.room.title=Room Count
+lw_p1.ui.room.header=Number of rooms
+lw_p1.ui.room.desc=Number of keys (1-N) at game start; wraps around if players exceed rooms.\nDefault 8\nNumber of rooms
+lw_p1.ui.room.set=§aRoom count set to %s
+lw_p1.ui.clear.title=Confirm clear
+lw_p1.ui.clear.body=§cClear all map coordinates? This cannot be undone!
+lw_p1.ui.clear.done=§cAll map coordinates cleared
+
+## Config UI - food & drink
+lw_p1.ui.food.title=Item Config Management
+lw_p1.ui.food.body=Manage the valid item lists for the eat/drink tasks
+lw_p1.ui.food.foods=Configure foods
+lw_p1.ui.food.drinks=Configure drinks
+lw_p1.ui.food.trays=Food tray config
+lw_p1.ui.resetFood.body=§cRestore the default food, drink and food tray lists? Your current custom entries will be overwritten!
+lw_p1.ui.resetFood.done=§aDefault food/drink/food tray config restored
+lw_p1.ui.foodList.title=Food Management
+lw_p1.ui.foodList.body=Manage the valid item list for the eat task
+lw_p1.ui.foodList.add=Add food
+lw_p1.ui.drinkList.title=Drink Management
+lw_p1.ui.drinkList.body=Manage the valid item list for the drink task
+lw_p1.ui.drinkList.add=Add drink
+lw_p1.ui.tray.title=Food Tray Config
+lw_p1.ui.tray.body=Pick a tray type. Interacting with it gives a random configured item
+lw_p1.ui.tray.items=%s items
+lw_p1.ui.tray.itemsBody=Interacting gives one of the following items at random
+lw_p1.ui.tray.addTitle=Add %s item
+
+## Config UI - shop
+lw_p1.ui.shop.title=Shop Config
+lw_p1.ui.shop.body=Manage shop item lists and starting gold
+lw_p1.ui.shop.killer=Killer Shop Config
+lw_p1.ui.shop.vending=Vending Machine Config
+lw_p1.ui.shop.initialCoins=Starting gold
+lw_p1.ui.resetShop.body=§cRestore the default killer shop and vending machine item lists? Your current custom entries will be overwritten!
+lw_p1.ui.resetShop.done=§aDefault shop config restored
+lw_p1.ui.killerForm.title=Killer Shop Config
+lw_p1.ui.killerForm.body=Manage the killer shop item list
+lw_p1.ui.vendingForm.title=Vending Machine Config
+lw_p1.ui.vendingForm.body=Manage the vending machine item list
+lw_p1.ui.shopItem.name=Display name
+lw_p1.ui.shopItem.namePh=Enter a name
+lw_p1.ui.shopItem.id=Item identifier
+lw_p1.ui.shopItem.idPh=e.g. minecraft:apple
+lw_p1.ui.shopItem.price=Price
+lw_p1.ui.shopItem.pricePh=Enter a positive integer
+lw_p1.ui.initialCoins.title=Starting Gold
+lw_p1.ui.initialCoins.killerHeader=Killer starting gold
+lw_p1.ui.initialCoins.killerDesc=Gold a killer starts with after the game begins.\nDefault 100\nKiller starting gold
+lw_p1.ui.initialCoins.civilHeader=\nCivilian starting gold
+lw_p1.ui.initialCoins.civilDesc=Gold a non-killer starts with after the game begins.\nDefault 0\nCivilian starting gold
+lw_p1.ui.initialCoins.killerRateHeader=\nKiller gold growth
+lw_p1.ui.initialCoins.killerRateDesc=Gold a killer earns every 10 seconds after the game begins.\nDefault 15\nGold per 10s
+lw_p1.ui.initialCoins.civilRateHeader=\nCivilian gold growth
+lw_p1.ui.initialCoins.civilRateDesc=Gold a non-killer earns every 10 seconds after the game begins.\nDefault 0\nGold per 10s
+lw_p1.ui.initialCoins.fail=§cFailed to save starting gold: %s
+
+## Config UI - other
+lw_p1.ui.other.title=Other
+lw_p1.ui.other.body=Reserved features and about information
+lw_p1.ui.other.mapInfo=Set map information
+lw_p1.ui.other.unused=More currently unavailable settings
+lw_p1.ui.other.about=About this addon
+lw_p1.ui.other.sponsor=Sponsor & join us
+lw_p1.ui.mapInfo.title=Map Information
+lw_p1.ui.mapInfo.name=Map name
+lw_p1.ui.mapInfo.namePh=Enter the map name
+lw_p1.ui.mapInfo.author=Map author
+lw_p1.ui.mapInfo.authorPh=Enter the author name
+lw_p1.ui.mapInfo.saved=§aMap information saved
+lw_p1.ui.unused.title=Reserved Config
+lw_p1.ui.unused.body=To add more tasks, preset game data or states, or change the underlying data, see the project source code at\nhttps://github.com/xiaopa-baka/train-werewolf-addon\nYou can browse the behavior pack source to learn from it, modify it, or fork it\n\nNotes:\nIf you build on this project, credit the original author and describe your changes. Malicious tampering and redistribution are prohibited!\nSecondary development must not be used commercially. Selling the original or a modified version is prohibited!\nDo not modify or remove anything in the "Other" section, including developer and sponsor information\nIf you run into any issues, feel free to contact the developer\n\n§6Stay tuned for future updates!
+lw_p1.ui.about.title=About this addon
+lw_p1.ui.about.body=§bTrain Werewolf Addon\n§fVersion: 1.0\n§fCompatible: Minecraft Bedrock 1.21.120+\n§fBuilt with: native Script API\n\n§aAbout the developer:\nStudio: LW Realm Studio\nDesign: Xiaopa baka\nAddon author: Xiaopa baka\nStudio group(QQ): 180568043
+lw_p1.ui.sponsor.title=Sponsorship & Recruitment
+lw_p1.ui.sponsor.body=§bThanks for supporting this project!\n\n§f[How to support]\nIf you enjoy this addon and would like to support us:\n• Share this addon on social media\n• Build and publish a gameplay map for it\n\nOur studio is actively recruiting — if you love MC, join us!\n§f[Open roles]\n• Map building\n• Project design\n• Operations & promotion\n• Command design, mod and plugin development\n• Textures and modeling\n• Skin design\n\n\nStudio group: 180568043\n§aEvery MC fan is welcome!\nJoin us and create even better MC adventures together!
+
+## Common
+lw_p1.common.unknownPlayer=Unknown
+
+## Game messages
+lw_p1.msg.killer.civilianDeath=§eA civilian died: +100 gold, timer extended by 60 seconds
+
+## Prop interactions
+lw_p1.prop.pistol.killerBlocked=§cKillers cannot use this gun
+lw_p1.prop.pistol.lostRight=§cYou have lost the right to use the pistol
+lw_p1.prop.pistol.picked=§aYou picked up the revolver
+lw_p1.prop.invFull=§cInventory full, cannot pick up
+lw_p1.prop.mad.start=§c§l%s has gone berserk!
+lw_p1.prop.mad.end=§7%s is no longer berserk
+lw_p1.prop.conch=§e§lMagic Conch §r§ftells you: %s's identity is %s
+lw_p1.prop.time.none=§eTime left --:--
+lw_p1.prop.time.remaining=§eTime left %s:%s
+lw_p1.prop.watch.saved=Father's Pocket Watch saved you from a fatal blow
+lw_p1.prop.tray.alreadyPoisoned=§cThis tray has already been poisoned
+lw_p1.prop.tray.poisoned=§aPoisoned successfully
+lw_p1.prop.tray.empty=§cThis tray is empty
+lw_p1.prop.royalJelly.cured=§aRoyal jelly cured your poisoning
+lw_p1.prop.note.title=Edit Note
+lw_p1.prop.note.label=Note content
+lw_p1.prop.note.ph=Type here...
+lw_p1.prop.note.empty=§cThe note is still empty, edit it first
+lw_p1.prop.note.received=§7Note from %s§f: %s
+lw_p1.prop.note.sent=§aNote sent to %s
+lw_p1.prop.note.corpse=§e[Note] §f%s
+
+## Common (additional)
+lw_p1.common.none=None
+lw_p1.common.listSep=, 
+
+## Game messages (additional)
+lw_p1.msg.boarded=Boarded %s / %s
+lw_p1.msg.gameStart=§aGame start!
+lw_p1.msg.notEnoughPlayers=§cNot enough players to start (current %s / minimum %s)
+lw_p1.msg.autoStart=§eGame starts in %s seconds
+
+## Results
+lw_p1.end.winner.killer=§cGame over — the Killer wins!
+lw_p1.end.winner.civil=§aGame over — the Passengers win!
+lw_p1.end.reason.killerDead=the Killer died
+lw_p1.end.reason.timeUp=time ran out, the passengers survived
+lw_p1.end.reason.civilsDead=all passengers died
+lw_p1.end.message=§6[Game Over]\n%s\n§fReason: %s\n§fKiller: %s\n§fOfficer: %s\n§fPassengers: %s
+
+## Key doors
+lw_p1.door.crowbarLocked=§cThis door was pried open and can no longer be closed
+lw_p1.door.crowbarCooldown=§cThis door is jammed by a crowbar, try again later
+
+## Role titles (mcfunction)
+lw_p1.roleRemind.killer=Welcome aboard, §c§lKiller
+lw_p1.roleRemind.officer=Welcome aboard, §b§lOfficer
+lw_p1.roleRemind.passenger=Welcome aboard, §a§lPassenger
+lw_p1.roleGoal.killer=Stay hidden and eliminate everyone
+lw_p1.roleGoal.officer=Protect the passengers and find the Killer
+lw_p1.roleGoal.passenger=Work with the Officer and get off safely
+
+## Task hints (mcfunction)
+lw_p1.task.1.hint1=§aYou feel a bit stuffy, go get some air
+lw_p1.task.1.hint2=§6You are struggling to breathe, go get some air
+lw_p1.task.1.hint3=§cYou are suffocating, get some air right now!
+lw_p1.task.2.hint1=§aYou need to use the toilet
+lw_p1.task.2.hint2=§6You really cannot hold it, hurry to the toilet
+lw_p1.task.2.hint3=§cYou are about to burst, where is the toilet?!
+lw_p1.task.3.hint1=§aYou feel sleepy, go get some sleep
+lw_p1.task.3.hint2=§6Your eyelids are fighting each other, go to sleep
+lw_p1.task.3.hint3=§cYou will collapse if you do not sleep now!
+lw_p1.task.4.hint1=§aYou are hungry and want something to eat
+lw_p1.task.4.hint2=§6You really crave something to eat right now
+lw_p1.task.4.hint3=§cYou are starving and will die without food!
+lw_p1.task.5.hint1=§aYou are thirsty and want something to drink
+lw_p1.task.5.hint2=§6Your lips are cracked, you really want a drink
+lw_p1.task.5.hint3=§cYou are dehydrating and will die without water!
+lw_p1.task.6.hint1=§aYou are bored, go socialize with someone
+lw_p1.task.6.hint2=§6You feel down and need to socialize
+lw_p1.task.6.hint3=§cYou are deeply depressed, you need to socialize!
+lw_p1.task.done=§aYou feel much better
+lw_p1.task.fake.1=§cYou could pretend to get some air
+lw_p1.task.fake.2=§cYou could pretend to use the toilet
+lw_p1.task.fake.3=§cYou could pretend to go to sleep
+lw_p1.task.fake.4=§cYou could pretend to go eat something
+lw_p1.task.fake.5=§cYou could pretend to go drink something
+lw_p1.task.fake.6=§cYou could pretend to go socialize

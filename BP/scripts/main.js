@@ -3,7 +3,7 @@
 // 前缀 "lw_p1" = "Lionwolf's mod - Project 1"
 
 // 输出测试日志，确认脚本已加载，同时声明版权信息
-console.log("\n©\n狮狼传奇_小怕\nLW.狮狼传奇工作室\n尘世之狼");
+console.log("\n©\nXiaopa baka\nLW Realm Studio");
 
 import * as mc from "@minecraft/server";
 import "./taskSystem.js";
@@ -14,7 +14,7 @@ import "./config/configUI.js";
 import { getWorldConfig } from "./config/worldConfig.js";
 import "./blocks/vending_machine.js";
 import { clearCrowbaredDoors } from "./blocks/keydoor.js";
-import "./blocks/blockComponents.js";
+import { t } from "./i18n/i18n.js";
 
 
 // 预创建全局所需计分板列表
@@ -238,7 +238,7 @@ mc.system.runInterval(() => {
     const totalPlayerCount = allPlayers.length;
     const inTrainPlayerCount = allPlayers.filter(player => player.hasTag("lw_p1:位于列车")).length;
 
-    const actionBarMsg = `已登车 ${inTrainPlayerCount} / ${totalPlayerCount} 人`;
+    const actionBarMsg = t("lw_p1.msg.boarded", inTrainPlayerCount, totalPlayerCount);
 
     for (const player of allPlayers) {
         if (!player.isValid) continue;
@@ -351,7 +351,7 @@ function startGameNow(allPlayers) {
             }
         } catch (e) { }
 
-        showTitle("§a游戏开始！");
+        showTitle(t("lw_p1.msg.gameStart"));
         mc.system.runTimeout(() => {
             clearTitle();
         }, 20);
@@ -396,7 +396,7 @@ mc.system.runInterval(() => {
                         for (const p of allPlayers) {
                             if (!p.isValid) continue;
                             try {
-                                p.sendMessage(`§c人数不足，无法开始游戏（当前 ${inTrainList.length} / 最低 ${minPlayer}）`);
+                                p.sendMessage(t("lw_p1.msg.notEnoughPlayers", inTrainList.length, minPlayer));
                             } catch { }
                         }
                     }
@@ -438,13 +438,13 @@ mc.system.runInterval(() => {
 
         if (gameStartTimer === null) {
             gameStartTimer = timeObj.getScore("lw_p1:全局") ?? 10;
-            showTitle(`§e${gameStartTimer} 秒后游戏开始`);
+            showTitle(t("lw_p1.msg.autoStart", gameStartTimer));
         }
 
         if (mc.system.currentTick % 20 === 0) {
             if (gameStartTimer > 0) {
                 gameStartTimer--;
-                showTitle(`§e${gameStartTimer} 秒后游戏开始`);
+                showTitle(t("lw_p1.msg.autoStart", gameStartTimer));
             } else if (gameStartTimer === 0) {
                 gameStartTimer = -1;
                 startGameNow(allPlayers);
@@ -611,7 +611,7 @@ mc.system.runInterval(() => {
 
     const m = Math.floor(remainSec / 60);
     const s = remainSec % 60;
-    const text = `§e剩余时间 ${m}:${String(s).padStart(2, "0")}`;
+    const text = t("lw_p1.prop.time.remaining", m, String(s).padStart(2, "0"));
 
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
@@ -627,22 +627,36 @@ let endTriggered = false;
 let pendingEndMsg = null;
 let roleRewardsGiven = false;
 
+// 结束原因内部代号 → 语言键
+const END_REASON_KEYS = {
+    "杀手死亡": "lw_p1.end.reason.killerDead",
+    "时间耗尽": "lw_p1.end.reason.timeUp",
+    "平民全部死亡": "lw_p1.end.reason.civilsDead"
+};
+
+// 名单拼接：用可翻译的分隔符连接，无成员时显示“无”
+function joinNames(names) {
+    if (!names || names.length === 0) return t("lw_p1.common.none");
+    const parts = [];
+    names.forEach((n, i) => {
+        if (i > 0) parts.push(t("lw_p1.common.listSep"));
+        parts.push({ text: String(n) });
+    });
+    return { rawtext: parts };
+}
+
 // 广播结束消息
 function broadcastEndMessage() {
     if (!pendingEndMsg) return;
     const { winner, reason, killerNames, policeNames, civilNames } = pendingEndMsg;
-    const resultLine = winner === "杀手" ? "§c游戏结束，杀手胜利！" : "§a游戏结束，平民胜利！";
-    const reasonText = {
-        "杀手死亡": "杀手死亡",
-        "时间耗尽": "时间耗尽，平民存活",
-        "平民全部死亡": "平民全部阵亡"
-    }[reason] || reason;
-    const killer = killerNames.join("、") || "无";
-    const police = policeNames.join("、") || "无";
-    const civils = civilNames.join("、") || "无";
+    const resultLine = t(winner === "杀手" ? "lw_p1.end.winner.killer" : "lw_p1.end.winner.civil");
+    const reasonText = t(END_REASON_KEYS[reason] ?? reason);
+    const killer = joinNames(killerNames);
+    const police = joinNames(policeNames);
+    const civils = joinNames(civilNames);
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
-        player.sendMessage(`§6【游戏结束】\n${resultLine}\n§f结束原因：${reasonText}\n§f杀手：${killer}\n§f警员：${police}\n§f平民：${civils}`);
+        player.sendMessage(t("lw_p1.end.message", resultLine, reasonText, killer, police, civils));
     }
     pendingEndMsg = null;
 }

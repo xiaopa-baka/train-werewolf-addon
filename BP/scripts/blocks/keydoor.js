@@ -2,6 +2,7 @@
 // keydoor.js - 钥匙门逻辑
 
 import * as mc from "@minecraft/server";
+import { t } from "../i18n/i18n.js";
 
 
 const DOOR_IDS = new Set(
@@ -198,22 +199,9 @@ mc.world.afterEvents.playerPlaceBlock.subscribe((event) => {
 });
 
 
-// 交互去重：同一 tick 内同一玩家对同一方块只处理一次
-// （国际版 beforeEvents.playerInteractWithBlock 与自定义组件 onPlayerInteract 会同时触发）
-const interactDedup = new Map();
-
-function tryClaimInteract(player, block) {
-    const now = mc.system.currentTick;
-    const key = `${player.id}@${block.dimension.id}:${block.x},${block.y},${block.z}`;
-    if (interactDedup.get(key) === now) return false;
-    interactDedup.set(key, now);
-    return true;
-}
-
-// 门交互核心逻辑（被 playerInteractWithBlock 与自定义组件 onPlayerInteract 共用）
-export function handleKeydoorInteract(player, block) {
+// 门交互核心逻辑
+function handleKeydoorInteract(player, block) {
     if (!player?.isValid || !block || !isDoor(block)) return;
-    if (!tryClaimInteract(player, block)) return;
 
     const hand = getHandTypeId(player);
 
@@ -273,11 +261,11 @@ export function handleKeydoorInteract(player, block) {
     const barExpiry = CROWBARED_DOORS.get(doorKeyStr);
     if (barExpiry !== undefined) {
         if (barExpiry === "permanent") {
-            try { player.sendMessage("§c这扇门被撬开了，无法关闭"); } catch (e) { }
+            try { player.sendMessage(t("lw_p1.door.crowbarLocked")); } catch (e) { }
             return;
         }
         if (barExpiry > mc.system.currentTick) {
-            try { player.sendMessage("§c这扇门被撬棍卡住了，稍后才能打开"); } catch (e) { }
+            try { player.sendMessage(t("lw_p1.door.crowbarCooldown")); } catch (e) { }
             return;
         }
         CROWBARED_DOORS.delete(doorKeyStr); // 临时锁定过期，解锁

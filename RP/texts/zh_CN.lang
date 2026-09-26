@@ -69,3 +69,320 @@ entity.lw_p1:bullet.name=子弹
 entity.lw_p1:grenade.name=手雷
 entity.lw_p1:corpes.name=尸体
 entity.lw_p1:player_name.name=玩家名
+
+## 通用
+lw_p1.common.notSet=未设置
+
+## 身份
+lw_p1.role.killer=§c杀手
+lw_p1.role.officer=§b警员
+lw_p1.role.passenger=§a平民
+
+## 指南书
+lw_p1.guide.title=§l§6列车乘客手册
+lw_p1.guide.indexHint=§7选择章节阅读§r
+lw_p1.guide.prev=← 上一页
+lw_p1.guide.next=下一页 →
+lw_p1.guide.ch.overview=§l游戏概述
+lw_p1.guide.ch.roles=§l身份
+lw_p1.guide.ch.tasks=§l任务系统
+lw_p1.guide.ch.items=§l道具与商店
+lw_p1.guide.ch.note=§l便条
+lw_p1.guide.ch.config=§l修改配置
+lw_p1.guide.overview.body=§f一列飞驰的火车，一场暗藏杀机的旅途。\n你能否活着到站？\n§f列车狼人杀是一款多人推理对抗游戏。\n§e5-15 人§f，一局约 §e10 分钟§f。\n\n§l规则§r\n§f1. 所有人登车后，列车出发\n2. 随机分配身份： §c杀手§f、§b警员§f、§a平民§f\n3. 杀手暗中消灭乘客，乘客努力找出杀手\n\n§l获胜条件§r\n§a乘客§f：杀手死亡 / 列车到站\n§c杀手§f：所有乘客死亡\n\n§7地图名称： %s\n§7地图作者： %s\n§7Addon作者： 狮狼传奇_小怕（LW.狮狼传奇工作室）
+lw_p1.guide.roles.body=· §c§l杀手§r\n§f隐藏在乘客之中，目标是消灭所有乘客，拥有§e杀手商店§f。\n\n· §b§l警员§r\n§f唯一的执法人员，拥有§e左轮手枪§f。\n\n· §a§l平民§r\n§f没有武器，没有特权，是人数最多的群体。\n\n\n
+lw_p1.guide.tasks.body=§f游戏开始后随机发布任务，倒计时在经验条上显示。\n§c超时未完成死亡§f\n\n§b§l任务列表§r\n§e通风任务§f：去车头或车尾透气\n§e睡觉任务§f：躺到床上\n§e进食任务§f：吃下任意食物\n§e补水任务§f：喝任意饮品 - §7香烟直接完成§f\n§e蹲坑任务§f：去厕所蹲下 - §7矿泉水瓶直接完成§f\n§e社交任务§f：靠近其他玩家站一会
+lw_p1.guide.items.body=§c§l杀手商店道具：§r\n§f匕首 · 德林杰手枪 · 撬棍 · 开锁器 · 毒药 · 球棒 · 手雷 · 断电装置\n\n§b§l通用道具§r\n§f便条 · 左轮手枪(警员) · 矿泉水 · 矿泉水瓶 · 神奇的海螺 · 父亲的怀表 · 野生蜂王浆\n\n§e杀手商店§f：杀手自带商店，可购买专属道具\n§e自动贩卖机§f：列车上的自动贩卖机可以购买特殊道具
+lw_p1.guide.note.body=§l便条系统§r\n§f每人开局获得一张便条，绑定背包。\n· 对空白处使用 → 编辑内容\n 对玩家使用 → 发送便条\n· 死亡后内容留在尸体上\n\n\n\n\n§7便条是游戏里唯一的通讯方式！\n
+lw_p1.guide.config.body=使用物品 §e木棍 §f打开配置界面，修改游戏配置\n\n\n\n\n\n\n\n\n\n\n\n\n
+
+## 商店
+lw_p1.shop.title.killer=杀手商店
+lw_p1.shop.title.vending=贩卖机
+lw_p1.shop.gold=当前金币：%s
+lw_p1.shop.button=%s：%s 金币
+lw_p1.shop.close=§c关闭
+lw_p1.shop.busy=§c操作中，请勿重复点击
+lw_p1.shop.notEnough=§c金币不足，购买失败！
+lw_p1.shop.fail=§c购买失败，请重试
+lw_p1.shop.success=§a成功购买 %s
+lw_p1.shop.invFull=§c物品栏已满，金币已退还
+lw_p1.shop.noScoreboard=§c内部错误：金币计分板未找到
+
+## 配置界面 - 通用
+lw_p1.ui.close=§c关闭
+lw_p1.ui.back=§c返回
+lw_p1.ui.cancel=取消
+lw_p1.ui.confirmReset=§c确认恢复
+lw_p1.ui.confirmClear=§c确认清空
+lw_p1.ui.resetDefault=§6恢复默认配置
+lw_p1.ui.resetTitle=恢复默认
+lw_p1.ui.deleteItem=§c删除此项
+lw_p1.ui.unset=未设置
+lw_p1.ui.coordInvalid=§c坐标输入不合法，保存失败
+lw_p1.ui.saveFail=§c保存失败: %s
+lw_p1.ui.addItem=新增物品
+lw_p1.ui.addProduct=新增商品
+lw_p1.ui.edit=编辑 %s
+lw_p1.ui.addCurrent=添加当前位置
+lw_p1.ui.coordX=X坐标
+lw_p1.ui.coordY=Y坐标
+lw_p1.ui.coordZ=Z坐标
+lw_p1.ui.inputInt=输入整型坐标
+lw_p1.ui.coord.diagStartX=对角线起点坐标\n\n起点X坐标
+lw_p1.ui.coord.startY=起点Y坐标
+lw_p1.ui.coord.startZ=起点Z坐标
+lw_p1.ui.coord.diagEndX=对角线终点坐标\n\n终点X坐标
+lw_p1.ui.coord.endY=终点Y坐标
+lw_p1.ui.coord.endZ=终点Z坐标
+lw_p1.ui.itemId.label=请输入物品完整标识符，示例：minecraft:apple
+lw_p1.ui.itemId.labelShort=物品完整标识符
+lw_p1.ui.itemId.ph=请输入物品ID
+lw_p1.ui.itemId.phShort=物品ID
+
+## 配置界面 - 主界面
+lw_p1.ui.main.title=主配置面板
+lw_p1.ui.main.body=请选择配置分类
+lw_p1.ui.main.game=全局游戏配置
+lw_p1.ui.main.map=地图区域配置
+lw_p1.ui.main.food=食物&饮品配置
+lw_p1.ui.main.shop=商店配置
+lw_p1.ui.main.other=其他
+
+## 配置界面 - 全局游戏配置
+lw_p1.ui.game.title=全局游戏配置
+lw_p1.ui.game.body=调整游戏全局数值参数
+lw_p1.ui.game.settings=游戏相关配置
+lw_p1.ui.game.task=任务相关配置
+lw_p1.ui.game.settingsTitle=游戏相关配置
+lw_p1.ui.game.autoHeader=自动开始时间
+lw_p1.ui.game.autoDesc=当所有玩家都位于列车时，游戏自动开始倒计时。\n也可通过以下指令手动开始游戏\n/function lw_p1:gameStart\n默认 10\n自动开始时间（秒）
+lw_p1.ui.game.autoToggle=启用自动开始游戏
+lw_p1.ui.game.minHeader=\n最低开局人数
+lw_p1.ui.game.minDesc=当列车内玩家数量达到此值时，游戏可以开始。\n默认 5\n最低开局人数（个）
+lw_p1.ui.game.baseHeader=\n游戏基础时长
+lw_p1.ui.game.baseDesc=单局游戏的基础时长，每死亡一位平民时长加60秒。\n默认 600\n游戏时长（秒）
+lw_p1.ui.game.saved=§a游戏配置已保存
+lw_p1.ui.task.title=任务相关配置
+lw_p1.ui.task.probHeader=任务分配概率
+lw_p1.ui.task.probDesc=每秒给未分配任务玩家发布任务的概率。\n默认 3\n分配概率（百分比）
+lw_p1.ui.task.startHeader=\n任务开始发布时间
+lw_p1.ui.task.startDesc=游戏开始后，首次尝试发布任务的时间。\n默认 20\n首个任务发布时间（秒）
+lw_p1.ui.task.limitHeader=\n单个任务限时
+lw_p1.ui.task.limitDesc=单个任务必须在该时间内完成，超时视为任务失败。\n默认 100\n单个任务限时（秒）
+lw_p1.ui.task.fakeHeader=\n杀手虚假任务限时
+lw_p1.ui.task.fakeDesc=杀手虚假任务可选择完成的限时，超过该时间未完成则虚假任务结束。\n默认 50\n虚假任务限时（秒）
+lw_p1.ui.task.rewardHeader=\n任务完成奖励
+lw_p1.ui.task.rewardDesc=平民/警员每完成一个任务获得的金币数。\n默认 25\n任务完成奖励（金币）
+lw_p1.ui.task.saved=§a任务配置已保存
+lw_p1.ui.reset.title=恢复默认配置
+lw_p1.ui.reset.body=§c确定要将所有游戏配置恢复为默认值吗？\n此操作会覆盖当前所有设置！
+lw_p1.ui.reset.done=§a已成功恢复所有任务/游戏配置为默认值！
+
+## 配置界面 - 地图区域配置
+lw_p1.ui.map.title=地图区域配置
+lw_p1.ui.map.body=坐标管理
+lw_p1.ui.map.stationEngine=站台&车头坐标
+lw_p1.ui.map.trainArea=列车区域坐标
+lw_p1.ui.map.engineVent=车头透气区坐标
+lw_p1.ui.map.tailVent=车尾透气区坐标
+lw_p1.ui.map.toilet=蹲坑坐标管理
+lw_p1.ui.map.randomTp=随机传送坐标管理
+lw_p1.ui.map.roomCount=房间数配置
+lw_p1.ui.map.clearAll=§6清空所有地图坐标
+lw_p1.ui.stationEngine.title=站台&车头坐标配置
+lw_p1.ui.stationEngine.stationHeader=站台坐标
+lw_p1.ui.stationEngine.stationX=每局结束后玩家传送至该坐标（开始屋）\n\n站台X坐标
+lw_p1.ui.stationEngine.stationY=站台Y坐标
+lw_p1.ui.stationEngine.stationZ=站台Z坐标
+lw_p1.ui.stationEngine.engineHeader=\n车头坐标
+lw_p1.ui.stationEngine.engineX=使用“传送至车头”物品后传送的坐标\n\n车头X坐标
+lw_p1.ui.stationEngine.engineY=车头Y坐标
+lw_p1.ui.stationEngine.engineZ=车头Z坐标
+lw_p1.ui.stationEngine.saved=§a站台&车头坐标已保存
+lw_p1.ui.trainArea.title=列车区域坐标配置
+lw_p1.ui.trainArea.startHeader=列车区域 起点
+lw_p1.ui.trainArea.endHeader=\n列车区域 终点
+lw_p1.ui.trainArea.saved=§a列车区域坐标已保存
+lw_p1.ui.engineVent.title=车头透气区坐标配置
+lw_p1.ui.engineVent.startHeader=车头透气区 起点
+lw_p1.ui.engineVent.endHeader=\n车头透气区 终点
+lw_p1.ui.engineVent.saved=§a车头透气区坐标已保存
+lw_p1.ui.tailVent.title=车尾透气区坐标配置
+lw_p1.ui.tailVent.startHeader=车尾透气区 起点
+lw_p1.ui.tailVent.endHeader=\n车尾透气区 终点
+lw_p1.ui.tailVent.saved=§a车尾透气区坐标已保存
+lw_p1.ui.toilet.title=蹲坑坐标管理
+lw_p1.ui.toilet.body=玩家在以下坐标位置潜行一段时间可完成蹲坑任务。\n至少设置一个坐标
+lw_p1.ui.toilet.added=§a蹲坑坐标已添加
+lw_p1.ui.toilet.deleted=§c已删除蹲坑坐标
+lw_p1.ui.toilet.updated=§a蹲坑坐标已更新
+lw_p1.ui.toilet.edit=编辑 蹲坑坐标 %s
+lw_p1.ui.random.title=随机传送坐标管理
+lw_p1.ui.random.body=开局后玩家将随机传送到以下坐标。\n至少设置数目为最大玩家数的坐标数。
+lw_p1.ui.random.added=§a随机坐标已添加
+lw_p1.ui.random.deleted=§c已删除随机传送坐标
+lw_p1.ui.random.updated=§a随机传送坐标已更新
+lw_p1.ui.random.edit=编辑 随机传送坐标 %s
+lw_p1.ui.room.title=房间数配置
+lw_p1.ui.room.header=房间数量
+lw_p1.ui.room.desc=游戏开始时，钥匙数量（1-N），若玩家数超过房间数则循环分配。\n默认 8\n房间数量
+lw_p1.ui.room.set=§a房间数已设为 %s
+lw_p1.ui.clear.title=确认清空
+lw_p1.ui.clear.body=§c确定清空所有地图坐标？不可恢复！
+lw_p1.ui.clear.done=§c所有地图坐标已清空
+
+## 配置界面 - 食物&饮品
+lw_p1.ui.food.title=物品配置管理
+lw_p1.ui.food.body=管理进食/补水任务的合法物品列表
+lw_p1.ui.food.foods=配置合法食物
+lw_p1.ui.food.drinks=配置合法饮品
+lw_p1.ui.food.trays=食物托盘配置
+lw_p1.ui.resetFood.body=§c确定恢复合法食物、饮品和食物托盘的默认列表吗？当前的自定义项将被覆盖！
+lw_p1.ui.resetFood.done=§a已恢复合法食物/饮品/食物托盘的默认配置
+lw_p1.ui.foodList.title=合法食物管理
+lw_p1.ui.foodList.body=管理进食任务的合法物品列表
+lw_p1.ui.foodList.add=新增食物
+lw_p1.ui.drinkList.title=合法饮品管理
+lw_p1.ui.drinkList.body=管理补水任务的合法物品列表
+lw_p1.ui.drinkList.add=新增饮品
+lw_p1.ui.tray.title=食物托盘配置
+lw_p1.ui.tray.body=选择要配置的托盘类型，交互后可随机获得配置中的物品
+lw_p1.ui.tray.items=%s 物品
+lw_p1.ui.tray.itemsBody=交互后可随机获得以下物品之一
+lw_p1.ui.tray.addTitle=新增 %s 物品
+
+## 配置界面 - 商店
+lw_p1.ui.shop.title=商店配置
+lw_p1.ui.shop.body=管理商店物品列表与初始金币
+lw_p1.ui.shop.killer=杀手商店配置
+lw_p1.ui.shop.vending=贩卖机配置
+lw_p1.ui.shop.initialCoins=初始金币
+lw_p1.ui.resetShop.body=§c确定恢复杀手商店和贩卖机的默认商品列表吗？当前的自定义项将被覆盖！
+lw_p1.ui.resetShop.done=§a已恢复商店的默认配置
+lw_p1.ui.killerForm.title=杀手商店配置
+lw_p1.ui.killerForm.body=管理杀手商店物品列表
+lw_p1.ui.vendingForm.title=贩卖机配置
+lw_p1.ui.vendingForm.body=管理贩卖机物品列表
+lw_p1.ui.shopItem.name=商品显示名称
+lw_p1.ui.shopItem.namePh=请输入名称
+lw_p1.ui.shopItem.id=物品标识符
+lw_p1.ui.shopItem.idPh=如 minecraft:apple
+lw_p1.ui.shopItem.price=价格
+lw_p1.ui.shopItem.pricePh=请输入正整数
+lw_p1.ui.initialCoins.title=初始金币设置
+lw_p1.ui.initialCoins.killerHeader=杀手初始金币
+lw_p1.ui.initialCoins.killerDesc=游戏开始后，杀手玩家持有的初始金币数。\n默认 100\n杀手初始金币
+lw_p1.ui.initialCoins.civilHeader=\n平民初始金币
+lw_p1.ui.initialCoins.civilDesc=游戏开始后，非杀手玩家持有的初始金币数。\n默认 0\n平民初始金币
+lw_p1.ui.initialCoins.killerRateHeader=\n杀手金币成长
+lw_p1.ui.initialCoins.killerRateDesc=游戏开始后，杀手玩家每 10 秒自然获得的金币数。\n默认 15\n每10秒金币
+lw_p1.ui.initialCoins.civilRateHeader=\n平民金币成长
+lw_p1.ui.initialCoins.civilRateDesc=游戏开始后，非杀手玩家每 10 秒自然获得的金币数。\n默认 0\n每10秒金币
+lw_p1.ui.initialCoins.fail=§c初始金币保存失败: %s
+
+## 配置界面 - 其他
+lw_p1.ui.other.title=其他功能
+lw_p1.ui.other.body=一些预留功能和关于信息
+lw_p1.ui.other.mapInfo=设置地图信息
+lw_p1.ui.other.unused=修改更多当前不可用配置
+lw_p1.ui.other.about=关于本Addon
+lw_p1.ui.other.sponsor=赞助&加入我们
+lw_p1.ui.mapInfo.title=地图信息设置
+lw_p1.ui.mapInfo.name=地图名称
+lw_p1.ui.mapInfo.namePh=请输入地图名称
+lw_p1.ui.mapInfo.author=地图作者
+lw_p1.ui.mapInfo.authorPh=请输入作者名称
+lw_p1.ui.mapInfo.saved=§a地图信息已保存
+lw_p1.ui.unused.title=功能预留配置
+lw_p1.ui.unused.body=若您想要增加更多任务、预设游戏数据或状态，修改底层数据，可访问以下网址查看项目源代码\nhttps://github.com/xiaopa-baka/train-werewolf-addon\n您可以访问项目仓库后查看行为包源代码，进行学习、修改、创建分支二次开发\n\n注意：\n进行二次开发后，请注明原作者和修改内容，禁止恶意篡改后传播！\n二次开发不得用于商业用途，禁止私自售卖原版或修改后的版本！\n二次开发后不得修改或删除整个“其他”板块的内容，包括开发者信息和赞助信息等\n二次开发过程中如有任何问题欢迎联系开发者\n\n§6敬请期待后续版本更新！
+lw_p1.ui.about.title=关于本Addon
+lw_p1.ui.about.body=§b列车狼人杀Addon\n§f版本：正式版 1.0\n§f适配：我的世界基岩版 1.21.120+\n§f开发模式：原生Script API\n\n§a开发者简介：\n工作室：LW.狮狼传奇工作室\n项目策划：狮狼传奇_小怕\nAddon作者：狮狼传奇_小怕\n工作室交流群：180568043
+lw_p1.ui.sponsor.title=赞助 & 团队招募
+lw_p1.ui.sponsor.body=§b欢迎支持本项目开发！\n\n§f【赞助说明】\n如果您喜欢本Addon，愿意支持我们，可以通过以下方式赞助：\n• 在社交媒体上宣传此Addon\n• 为此Addon制作玩法地图并发布\n\n工作室正在积极招新中，欢迎热爱MC的你加入我们！\n§f【招募岗位】\n• 地图建筑\n• 项目策划\n• 运营及宣传\n• 指令设计、模组与插件开发\n• 贴图与建模制作\n• 皮肤设计\n\n\n工作室交流群：180568043\n§a欢迎热爱MC的小伙伴加入！\n加入我们，一起创造更精彩的MC冒险体验！
+
+## 通用提示
+lw_p1.common.unknownPlayer=未知玩家
+
+## 游戏消息
+lw_p1.msg.killer.civilianDeath=§e有平民死亡，获得 100 金币，倒计时延长 60 秒
+
+## 道具交互
+lw_p1.prop.pistol.killerBlocked=§c杀手无法使用这把枪
+lw_p1.prop.pistol.lostRight=§c你已失去使用手枪的资格
+lw_p1.prop.pistol.picked=§a你捡起了左轮手枪
+lw_p1.prop.invFull=§c背包已满，无法拾取
+lw_p1.prop.mad.start=§c§l%s 进入了疯狂状态！
+lw_p1.prop.mad.end=§7%s 的疯狂状态已结束
+lw_p1.prop.conch=§e§l神奇的海螺 §r§f告诉你： %s 的身份是 %s
+lw_p1.prop.time.none=§e剩余时间 --:--
+lw_p1.prop.time.remaining=§e剩余时间 %s:%s
+lw_p1.prop.watch.saved=父亲的怀表 帮你免除了一次致命伤害
+lw_p1.prop.tray.alreadyPoisoned=§c这个托盘已经被下毒了
+lw_p1.prop.tray.poisoned=§a下毒成功
+lw_p1.prop.tray.empty=§c这个托盘是空的
+lw_p1.prop.royalJelly.cured=§a蜂王浆解除了你的中毒状态
+lw_p1.prop.note.title=便条编辑
+lw_p1.prop.note.label=输入便条内容
+lw_p1.prop.note.ph=在这里输入...
+lw_p1.prop.note.empty=§c便条上还没有内容，请先编辑
+lw_p1.prop.note.received=§7%s 的便条§f: %s
+lw_p1.prop.note.sent=§a已向 %s 发送便条
+lw_p1.prop.note.corpse=§e[便条] §f%s
+
+## 通用（补充）
+lw_p1.common.none=无
+lw_p1.common.listSep=、
+
+## 游戏消息（补充）
+lw_p1.msg.boarded=已登车 %s / %s 人
+lw_p1.msg.gameStart=§a游戏开始！
+lw_p1.msg.notEnoughPlayers=§c人数不足，无法开始游戏（当前 %s / 最低 %s）
+lw_p1.msg.autoStart=§e%s 秒后游戏开始
+
+## 结算
+lw_p1.end.winner.killer=§c游戏结束，杀手胜利！
+lw_p1.end.winner.civil=§a游戏结束，平民胜利！
+lw_p1.end.reason.killerDead=杀手死亡
+lw_p1.end.reason.timeUp=时间耗尽，平民存活
+lw_p1.end.reason.civilsDead=平民全部阵亡
+lw_p1.end.message=§6【游戏结束】\n%s\n§f结束原因：%s\n§f杀手：%s\n§f警员：%s\n§f平民：%s
+
+## 钥匙门
+lw_p1.door.crowbarLocked=§c这扇门被撬开了，无法关闭
+lw_p1.door.crowbarCooldown=§c这扇门被撬棍卡住了，稍后才能打开
+
+## 身份提示（mcfunction）
+lw_p1.roleRemind.killer=欢迎登车 §c§l杀手
+lw_p1.roleRemind.officer=欢迎登车 §b§l警员
+lw_p1.roleRemind.passenger=欢迎登车 §a§l乘客
+lw_p1.roleGoal.killer=隐藏身份，解决所有人
+lw_p1.roleGoal.officer=保护乘客，找出杀手
+lw_p1.roleGoal.passenger=配合警员，安全下车
+
+## 任务提示（mcfunction）
+lw_p1.task.1.hint1=§a你感觉有点闷，去透透气吧
+lw_p1.task.1.hint2=§6你有点喘不过来气，去透透气吧
+lw_p1.task.1.hint3=§c你快闷死了，现在必须马上去透气！
+lw_p1.task.2.hint1=§a你想去上个厕所
+lw_p1.task.2.hint2=§6你有点憋不住了，快去上个厕所
+lw_p1.task.2.hint3=§c你就要憋死了,厕所在哪里？！
+lw_p1.task.3.hint1=§a你有点困了，去睡个觉吧
+lw_p1.task.3.hint2=§6你的眼皮在打架，睡个觉吧
+lw_p1.task.3.hint3=§c你确信再不睡觉就要猝死了！
+lw_p1.task.4.hint1=§a你有点饿，想吃东西
+lw_p1.task.4.hint2=§6你现在特别想吃点什么东西
+lw_p1.task.4.hint3=§c你饿得想啃墙，再不吃东西绝对会饿死！
+lw_p1.task.5.hint1=§a你有点口渴，想喝点什么
+lw_p1.task.5.hint2=§6你嘴唇干裂，特别想喝点什么
+lw_p1.task.5.hint3=§c你快脱水了，再不补水就会渴死！
+lw_p1.task.6.hint1=§a你有点无聊，去找其他人社交吧
+lw_p1.task.6.hint2=§6你有点抑郁了，需要找人社交
+lw_p1.task.6.hint3=§c你现在重度抑郁，你需要社交！
+lw_p1.task.done=§a你感觉好多了
+lw_p1.task.fake.1=§c你可以假装去透气
+lw_p1.task.fake.2=§c你可以假装去上厕所
+lw_p1.task.fake.3=§c你可以假装去睡觉
+lw_p1.task.fake.4=§c你可以假装去吃东西
+lw_p1.task.fake.5=§c你可以假装去喝点什么
+lw_p1.task.fake.6=§c你可以假装去找别人社交

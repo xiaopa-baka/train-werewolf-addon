@@ -76,47 +76,47 @@ export function getEmptyConfig() {
         killerStoreItems: [
             {
                 id: "lw_p1:dagger",
-                displayName: "匕首",
+                displayName: "",
                 price: 100
             },
             {
                 id: "lw_p1:pistol_mini",
-                displayName: "德林杰手枪",
+                displayName: "",
                 price: 250
             },
             {
                 id: "lw_p1:crowbar",
-                displayName: "撬棍",
+                displayName: "",
                 price: 75
             },
             {
                 id: "lw_p1:lockpick",
-                displayName: "开锁器",
+                displayName: "",
                 price: 100
             },
             {
                 id: "lw_p1:poison",
-                displayName: "毒药",
+                displayName: "",
                 price: 100
             },
             {
-                id: "lw_p1:firecracker",
-                displayName: "爆竹",
+                id: "lw_p1:firecracker_spawn_egg",
+                displayName: "",
                 price: 75
             },
             {
                 id: "lw_p1:grenade",
-                displayName: "手雷",
+                displayName: "",
                 price: 250
             },
             {
                 id: "lw_p1:bat",
-                displayName: "球棒",
+                displayName: "",
                 price: 300
             },
             {
                 id: "lw_p1:power_cut",
-                displayName: "断电装置",
+                displayName: "",
                 price: 200
             },
         ],
@@ -125,37 +125,37 @@ export function getEmptyConfig() {
         vendingMachineItems: [
             {
                 id: "lw_p1:pistol",
-                displayName: "左轮手枪",
+                displayName: "",
                 price: 250
             },
             {
                 id: "lw_p1:mineral_water",
-                displayName: "矿泉水",
+                displayName: "",
                 price: 100
             },
             {
                 id: "lw_p1:cigarette",
-                displayName: "香烟",
+                displayName: "",
                 price: 100
             },
             {
                 id: "minecraft:ender_pearl",
-                displayName: "末影珍珠",
+                displayName: "",
                 price: 100
             },
             {
                 id: "lw_p1:magic_conch",
-                displayName: "神奇的海螺",
+                displayName: "",
                 price: 100
             },
             {
                 id: "lw_p1:pocke_watch",
-                displayName: "父亲的怀表",
+                displayName: "",
                 price: 125
             },
             {
                 id: "lw_p1:royal_jelly",
-                displayName: "野生蜂王浆",
+                displayName: "",
                 price: 100
             },
         ],

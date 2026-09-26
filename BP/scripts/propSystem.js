@@ -4,6 +4,7 @@
 import * as mc from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { getWorldConfig } from "./config/worldConfig.js";
+import { t } from "./i18n/i18n.js";
 
 
 // 判断玩家是否为创造模式
@@ -488,12 +489,12 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
 
     // 杀手无法拾取
     if (player.hasTag("lw_p1:杀手")) {
-        try { player.sendMessage("§c杀手无法使用这把枪"); } catch (e) { }
+        try { player.sendMessage(t("lw_p1.prop.pistol.killerBlocked")); } catch (e) { }
         return;
     }
     // 掉落过枪的人无法拾取
     if (player.hasTag("lw_p1:禁用手枪")) {
-        try { player.sendMessage("§c你已失去使用手枪的资格"); } catch (e) { }
+        try { player.sendMessage(t("lw_p1.prop.pistol.lostRight")); } catch (e) { }
         return;
     }
 
@@ -512,9 +513,9 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
                 pistolEntity.remove();
                 // 防止拾取后走火
                 try { player.startItemCooldown("lw_p1_pistol", 20); } catch (e) { }
-                try { player.sendMessage("§a你捡起了左轮手枪"); } catch (e) { }
+                try { player.sendMessage(t("lw_p1.prop.pistol.picked")); } catch (e) { }
             } else {
-                try { player.sendMessage("§c背包已满，无法拾取"); } catch (e) { }
+                try { player.sendMessage(t("lw_p1.prop.invFull")); } catch (e) { }
             }
         } catch (e) { }
     });
@@ -572,7 +573,7 @@ mc.system.runInterval(() => {
 
         for (const p of mc.world.getPlayers()) {
             if (!p.isValid) continue;
-            try { p.sendMessage(`§c§l${player.name} 进入了疯狂状态！`); } catch (e) { }
+            try { p.sendMessage(t("lw_p1.prop.mad.start", player.name)); } catch (e) { }
         }
 
         // 30 秒后清除球棍并结束狂暴
@@ -590,7 +591,7 @@ mc.system.runInterval(() => {
             } catch (e) { }
             for (const p of mc.world.getPlayers()) {
                 if (!p.isValid) continue;
-                try { p.sendMessage(`§7${player.name} 的疯狂状态已结束`); } catch (e) { }
+                try { p.sendMessage(t("lw_p1.prop.mad.end", player.name)); } catch (e) { }
             }
         }, 600);
     }
@@ -951,11 +952,11 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
     if (!targetPlayer?.isValid) return;
 
     // 判断目标身份
-    let role = "§a平民";
-    if (targetPlayer.hasTag("lw_p1:杀手")) role = "§c杀手";
-    else if (targetPlayer.hasTag("lw_p1:警员")) role = "§b警员";
+    let role = t("lw_p1.role.passenger");
+    if (targetPlayer.hasTag("lw_p1:杀手")) role = t("lw_p1.role.killer");
+    else if (targetPlayer.hasTag("lw_p1:警员")) role = t("lw_p1.role.officer");
 
-    try { player.sendMessage(`§e§l神奇的海螺 §r§f告诉你： ${targetPlayer.name} 的身份是 ${role}`); } catch (e) { }
+    try { player.sendMessage(t("lw_p1.prop.conch", targetPlayer.name, role)); } catch (e) { }
 
     // 使用后消失
     if (!isCreative(player)) {
@@ -987,15 +988,15 @@ function watchRemainText() {
         const gt = mc.world.scoreboard.getObjective("lw_p1:游戏时间");
         const bt = mc.world.scoreboard.getObjective("lw_p1:单局游戏基础时长");
         const ex = mc.world.scoreboard.getObjective("lw_p1:死亡加时");
-        if (!gt || !bt) return "§e剩余时间 --:--";
+        if (!gt || !bt) return t("lw_p1.prop.time.none");
         const elapsed = Math.floor((gt.getScore("lw_p1:全局") ?? 0) / 20);
         const base = bt.getScore("lw_p1:全局") ?? 600;
         const extra = ex?.getScore("lw_p1:全局") ?? 0;
         const remain = Math.max(0, base + extra - elapsed);
         const m = Math.floor(remain / 60), s = remain % 60;
-        return `§e剩余时间 ${m}:${String(s).padStart(2, "0")}`;
+        return t("lw_p1.prop.time.remaining", m, String(s).padStart(2, "0"));
     } catch (e) {
-        return "§e剩余时间 --:--";
+        return t("lw_p1.prop.time.none");
     }
 }
 
@@ -1064,7 +1065,7 @@ mc.system.runInterval(() => {
                     container.setItem(foundSlot, undefined);
                 }
             } catch (e) { }
-            player.sendMessage("父亲的怀表 帮你免除了一次致命伤害")
+            player.sendMessage(t("lw_p1.prop.watch.saved"))
             player.removeTag("lw_p1:受到伤害");
         } else {
             poisonKill(player);
@@ -1097,23 +1098,10 @@ const POISONED_EATERS = new Map();
 // 记录玩家已吃下被下毒食物且毒药生效中
 const ACTIVE_POISONS = new Map();
 
-// 交互去重,同一 tick 内同一玩家对同一方块只处理一次
-// （国际版 beforeEvents.playerInteractWithBlock 与自定义组件 onPlayerInteract 会同时触发）
-const interactDedup = new Map();
-
-function tryClaimInteract(player, block) {
-    const now = mc.system.currentTick;
-    const key = `${player.id}@${block.dimension.id}:${block.x},${block.y},${block.z}`;
-    if (interactDedup.get(key) === now) return false;
-    interactDedup.set(key, now);
-    return true;
-}
-
-// 食物托盘交互核心逻辑（被 playerInteractWithBlock 与自定义组件 onPlayerInteract 共用）
-export function handleFoodTrayInteract(player, block) {
+// 食物托盘交互核心逻辑
+function handleFoodTrayInteract(player, block) {
     if (!player?.isValid || !block) return;
     if (!FOOD_TRAY_IDS.includes(block.typeId)) return;
-    if (!tryClaimInteract(player, block)) return;
 
     // 获取玩家当前手持物品
     let hand = null;
@@ -1132,12 +1120,12 @@ export function handleFoodTrayInteract(player, block) {
         trayCooldown.set(player.id, mc.system.currentTick);
 
         if (POISONED_TRAYS.has(tKey)) {
-            try { player.sendMessage("§c这个托盘已经被下毒了"); } catch (e) { }
+            try { player.sendMessage(t("lw_p1.prop.tray.alreadyPoisoned")); } catch (e) { }
             return;
         }
         const slot = player.selectedSlotIndex;
         POISONED_TRAYS.set(tKey, { poisonerId: player.id });
-        try { player.sendMessage("§a下毒成功"); } catch (e) { }
+        try { player.sendMessage(t("lw_p1.prop.tray.poisoned")); } catch (e) { }
 
         // 消耗毒药
         if (!isCreative(player)) {
@@ -1164,14 +1152,14 @@ export function handleFoodTrayInteract(player, block) {
     const poisonedInfo = POISONED_TRAYS.get(tKey);
     // 下毒者本人无法从该托盘获取物品
     if (poisonedInfo && poisonedInfo.poisonerId === player.id) {
-        try { player.sendMessage("§c这个托盘已经被下毒了"); } catch (e) { }
+        try { player.sendMessage(t("lw_p1.prop.tray.alreadyPoisoned")); } catch (e) { }
         return;
     }
 
     const config = getWorldConfig();
     const items = config.foodTrayItems?.[block.typeId];
     if (!Array.isArray(items) || items.length === 0) {
-        try { player.sendMessage("§c这个托盘是空的"); } catch (e) { }
+        try { player.sendMessage(t("lw_p1.prop.tray.empty")); } catch (e) { }
         return;
     }
 
@@ -1240,7 +1228,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
                     // 移除已施加的反胃效果
                     if (player.isValid) player.addEffect("minecraft:nausea", 0, { amplifier: 0, showParticles: false });
                 } catch (e) { }
-                try { player.sendMessage("§a蜂王浆解除了你的中毒状态"); } catch (e) { }
+                try { player.sendMessage(t("lw_p1.prop.royalJelly.cured")); } catch (e) { }
             }
             return;
         }
@@ -1311,12 +1299,12 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
 
     const message = player.getDynamicProperty("lw_p1:noteMessage");
     if (!message || typeof message !== "string" || message.trim() === "") {
-        try { player.sendMessage("§c便条上还没有内容，请先编辑"); } catch (e) { }
+        try { player.sendMessage(t("lw_p1.prop.note.empty")); } catch (e) { }
         return;
     }
 
-    try { targetPlayer.sendMessage(`§7${player.name} 的便条§f: ${message}`); } catch (e) { }
-    try { player.sendMessage(`§a已向 ${targetPlayer.name} 发送便条`); } catch (e) { }
+    try { targetPlayer.sendMessage(t("lw_p1.prop.note.received", player.name, String(message))); } catch (e) { }
+    try { player.sendMessage(t("lw_p1.prop.note.sent", targetPlayer.name)); } catch (e) { }
 });
 
 // 右键空白处打开便条编辑表单
@@ -1333,8 +1321,8 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 
         const currentMessage = player.getDynamicProperty("lw_p1:noteMessage") ?? "";
         new ModalFormData()
-            .title("便条编辑")
-            .textField("输入便条内容", "在这里输入...", { defaultValue: String(currentMessage) })
+            .title(t("lw_p1.prop.note.title"))
+            .textField(t("lw_p1.prop.note.label"), t("lw_p1.prop.note.ph"), { defaultValue: String(currentMessage) })
             .show(player).then(res => {
                 if (res.canceled || !player.isValid) return;
                 const text = res.formValues?.[0] ?? "";
@@ -1379,8 +1367,8 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
     const noteContent = corpse.getDynamicProperty("lw_p1:noteContent");
     const ownerId = corpse.getDynamicProperty("lw_p1:ownerId");
     const ownerName = typeof ownerId === "string"
-        ? (Array.from(mc.world.getPlayers()).find(p => p.id === ownerId)?.name ?? "未知玩家")
-        : "未知玩家";
+        ? (Array.from(mc.world.getPlayers()).find(p => p.id === ownerId)?.name ?? t("lw_p1.common.unknownPlayer"))
+        : t("lw_p1.common.unknownPlayer");
 
-    try { player.sendMessage(`§e[便条] §f${noteContent}`); } catch (e) { }
+    try { player.sendMessage(t("lw_p1.prop.note.corpse", String(noteContent))); } catch (e) { }
 });

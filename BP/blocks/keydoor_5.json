@@ -27,7 +27,6 @@
             }
         },
         "components": {
-            "minecraft:custom_components": ["lw_p1:keydoor_interact"],
             "minecraft:material_instances": {
                 "*": {
                     "texture": "keydoor_top",

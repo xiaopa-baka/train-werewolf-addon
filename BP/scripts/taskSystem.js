@@ -3,6 +3,7 @@
 
 import * as mc from "@minecraft/server";
 import { getWorldConfig } from "./config/worldConfig.js";
+import { t } from "./i18n/i18n.js";
 
 
 // 游戏开始后按概率给无任务玩家分配随机任务
@@ -379,7 +380,7 @@ mc.system.runInterval(() => {
         player.addTag("lw_p1:已击杀奖励");
         if (extraObj) extraObj.addScore("lw_p1:全局", 60);
         goldObj.addScore(killer, 100);
-        try { killer.sendMessage("§e有平民死亡，获得 100 金币，倒计时延长 60 秒"); } catch (e2) { }
+        try { killer.sendMessage(t("lw_p1.msg.killer.civilianDeath")); } catch (e2) { }
     }
 }, 1);
 
