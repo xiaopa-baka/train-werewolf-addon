@@ -100,7 +100,7 @@ export function getEmptyConfig() {
                 price: 100
             },
             {
-                id: "lw_p1:firecracker",
+                id: "lw_p1:firecracker_spawn_egg",
                 displayName: "爆竹",
                 price: 75
             },
