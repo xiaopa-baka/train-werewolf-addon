@@ -4,7 +4,8 @@
         "description": {
             "identifier": "lw_p1:food_tray",
             "menu_category": {
-                "category": "construction"
+                "category": "construction",
+                "group": "lw_p1:itemGroup.name.trays"
             }
         },
         "components": {
