@@ -3,6 +3,25 @@
     "minecraft:crafting_items_catalog": {
         "categories": [
             {
+                "category_name": "construction",
+                "groups": [
+                    {
+                        "group_identifier": {
+                            "icon": "lw_p1:keydoor_1",
+                            "name": "lw_p1:itemGroup.name.doors"
+                        },
+                        "items": []
+                    },
+                    {
+                        "group_identifier": {
+                            "icon": "lw_p1:food_tray",
+                            "name": "lw_p1:itemGroup.name.trays"
+                        },
+                        "items": []
+                    }
+                ]
+            },
+            {
                 "category_name": "equipment",
                 "groups": [
                     {
@@ -33,41 +52,6 @@
                             "lw_p1:cosmopolitan",
                             "lw_p1:champagne",
                             "lw_p1:mineral_water"
-                        ]
-                    }
-                ]
-            },
-            {
-                "category_name": "construction",
-                "groups": [
-                    {
-                        "group_identifier": {
-                            "icon": "lw_p1:keydoor_1",
-                            "name": "lw_p1:itemGroup.name.doors"
-                        },
-                        "items": [
-                            "lw_p1:keydoor_1",
-                            "lw_p1:keydoor_2",
-                            "lw_p1:keydoor_3",
-                            "lw_p1:keydoor_4",
-                            "lw_p1:keydoor_5",
-                            "lw_p1:keydoor_6",
-                            "lw_p1:keydoor_7",
-                            "lw_p1:keydoor_8",
-                            "lw_p1:keydoor_9",
-                            "lw_p1:keydoor_10"
-                        ]
-                    },
-                    {
-                        "group_identifier": {
-                            "icon": "lw_p1:food_tray",
-                            "name": "lw_p1:itemGroup.name.trays"
-                        },
-                        "items": [
-                            "lw_p1:food_tray",
-                            "lw_p1:food_tray_ceramic",
-                            "lw_p1:food_tray_glass",
-                            "lw_p1:food_tray_wood"
                         ]
                     }
                 ]
