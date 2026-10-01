@@ -40,9 +40,9 @@ export function getEmptyConfig() {
 
         // 车头单点坐标
         trainEngineCoordinates: {
-            x: 0,
-            y: 0,
-            z: 0
+            x: 0.5,
+            y: 0.5,
+            z: 0.5
         },
 
         // 站台单点坐标
