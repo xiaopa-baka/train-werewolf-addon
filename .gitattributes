@@ -1,0 +1,2 @@
+# 换行符统一：仓库与工作区一律使用 LF，避免 Windows 上 CRLF/LF 混用造成的 status、diff 噪音
+* text=auto eol=lf
