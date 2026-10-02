@@ -103,6 +103,9 @@ registerActionBarProvider("lw_p1:stamina", (player) => {
     const state = staminaMap.get(player.id);
     if (!state) return undefined;
 
+    // 体力已满时不占用活动栏
+    if (state.value >= STAMINA_MAX) return undefined;
+
     const bar = staminaBar(state.value);
     const value = Math.round(state.value);
     return state.exhausted
