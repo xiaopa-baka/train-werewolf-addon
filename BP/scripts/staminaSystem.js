@@ -17,7 +17,7 @@ const EXHAUST_HUNGER = 2;         // 力竭时把饱食度压到 2（≤6 无法
 const MIN_SPRINT_HUNGER = 7;      // 解除力竭时至少恢复到 7（>6 才能疾跑）
 
 // 排查用日志开关：打开后每秒输出一次每个玩家的体力状态；确认无误后可关掉
-const DEBUG_LOG = true;
+const DEBUG_LOG = false;
 
 // 力竭期间记录"力竭前的饱食度"，存玩家动态属性以便跨会话保留（避免退出后卡在低饱食度）
 const HUNGER_LOCK_KEY = "lw_p1:staminaHungerLock";
