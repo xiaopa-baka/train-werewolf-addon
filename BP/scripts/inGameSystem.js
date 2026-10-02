@@ -1,14 +1,19 @@
 // @ts-check
-// staminaSystem.js - 体力（疾跑耐久）系统
-// 全局生效，不限游戏状态与游戏模式
-// 疾跑持续消耗体力 -> 体力耗尽把饱食度压在 6（原版规则：饱食度 ≤6 无法疾跑）
-// -> 停止疾跑一段时间后体力缓慢恢复 -> 回到阈值解除饱食度压制，恢复疾跑
+// inGameSystem.js - 局内系统（体力 + 跳跃），对应配置界面的「局内相关配置」开关
+//
+// 体力（疾跑耐久）：全局生效，不限游戏状态与游戏模式
+//   疾跑持续消耗体力 -> 体力耗尽把饱食度压在 6（原版规则：饱食度 ≤6 无法疾跑）
+//   -> 停止疾跑一段时间后体力缓慢恢复 -> 回到阈值解除饱食度压制，恢复疾跑
+//
+// 跳跃：由世界配置 jumpEnabled 控制，周期性向所有在线玩家下发跳跃输入权限
 
 import * as mc from "@minecraft/server";
 import { getWorldConfig } from "./config/worldConfig.js";
 import { registerActionBarProvider } from "./hudScheduler.js";
 import { t } from "./i18n/i18n.js";
 
+
+// ============================ 体力（疾跑耐久）系统 ============================
 
 // ——— 可调参数 ———
 const STAMINA_MAX = 100;          // 体力上限
@@ -201,3 +206,18 @@ mc.system.runInterval(() => {
 mc.world.afterEvents.playerLeave.subscribe((event) => {
     staminaMap.delete(event.playerId);
 });
+
+
+// ============================ 跳跃开关 ============================
+
+// 跳跃输入权限会随玩家重登/重生重置，所以周期性重新下发，保证开关始终生效
+mc.system.runInterval(() => {
+    const jumpEnabled = getWorldConfig().jumpEnabled !== false;
+
+    for (const player of mc.world.getPlayers()) {
+        if (!player.isValid) continue;
+        try {
+            player.inputPermissions.setPermissionCategory(mc.InputPermissionCategory.Jump, jumpEnabled);
+        } catch (e) { }
+    }
+}, 20);
