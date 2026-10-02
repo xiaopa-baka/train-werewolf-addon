@@ -8,15 +8,80 @@ console.log("\n©\nXiaopa baka\nLW Realm Studio");
 import * as mc from "@minecraft/server";
 import "./taskSystem.js";
 import "./shopSystem.js";
-import "./propSystem.js";
-import "./inGameSystem.js";
+import { watchHudText } from "./propSystem.js";
+import { staminaHudText } from "./inGameSystem.js";
 import "./guideBook.js";
 import "./config/configUI.js";
 import { getWorldConfig } from "./config/worldConfig.js";
-import { registerActionBarProvider } from "./hudScheduler.js";
 import "./blocks/vending_machine.js";
 import { clearCrowbaredDoors } from "./blocks/keydoor.js";
 import { t } from "./i18n/i18n.js";
+
+
+// ============================ 活动栏轮播调度器 ============================
+// 多个功能都要占用活动栏时统一分配：各功能提供文案，按权重轮播；
+// 无适用文案时清空；任务进度条等外部独占时让位。
+
+const ACTION_BAR_ROTATE_TICKS = 40;   // 每隔多少 tick 切换一次文案（40 tick = 2 秒）
+const actionBarProviders = new Map();
+
+// 注册一个活动栏文案来源；getText 返回空串 / undefined / null 表示此刻不适用
+function registerActionBarProvider(id, getText, options = {}) {
+    const weight = Math.max(1, Math.floor(options.weight ?? 1));
+    actionBarProviders.set(id, { getText, weight });
+}
+
+// 任务进行中（任务中 > 0）活动栏由 tick 函数里的进度条独占，调度器让位。
+// 注意要与 tick 函数一致：进度条只画给非杀手，杀手不参与让位（否则其倒计时会卡住）
+function actionBarShouldYield(player) {
+    if (!player.hasTag("lw_p1:游戏中")) return false;
+    if (player.hasTag("lw_p1:杀手")) return false;
+    const obj = mc.world.scoreboard.getObjective("lw_p1:任务中");
+    if (!obj) return false;
+    try {
+        return (obj.getScore(player) ?? 0) > 0;
+    } catch (e) {
+        return false;
+    }
+}
+
+mc.system.runInterval(() => {
+    const rotateIndex = Math.floor(mc.system.currentTick / ACTION_BAR_ROTATE_TICKS);
+
+    for (const player of mc.world.getPlayers()) {
+        if (!player.isValid) continue;
+
+        try {
+            if (actionBarShouldYield(player)) continue;
+        } catch (e) { }
+
+        const slots = [];
+        for (const provider of actionBarProviders.values()) {
+            let text;
+            try {
+                text = provider.getText(player);
+            } catch (e) {
+                continue;
+            }
+            if (text === undefined || text === null || text === "") continue;
+            for (let i = 0; i < provider.weight; i++) slots.push(text);
+        }
+
+        try {
+            player.onScreenDisplay.setActionBar(slots.length === 0 ? "" : slots[rotateIndex % slots.length]);
+        } catch (e) { }
+    }
+}, 1);
+
+
+// ——— 各功能的注册（weight 越大，轮播中停留的份额越多）———
+registerActionBarProvider("lw_p1:boarded", () => boardedText(), { weight: 2 });
+registerActionBarProvider("lw_p1:killerTime", (player) => {
+    if (!player.hasTag("lw_p1:游戏中") || !player.hasTag("lw_p1:杀手")) return undefined;
+    return killerCountdownText();
+}, { weight: 3 });
+registerActionBarProvider("lw_p1:watch", (player) => watchHudText(player), { weight: 4 });
+registerActionBarProvider("lw_p1:stamina", (player) => staminaHudText(player), { weight: 1 });
 
 
 // 预创建全局所需计分板列表
@@ -254,8 +319,6 @@ function boardedText() {
     boardedCache = t("lw_p1.msg.boarded", inTrainPlayerCount, totalPlayerCount);
     return boardedCache;
 }
-
-registerActionBarProvider("lw_p1:boarded", () => boardedText(), { weight: 2 });
 
 
 // 非游戏阶段，人数达标且全在列车内 开启开局倒计时
@@ -635,11 +698,6 @@ function killerCountdownText() {
     killerTimeCache = t("lw_p1.prop.time.remaining", m, String(s).padStart(2, "0"));
     return killerTimeCache;
 }
-
-registerActionBarProvider("lw_p1:killerTime", (player) => {
-    if (!player.hasTag("lw_p1:游戏中") || !player.hasTag("lw_p1:杀手")) return undefined;
-    return killerCountdownText();
-}, { weight: 3 });
 
 
 // 游戏结束，胜负判定、职业名单收集、结果广播

@@ -1,17 +1,13 @@
 // @ts-check
 // inGameSystem.js - 局内系统（体力 + 跳跃）
-// 只在带有"lw_p1:游戏中"标签的玩家身上生效；离开对局后自动还原（体力锁解除、跳跃恢复）
-
 
 import * as mc from "@minecraft/server";
 import { getWorldConfig } from "./config/worldConfig.js";
-import { registerActionBarProvider } from "./hudScheduler.js";
 import { t } from "./i18n/i18n.js";
 
 
 // 体力（疾跑耐久）系统
-
-// ——— 可调参数 ———
+// 可调参数
 const STAMINA_MAX = 100;          // 体力上限
 const DRAIN_PER_TICK = 0.5;       // 疾跑每 tick 消耗（200 tick ≈ 10 秒耗尽）
 const REGEN_PER_TICK = 0.2;       // 恢复每 tick 回复（500 tick ≈ 25 秒回满）
@@ -114,8 +110,8 @@ function staminaBar(value) {
 }
 
 
-// 注册到活动栏调度器：仅玩家自己看得到（活动栏天然按玩家单独下发），创造模式不显示
-registerActionBarProvider("lw_p1:stamina", (player) => {
+// 体力条文案（由 main.js 注册到活动栏调度器）：仅玩家自己看得到（活动栏天然按玩家单独下发）
+export function staminaHudText(player) {
     if (!staminaEnabled || !player.hasTag("lw_p1:游戏中")) return undefined;
 
     let isCreative = false;
@@ -133,7 +129,7 @@ registerActionBarProvider("lw_p1:stamina", (player) => {
     return state.exhausted
         ? t("lw_p1.hud.stamina.exhausted", bar, value)
         : t("lw_p1.hud.stamina", bar, value);
-}, { weight: 1 });
+}
 
 
 mc.system.runInterval(() => {
@@ -204,8 +200,7 @@ mc.world.afterEvents.playerLeave.subscribe((event) => {
 });
 
 
-//跳跃开关
-
+// 跳跃开关
 mc.system.runInterval(() => {
     const jumpEnabled = getWorldConfig().jumpEnabled !== false;
 

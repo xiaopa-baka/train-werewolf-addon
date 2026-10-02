@@ -4,7 +4,6 @@
 import * as mc from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { getWorldConfig } from "./config/worldConfig.js";
-import { registerActionBarProvider } from "./hudScheduler.js";
 import { t } from "./i18n/i18n.js";
 
 
@@ -1028,11 +1027,11 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.afterEvents.itemStopUse.subscribe(stop);
 });
 
-// 蓄力期间活动栏显示剩余时间（注册到活动栏调度器）
-registerActionBarProvider("lw_p1:watch", (player) => {
+// 蓄力期间活动栏显示剩余时间（由 main.js 注册到活动栏调度器）
+export function watchHudText(player) {
     if (!watchCharging.has(player.id)) return undefined;
     return watchRemainText();
-}, { weight: 4 });
+}
 // 抵挡一次伤害
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {

@@ -3,23 +3,7 @@
 
 import * as mc from "@minecraft/server";
 import { getWorldConfig } from "./config/worldConfig.js";
-import { setActionBarYieldPredicate } from "./hudScheduler.js";
 import { t } from "./i18n/i18n.js";
-
-
-// 任务进行中（任务中 > 0），活动栏由 tick 函数里的进度条独占，调度器让位。
-// 注意要与 tick 函数一致：进度条只画给非杀手，杀手不参与让位（否则其倒计时会卡住）
-setActionBarYieldPredicate((player) => {
-    if (!player.hasTag("lw_p1:游戏中")) return false;
-    if (player.hasTag("lw_p1:杀手")) return false;
-    const obj = mc.world.scoreboard.getObjective("lw_p1:任务中");
-    if (!obj) return false;
-    try {
-        return (obj.getScore(player) ?? 0) > 0;
-    } catch (e) {
-        return false;
-    }
-});
 
 
 // 游戏开始后按概率给无任务玩家分配随机任务
