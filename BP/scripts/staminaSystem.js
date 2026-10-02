@@ -5,6 +5,7 @@
 // -> 停止疾跑一段时间后体力缓慢恢复 -> 回到阈值解除饱食度压制，恢复疾跑
 
 import * as mc from "@minecraft/server";
+import { getWorldConfig } from "./config/worldConfig.js";
 import { registerActionBarProvider } from "./hudScheduler.js";
 import { t } from "./i18n/i18n.js";
 
@@ -14,7 +15,7 @@ const STAMINA_MAX = 100;          // 体力上限
 const DRAIN_PER_TICK = 0.5;       // 疾跑每 tick 消耗（200 tick ≈ 10 秒耗尽）
 const REGEN_PER_TICK = 0.2;       // 恢复每 tick 回复（500 tick ≈ 25 秒回满）
 const REGEN_DELAY_TICKS = 60;     // 停止疾跑后延迟多久才开始恢复（3 秒）
-const RECOVER_THRESHOLD = 50;     // 体力回到该值才解除禁跑
+const RECOVER_THRESHOLD = 30;     // 体力回到该值才解除禁跑
 const EXHAUST_HUNGER = 2;         // 力竭时把饱食度压到 2（≤6 无法疾跑；取 2 以防和平模式自然恢复过快）
 const MIN_SPRINT_HUNGER = 7;      // 解除力竭时至少恢复到 7（>6 才能疾跑）
 
@@ -28,6 +29,9 @@ const HUNGER_LOCK_KEY = "lw_p1:staminaHungerLock";
 // playerId -> { value, exhausted, lastSprintTick, savedHunger }
 const staminaMap = new Map();
 
+// 体力系统是否启用（由世界配置决定，每条 tick 刷新）
+let staminaEnabled = true;
+
 
 // 获取玩家的 hunger 属性组件（读写饱食度）
 function getHunger(player) {
@@ -36,6 +40,21 @@ function getHunger(player) {
     } catch (e) {
         return undefined;
     }
+}
+
+
+// 按动态属性里的记录还原饱食度并清锁（用于关闭体力系统、或玩家上线兜底）
+function restoreFromLock(player) {
+    try {
+        const lock = player.getDynamicProperty(HUNGER_LOCK_KEY);
+        if (typeof lock !== "number") return;
+        const hunger = getHunger(player);
+        if (hunger) {
+            const max = hunger.effectiveMax ?? 20;
+            hunger.setCurrentValue(Math.min(Math.max(lock, MIN_SPRINT_HUNGER), max));
+        }
+        player.setDynamicProperty(HUNGER_LOCK_KEY, undefined);
+    } catch (e) { }
 }
 
 
@@ -96,6 +115,8 @@ function staminaBar(value) {
 
 // 注册到活动栏调度器：仅玩家自己看得到（活动栏天然按玩家单独下发），创造模式不显示
 registerActionBarProvider("lw_p1:stamina", (player) => {
+    if (!staminaEnabled) return undefined;
+
     let isCreative = false;
     try { isCreative = player.getGameMode() === mc.GameMode.Creative; } catch (e) { }
     if (isCreative) return undefined;
@@ -116,9 +137,17 @@ registerActionBarProvider("lw_p1:stamina", (player) => {
 
 mc.system.runInterval(() => {
     const tick = mc.system.currentTick;
+    staminaEnabled = getWorldConfig().staminaEnabled !== false;
 
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
+
+        // 体力系统关闭：清掉状态并还原可能被压制的饱食度
+        if (!staminaEnabled) {
+            staminaMap.delete(player.id);
+            restoreFromLock(player);
+            continue;
+        }
 
         // 创造模式跳过
         let isCreative = false;
@@ -131,17 +160,7 @@ mc.system.runInterval(() => {
             staminaMap.set(player.id, state);
 
             // 若上次是力竭状态退出（存在锁），上线先还原饱食度，避免一上线就跑不动
-            try {
-                const lock = player.getDynamicProperty(HUNGER_LOCK_KEY);
-                if (typeof lock === "number") {
-                    const hunger = getHunger(player);
-                    if (hunger) {
-                        const max = hunger.effectiveMax ?? 20;
-                        hunger.setCurrentValue(Math.min(Math.max(lock, MIN_SPRINT_HUNGER), max));
-                    }
-                    player.setDynamicProperty(HUNGER_LOCK_KEY, undefined);
-                }
-            } catch (e) { }
+            restoreFromLock(player);
         }
 
         const sprinting = player.isSprinting;

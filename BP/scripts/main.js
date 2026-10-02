@@ -10,6 +10,7 @@ import "./taskSystem.js";
 import "./shopSystem.js";
 import "./propSystem.js";
 import "./staminaSystem.js";
+import "./inGameSettings.js";
 import "./guideBook.js";
 import "./config/configUI.js";
 import { getWorldConfig } from "./config/worldConfig.js";
