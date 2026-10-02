@@ -1,7 +1,8 @@
 // @ts-check
 // staminaSystem.js - 体力（疾跑耐久）系统
-// 机制：疾跑持续消耗体力 -> 体力耗尽把饱食度压在 6（原版规则：饱食度 ≤6 无法疾跑）
-//      -> 停止疾跑一段时间后体力缓慢恢复 -> 回到阈值后解除饱食度压制，恢复疾跑
+// 全局生效，不限游戏状态与游戏模式
+// 疾跑持续消耗体力 -> 体力耗尽把饱食度压在 6（原版规则：饱食度 ≤6 无法疾跑）
+// -> 停止疾跑一段时间后体力缓慢恢复 -> 回到阈值解除饱食度压制，恢复疾跑
 
 import * as mc from "@minecraft/server";
 
@@ -14,6 +15,12 @@ const REGEN_DELAY_TICKS = 60;     // 停止疾跑后延迟多久才开始恢复�
 const RECOVER_THRESHOLD = 50;     // 体力回到该值才解除禁跑
 const EXHAUST_HUNGER = 6;         // 力竭时把饱食度压到 6（≤6 无法疾跑）
 const MIN_SPRINT_HUNGER = 7;      // 解除力竭时至少恢复到 7（>6 才能疾跑）
+
+// 排查用日志开关：打开后每秒输出一次每个玩家的体力状态；确认无误后可关掉
+const DEBUG_LOG = true;
+
+// 力竭期间记录"力竭前的饱食度"，存玩家动态属性以便跨会话保留（避免退出后卡在低饱食度）
+const HUNGER_LOCK_KEY = "lw_p1:staminaHungerLock";
 
 
 // playerId -> { value, exhausted, lastSprintTick, savedHunger }
@@ -30,22 +37,13 @@ function getHunger(player) {
 }
 
 
-// 创造 / 旁观不参与体力系统
-function shouldSkip(player) {
-    try {
-        const mode = player.getGameMode();
-        if (mode === mc.GameMode.Creative || mode === mc.GameMode.Spectator) return true;
-    } catch (e) { }
-    return false;
-}
-
-
 // 进入力竭：记录当前饱食度并压到 6
 function enterExhausted(player, state) {
     const hunger = getHunger(player);
     if (!hunger) return;
     try {
         state.savedHunger = hunger.currentValue;
+        player.setDynamicProperty(HUNGER_LOCK_KEY, state.savedHunger);
         hunger.setCurrentValue(EXHAUST_HUNGER);
     } catch (e) { }
 }
@@ -63,8 +61,9 @@ function holdHunger(player) {
 }
 
 
-// 解除力竭：把饱食度还原到力竭前的值（至少 7，且不超过上限）
+// 解除力竭：把饱食度还原到力竭前的值（至少 7，且不超过上限），并清掉锁
 function restoreHunger(player, state) {
+    try { player.setDynamicProperty(HUNGER_LOCK_KEY, undefined); } catch (e) { }
     const hunger = getHunger(player);
     if (!hunger) return;
     try {
@@ -75,34 +74,44 @@ function restoreHunger(player, state) {
 }
 
 
+function createState() {
+    return {
+        value: STAMINA_MAX,
+        exhausted: false,
+        lastSprintTick: -REGEN_DELAY_TICKS,
+        savedHunger: null
+    };
+}
+
+
 mc.system.runInterval(() => {
     const tick = mc.system.currentTick;
 
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
 
-        // 非游戏内 / 创造 / 旁观：清状态，但若正力竭先还原饱食度，避免卡在低饱食度
-        if (!player.hasTag("lw_p1:游戏中") || shouldSkip(player)) {
-            const state = staminaMap.get(player.id);
-            if (state) {
-                if (state.exhausted) restoreHunger(player, state);
-                staminaMap.delete(player.id);
-            }
-            continue;
-        }
-
         let state = staminaMap.get(player.id);
         if (!state) {
-            state = {
-                value: STAMINA_MAX,
-                exhausted: false,
-                lastSprintTick: -REGEN_DELAY_TICKS,
-                savedHunger: null
-            };
+            state = createState();
             staminaMap.set(player.id, state);
+
+            // 若上次是力竭状态退出（存在锁），上线先还原饱食度，避免一上线就跑不动
+            try {
+                const lock = player.getDynamicProperty(HUNGER_LOCK_KEY);
+                if (typeof lock === "number") {
+                    const hunger = getHunger(player);
+                    if (hunger) {
+                        const max = hunger.effectiveMax ?? 20;
+                        hunger.setCurrentValue(Math.min(Math.max(lock, MIN_SPRINT_HUNGER), max));
+                    }
+                    player.setDynamicProperty(HUNGER_LOCK_KEY, undefined);
+                }
+            } catch (e) { }
         }
 
-        if (player.isSprinting && !state.exhausted) {
+        const sprinting = player.isSprinting;
+
+        if (sprinting && !state.exhausted) {
             // 疾跑中：持续消耗体力
             state.lastSprintTick = tick;
             state.value -= DRAIN_PER_TICK;
@@ -126,11 +135,15 @@ mc.system.runInterval(() => {
                 restoreHunger(player, state);
             }
         }
+
+        if (DEBUG_LOG && tick % 20 === 0) {
+            console.log(`[体力] ${player.name} 疾跑=${sprinting} 体力=${state.value.toFixed(1)} 力竭=${state.exhausted}`);
+        }
     }
 }, 1);
 
 
-// 玩家离开：清理状态
+// 玩家离开：清理内存状态（动态属性锁保留，供下次上线还原）
 mc.world.afterEvents.playerLeave.subscribe((event) => {
     staminaMap.delete(event.playerId);
 });
