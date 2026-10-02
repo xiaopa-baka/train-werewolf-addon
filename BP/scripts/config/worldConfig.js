@@ -192,6 +192,10 @@ export function getEmptyConfig() {
             ]
         },
 
+        // 局内相关开关
+        staminaEnabled: true,           // 体力系统：关闭后疾跑不再消耗体力
+        jumpEnabled: true,              // 是否允许跳跃：关闭后玩家无法跳跃
+
         // 地图信息
         worldInformation: {
             mapName: "",

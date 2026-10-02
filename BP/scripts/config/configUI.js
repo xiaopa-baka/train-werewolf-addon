@@ -82,6 +82,7 @@ function showGameSettingForm(player) {
         .body("调整游戏全局数值参数")
         .button("游戏相关配置")
         .button("任务相关配置")
+        .button("局内相关配置")
         .button("§6恢复默认配置")
         .button("§c返回");
 
@@ -91,10 +92,37 @@ function showGameSettingForm(player) {
         switch (res.selection) {
             case 0: mc.system.run(() => showGameConfigModal(player)); break;
             case 1: mc.system.run(() => showTaskConfigModal(player)); break;
-            case 2: resetAllScoresToDefault(player); break;
-            case 3: showMainForm(player); break;
+            case 2: mc.system.run(() => showInGameSettingModal(player)); break;
+            case 3: resetAllScoresToDefault(player); break;
+            case 4: showMainForm(player); break;
         }
     }).catch(() => { });
+}
+
+
+// 主界面/全局游戏配置/局内相关配置
+function showInGameSettingModal(player) {
+    if (!player.isValid) return;
+    const cfg = getWorldConfig();
+    new ModalFormData()
+        .title("局内相关配置")
+        .toggle("体力系统：仅局内生效，关闭后疾跑不再消耗体力", { defaultValue: cfg.staminaEnabled !== false })
+        .toggle("允许跳跃：仅局内生效，关闭后玩家无法跳跃", { defaultValue: cfg.jumpEnabled !== false })
+        .show(player).then(res => {
+            if (!player.isValid) return;
+            if (res.canceled) { showGameSettingForm(player); return; }
+            try {
+                const vals = res.formValues.filter(v => v !== null && v !== undefined);
+                const latest = getWorldConfig();
+                latest.staminaEnabled = vals[0] === true;
+                latest.jumpEnabled = vals[1] === true;
+                saveWorldConfig(latest);
+                player.sendMessage("§a局内相关配置已保存");
+            } catch (e) {
+                player.sendMessage("§c保存失败: " + e);
+            }
+            showGameSettingForm(player);
+        }).catch(() => { });
 }
 
 
@@ -203,6 +231,12 @@ function resetAllScoresToDefault(player) {
                         if (obj) obj.setScore(fakePlayer, defaults[objName]);
                     } catch (e) { }
                 }
+
+                // 局内开关同样恢复默认（开启）
+                const cfg = getWorldConfig();
+                cfg.staminaEnabled = true;
+                cfg.jumpEnabled = true;
+                saveWorldConfig(cfg);
 
                 player.sendMessage("§a已成功恢复所有任务/游戏配置为默认值！");
             }

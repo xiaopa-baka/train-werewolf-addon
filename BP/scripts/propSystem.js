@@ -1002,7 +1002,6 @@ function watchRemainText() {
 function endWatchCharge(player) {
     if (!player?.isValid) return;
     watchCharging.delete(player.id);
-    try { player.onScreenDisplay.setActionBar(""); } catch (e) { }
 }
 
 mc.world.afterEvents.worldLoad.subscribe(() => {
@@ -1027,16 +1026,11 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.afterEvents.itemStopUse.subscribe(stop);
 });
 
-// 蓄力期间活动栏显示剩余时间
-mc.system.runInterval(() => {
-    if (mc.system.currentTick % 20 !== 0) return;
-    for (const player of mc.world.getPlayers()) {
-        if (!player?.isValid) continue;
-        if (watchCharging.has(player.id)) {
-            player.onScreenDisplay.setActionBar(watchRemainText());
-        }
-    }
-}, 1);
+// 蓄力期间活动栏显示剩余时间（由 main.js 注册到活动栏调度器）
+export function watchHudText(player) {
+    if (!watchCharging.has(player.id)) return undefined;
+    return watchRemainText();
+}
 // 抵挡一次伤害
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {

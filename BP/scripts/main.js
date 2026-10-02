@@ -8,10 +8,11 @@ console.log("\n©\n狮狼传奇_小怕\nLW.狮狼传奇工作室\n尘世之狼")
 import * as mc from "@minecraft/server";
 import "./taskSystem.js";
 import "./shopSystem.js";
-import "./propSystem.js";
+import { watchHudText } from "./propSystem.js";
 import "./guideBook.js";
 import "./config/configUI.js";
 import { getWorldConfig } from "./config/worldConfig.js";
+import { staminaHudText } from "./inGameSystem.js";
 import "./blocks/vending_machine.js";
 import { clearCrowbaredDoors } from "./blocks/keydoor.js";
 import "./blocks/blockComponents.js";
@@ -225,26 +226,99 @@ mc.system.runInterval(() => {
 }, 1);
 
 
-// 非游戏阶段，活动栏显示列车人数统计
+//  活动栏轮播调度器
+// 多个功能都要占用活动栏时统一分配：各功能提供文案，按权重轮播；
+// 无适用文案时清空；任务进度条等外部独占时让位。
+
+const ACTION_BAR_ROTATE_TICKS = 40;   // 每隔多少 tick 切换一次文案（40 tick = 2 秒）
+const actionBarProviders = new Map();
+
+// 注册一个活动栏文案来源；getText 返回空串 / undefined / null 表示此刻不适用
+function registerActionBarProvider(id, getText, options = {}) {
+    const weight = Math.max(1, Math.floor(options.weight ?? 1));
+    actionBarProviders.set(id, { getText, weight });
+}
+
+// 任务进行中（任务中 > 0）活动栏由 tick 函数里的进度条独占，调度器让位。
+// 注意要与 tick 函数一致：进度条只画给非杀手，杀手不参与让位（否则其倒计时会卡住）
+function actionBarShouldYield(player) {
+    if (!player.hasTag("lw_p1:游戏中")) return false;
+    if (player.hasTag("lw_p1:杀手")) return false;
+    const obj = mc.world.scoreboard.getObjective("lw_p1:任务中");
+    if (!obj) return false;
+    try {
+        return (obj.getScore(player) ?? 0) > 0;
+    } catch (e) {
+        return false;
+    }
+}
+
 mc.system.runInterval(() => {
-    const allPlayers = Array.from(mc.world.getPlayers());
+    const rotateIndex = Math.floor(mc.system.currentTick / ACTION_BAR_ROTATE_TICKS);
+
+    for (const player of mc.world.getPlayers()) {
+        if (!player.isValid) continue;
+
+        try {
+            if (actionBarShouldYield(player)) continue;
+        } catch (e) { }
+
+        const slots = [];
+        for (const provider of actionBarProviders.values()) {
+            let text;
+            try {
+                text = provider.getText(player);
+            } catch (e) {
+                continue;
+            }
+            if (text === undefined || text === null || text === "") continue;
+            for (let i = 0; i < provider.weight; i++) slots.push(text);
+        }
+
+        try {
+            player.onScreenDisplay.setActionBar(slots.length === 0 ? "" : slots[rotateIndex % slots.length]);
+        } catch (e) { }
+    }
+}, 1);
+
+
+// 各功能的注册（weight 越大，轮播中停留的份额越多）
+registerActionBarProvider("lw_p1:boarded", () => boardedText(), { weight: 2 });
+registerActionBarProvider("lw_p1:killerTime", (player) => {
+    if (!player.hasTag("lw_p1:游戏中") || !player.hasTag("lw_p1:杀手")) return undefined;
+    return killerCountdownText();
+}, { weight: 3 });
+registerActionBarProvider("lw_p1:watch", (player) => watchHudText(player), { weight: 4 });
+registerActionBarProvider("lw_p1:stamina", (player) => staminaHudText(player), { weight: 1 });
+
+
+// 非游戏阶段，活动栏显示列车人数统计（注册到活动栏调度器）
+let boardedCacheTick = -1;
+let boardedCache = undefined;
+function boardedText() {
+    const tick = mc.system.currentTick;
+    if (tick === boardedCacheTick) return boardedCache;
+    boardedCacheTick = tick;
+
     const latestConfig = getWorldConfig();
+    if (!latestConfig.trainCoordinates?.start || !latestConfig.trainCoordinates?.end) {
+        boardedCache = undefined;
+        return undefined;
+    }
 
-    if (!latestConfig.trainCoordinates?.start || !latestConfig.trainCoordinates?.end) return;
-
+    const allPlayers = Array.from(mc.world.getPlayers());
     const hasInGameTag = allPlayers.some(player => player.hasTag("lw_p1:游戏中"));
-    if (hasInGameTag) return;
+    if (hasInGameTag) {
+        boardedCache = undefined;
+        return undefined;
+    }
 
     const totalPlayerCount = allPlayers.length;
     const inTrainPlayerCount = allPlayers.filter(player => player.hasTag("lw_p1:位于列车")).length;
 
-    const actionBarMsg = `已登车 ${inTrainPlayerCount} / ${totalPlayerCount} 人`;
-
-    for (const player of allPlayers) {
-        if (!player.isValid) continue;
-        player.onScreenDisplay.setActionBar(actionBarMsg);
-    }
-}, 1);
+    boardedCache = `已登车 ${inTrainPlayerCount} / ${totalPlayerCount} 人`;
+    return boardedCache;
+}
 
 
 // 非游戏阶段，人数达标且全在列车内 开启开局倒计时
@@ -595,14 +669,22 @@ mc.system.runInterval(() => {
 }, 1);
 
 
-// 杀手活动栏显示剩余游戏时长倒计时（每秒更新，格式 分:秒）
-mc.system.runInterval(() => {
-    if (mc.system.currentTick % 20 !== 0) return;
+// 杀手活动栏显示剩余游戏时长倒计时（格式 分:秒，注册到活动栏调度器）
+let killerTimeCacheBucket = -1;
+let killerTimeCache = undefined;
+function killerCountdownText() {
+    // 每秒（20 tick）才重算一次，避免逐 tick 反复读计分板
+    const bucket = Math.floor(mc.system.currentTick / 20);
+    if (bucket === killerTimeCacheBucket) return killerTimeCache;
+    killerTimeCacheBucket = bucket;
 
     const gameTimeObj = mc.world.scoreboard.getObjective("lw_p1:游戏时间");
     const baseTimeObj = mc.world.scoreboard.getObjective("lw_p1:单局游戏基础时长");
     const extraObj = mc.world.scoreboard.getObjective("lw_p1:死亡加时");
-    if (!gameTimeObj || !baseTimeObj) return;
+    if (!gameTimeObj || !baseTimeObj) {
+        killerTimeCache = undefined;
+        return undefined;
+    }
 
     const elapsedSec = Math.floor((gameTimeObj.getScore("lw_p1:全局") ?? 0) / 20);
     const baseSec = baseTimeObj.getScore("lw_p1:全局") ?? 600;
@@ -611,15 +693,9 @@ mc.system.runInterval(() => {
 
     const m = Math.floor(remainSec / 60);
     const s = remainSec % 60;
-    const text = `§e剩余时间 ${m}:${String(s).padStart(2, "0")}`;
-
-    for (const player of mc.world.getPlayers()) {
-        if (!player.isValid) continue;
-        if (player.hasTag("lw_p1:游戏中") && player.hasTag("lw_p1:杀手")) {
-            player.onScreenDisplay.setActionBar(text);
-        }
-    }
-}, 1);
+    killerTimeCache = `§e剩余时间 ${m}:${String(s).padStart(2, "0")}`;
+    return killerTimeCache;
+}
 
 
 // 游戏结束，胜负判定、职业名单收集、结果广播
