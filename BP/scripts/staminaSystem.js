@@ -13,7 +13,7 @@ const DRAIN_PER_TICK = 0.5;       // 疾跑每 tick 消耗（200 tick ≈ 10 秒
 const REGEN_PER_TICK = 0.2;       // 恢复每 tick 回复（500 tick ≈ 25 秒回满）
 const REGEN_DELAY_TICKS = 60;     // 停止疾跑后延迟多久才开始恢复（3 秒）
 const RECOVER_THRESHOLD = 50;     // 体力回到该值才解除禁跑
-const EXHAUST_HUNGER = 6;         // 力竭时把饱食度压到 6（≤6 无法疾跑）
+const EXHAUST_HUNGER = 2;         // 力竭时把饱食度压到 2（≤6 无法疾跑；取 2 以防和平模式自然恢复过快）
 const MIN_SPRINT_HUNGER = 7;      // 解除力竭时至少恢复到 7（>6 才能疾跑）
 
 // 排查用日志开关：打开后每秒输出一次每个玩家的体力状态；确认无误后可关掉
@@ -89,6 +89,11 @@ mc.system.runInterval(() => {
 
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
+
+        // 创造模式跳过
+        let isCreative = false;
+        try { isCreative = player.getGameMode() === mc.GameMode.Creative; } catch (e) { }
+        if (isCreative) continue;
 
         let state = staminaMap.get(player.id);
         if (!state) {
