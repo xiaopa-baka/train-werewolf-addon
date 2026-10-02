@@ -1,11 +1,7 @@
 // @ts-check
-// inGameSystem.js - 局内系统（体力 + 跳跃），对应配置界面的「局内相关配置」开关
-//
-// 体力（疾跑耐久）：全局生效，不限游戏状态与游戏模式
-//   疾跑持续消耗体力 -> 体力耗尽把饱食度压在 6（原版规则：饱食度 ≤6 无法疾跑）
-//   -> 停止疾跑一段时间后体力缓慢恢复 -> 回到阈值解除饱食度压制，恢复疾跑
-//
-// 跳跃：由世界配置 jumpEnabled 控制，周期性向所有在线玩家下发跳跃输入权限
+// inGameSystem.js - 局内系统（体力 + 跳跃）
+// 只在带有"lw_p1:游戏中"标签的玩家身上生效；离开对局后自动还原（体力锁解除、跳跃恢复）
+
 
 import * as mc from "@minecraft/server";
 import { getWorldConfig } from "./config/worldConfig.js";
@@ -13,7 +9,7 @@ import { registerActionBarProvider } from "./hudScheduler.js";
 import { t } from "./i18n/i18n.js";
 
 
-// ============================ 体力（疾跑耐久）系统 ============================
+// 体力（疾跑耐久）系统
 
 // ——— 可调参数 ———
 const STAMINA_MAX = 100;          // 体力上限
@@ -120,7 +116,7 @@ function staminaBar(value) {
 
 // 注册到活动栏调度器：仅玩家自己看得到（活动栏天然按玩家单独下发），创造模式不显示
 registerActionBarProvider("lw_p1:stamina", (player) => {
-    if (!staminaEnabled) return undefined;
+    if (!staminaEnabled || !player.hasTag("lw_p1:游戏中")) return undefined;
 
     let isCreative = false;
     try { isCreative = player.getGameMode() === mc.GameMode.Creative; } catch (e) { }
@@ -147,8 +143,8 @@ mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
 
-        // 体力系统关闭：清掉状态并还原可能被压制的饱食度
-        if (!staminaEnabled) {
+        // 只在"游戏中"生效：开关关闭、或玩家不在局内时，清状态并还原可能被压制的饱食度
+        if (!staminaEnabled || !player.hasTag("lw_p1:游戏中")) {
             staminaMap.delete(player.id);
             restoreFromLock(player);
             continue;
@@ -208,16 +204,17 @@ mc.world.afterEvents.playerLeave.subscribe((event) => {
 });
 
 
-// ============================ 跳跃开关 ============================
+//跳跃开关
 
-// 跳跃输入权限会随玩家重登/重生重置，所以周期性重新下发，保证开关始终生效
 mc.system.runInterval(() => {
     const jumpEnabled = getWorldConfig().jumpEnabled !== false;
 
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
+        // 只在"游戏中"生效；局外一律恢复可跳跃，避免出局后仍被禁跳
+        const allowJump = !player.hasTag("lw_p1:游戏中") || jumpEnabled;
         try {
-            player.inputPermissions.setPermissionCategory(mc.InputPermissionCategory.Jump, jumpEnabled);
+            player.inputPermissions.setPermissionCategory(mc.InputPermissionCategory.Jump, allowJump);
         } catch (e) { }
     }
 }, 20);
