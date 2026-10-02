@@ -5,6 +5,8 @@
 // -> 停止疾跑一段时间后体力缓慢恢复 -> 回到阈值解除饱食度压制，恢复疾跑
 
 import * as mc from "@minecraft/server";
+import { registerActionBarProvider } from "./hudScheduler.js";
+import { t } from "./i18n/i18n.js";
 
 
 // ——— 可调参数 ———
@@ -82,6 +84,31 @@ function createState() {
         savedHunger: null
     };
 }
+
+
+// 把体力画成 10 格的进度条
+const BAR_SEGMENTS = 10;
+function staminaBar(value) {
+    const filled = Math.max(0, Math.min(BAR_SEGMENTS, Math.round(value / STAMINA_MAX * BAR_SEGMENTS)));
+    return "█".repeat(filled) + "░".repeat(BAR_SEGMENTS - filled);
+}
+
+
+// 注册到活动栏调度器：仅玩家自己看得到（活动栏天然按玩家单独下发），创造模式不显示
+registerActionBarProvider("lw_p1:stamina", (player) => {
+    let isCreative = false;
+    try { isCreative = player.getGameMode() === mc.GameMode.Creative; } catch (e) { }
+    if (isCreative) return undefined;
+
+    const state = staminaMap.get(player.id);
+    if (!state) return undefined;
+
+    const bar = staminaBar(state.value);
+    const value = Math.round(state.value);
+    return state.exhausted
+        ? t("lw_p1.hud.stamina.exhausted", bar, value)
+        : t("lw_p1.hud.stamina", bar, value);
+}, { weight: 1 });
 
 
 mc.system.runInterval(() => {

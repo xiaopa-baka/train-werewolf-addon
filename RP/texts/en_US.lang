@@ -334,6 +334,10 @@ lw_p1.prop.note.corpse=§e[Note] §f%s
 lw_p1.common.none=None
 lw_p1.common.listSep=, 
 
+## Action bar HUD
+lw_p1.hud.stamina=§bStamina %s §f%s
+lw_p1.hud.stamina.exhausted=§cStamina %s §f%s
+
 ## Game messages (additional)
 lw_p1.msg.boarded=Boarded %s / %s
 lw_p1.msg.gameStart=§aGame start!

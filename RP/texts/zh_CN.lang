@@ -334,6 +334,10 @@ lw_p1.prop.note.corpse=§e[便条] §f%s
 lw_p1.common.none=无
 lw_p1.common.listSep=、
 
+## 活动栏 HUD
+lw_p1.hud.stamina=§b体力 %s §f%s
+lw_p1.hud.stamina.exhausted=§c体力 %s §f%s
+
 ## 游戏消息（补充）
 lw_p1.msg.boarded=已登车 %s / %s 人
 lw_p1.msg.gameStart=§a游戏开始！
