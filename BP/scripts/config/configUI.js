@@ -1,10 +1,11 @@
 // @ts-check
-// config_UI.js - 用于管理游戏配置的UI界面脚本
+// configUI.js - 用于管理游戏配置的UI界面脚本
 
 import * as mc from "@minecraft/server";
 import {ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
-import { getWorldConfig, saveWorldConfig, getEmptyConfig, getScoreboardDefault, getScoreboardSlider, getAllScoreboardDefaults } from "./worldConfig.js";
-import { t, tBlock, tConfigName } from "../i18n/i18n.js";
+import { getWorldConfig, saveWorldConfig, getEmptyConfig, getConfig, setConfig, getConfigMeta, resetConfigDefaults } from "./worldConfig.js";
+import { t, tBlock, tConfigName } from "../core/i18n.js";
+import { itemIdToIconPath } from "../core/itemIcons.js";
 
 
 // 将玩家位置转换为方块坐标，并提供一个函数将方块坐标转换为方块中心坐标，方便UI输入输出
@@ -26,16 +27,6 @@ function intPosToCenter(intX, intY, intZ) {
 }
 
 
-// 获取全局计分板分数
-function getSco(objName, def = getScoreboardDefault(objName)) {
-    try {
-        return mc.world.scoreboard.getObjective(objName).getScore("lw_p1:全局") ?? def;
-    } catch {
-        return def;
-    }
-}
-
-
 // 使用物品 木棍 打开配置UI
 mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.afterEvents.itemUse.subscribe(event => {
@@ -47,7 +38,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 });
 
 
-// 主界面
+// ===== 主界面 =====
 function showMainForm(player) {
     if (!player.isValid) return;
 
@@ -74,7 +65,7 @@ function showMainForm(player) {
 }
 
 
-// 主界面/全局游戏配置
+// ===== 主界面/全局游戏配置 =====
 function showGameSettingForm(player) {
     if (!player.isValid) return;
 
@@ -101,7 +92,7 @@ function showGameSettingForm(player) {
 }
 
 
-// 主界面/全局游戏配置/局内相关配置
+// ===== 主界面/全局游戏配置/局内相关配置 =====
 function showInGameSettingModal(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -133,30 +124,30 @@ function showInGameSettingModal(player) {
 }
 
 
-// 主界面/全局游戏配置/游戏相关配置
+// ===== 主界面/全局游戏配置/游戏相关配置 =====
 function showGameConfigModal(player) {
     if (!player.isValid) return;
-    const val0 = getSco("lw_p1:是否自动开始");
-    const s1 = getScoreboardSlider("lw_p1:游戏自动开始时间");
-    const s2 = getScoreboardSlider("lw_p1:最低开局人数");
-    const s3 = getScoreboardSlider("lw_p1:单局游戏基础时长");
+    const autoStart = getConfig("autoStart");
+    const s1 = getConfigMeta("autoStartDelay");
+    const s2 = getConfigMeta("minPlayers");
+    const s3 = getConfigMeta("baseDuration");
     new ModalFormData()
         .title(t("lw_p1.ui.game.settingsTitle"))
         .header(t("lw_p1.ui.game.autoHeader"))
-        .slider(t("lw_p1.ui.game.autoDesc", s1.defaultValue), s1.min, s1.max, { valueStep: s1.step, defaultValue: getSco("lw_p1:游戏自动开始时间") })
-        .toggle(t("lw_p1.ui.game.autoToggle"), { defaultValue: val0 !== 0 })
+        .slider(t("lw_p1.ui.game.autoDesc", s1.default), s1.min, s1.max, { valueStep: s1.step, defaultValue: getConfig("autoStartDelay") })
+        .toggle(t("lw_p1.ui.game.autoToggle"), { defaultValue: autoStart !== 0 })
         .header(t("lw_p1.ui.game.minHeader"))
-        .slider(t("lw_p1.ui.game.minDesc", s2.defaultValue), s2.min, s2.max, { valueStep: s2.step, defaultValue: getSco("lw_p1:最低开局人数") })
+        .slider(t("lw_p1.ui.game.minDesc", s2.default), s2.min, s2.max, { valueStep: s2.step, defaultValue: getConfig("minPlayers") })
         .header(t("lw_p1.ui.game.baseHeader"))
-        .slider(t("lw_p1.ui.game.baseDesc", s3.defaultValue), s3.min, s3.max, { valueStep: s3.step, defaultValue: getSco("lw_p1:单局游戏基础时长") })
+        .slider(t("lw_p1.ui.game.baseDesc", s3.default), s3.min, s3.max, { valueStep: s3.step, defaultValue: getConfig("baseDuration") })
         .show(player).then(res => {
             if (res.canceled) { showGameSettingForm(player); return; }
             try {
                 const vals = res.formValues.filter(v => v !== null && v !== undefined);
-                mc.world.scoreboard.getObjective("lw_p1:游戏自动开始时间").setScore("lw_p1:全局", Number(vals[0]));
-                mc.world.scoreboard.getObjective("lw_p1:是否自动开始").setScore("lw_p1:全局", vals[1] ? 1 : 0);
-                mc.world.scoreboard.getObjective("lw_p1:最低开局人数").setScore("lw_p1:全局", Number(vals[2]));
-                mc.world.scoreboard.getObjective("lw_p1:单局游戏基础时长").setScore("lw_p1:全局", Number(vals[3]));
+                setConfig("autoStartDelay", Number(vals[0]));
+                setConfig("autoStart", vals[1] ? 1 : 0);
+                setConfig("minPlayers", Number(vals[2]));
+                setConfig("baseDuration", Number(vals[3]));
                 player.sendMessage(t("lw_p1.ui.game.saved"));
             } catch (e) {
                 player.sendMessage(t("lw_p1.ui.saveFail", String(e)));
@@ -166,35 +157,35 @@ function showGameConfigModal(player) {
 }
 
 
-// 主界面/全局游戏配置/任务相关配置
+// ===== 主界面/全局游戏配置/任务相关配置 =====
 function showTaskConfigModal(player) {
     if (!player.isValid) return;
-    const s1 = getScoreboardSlider("lw_p1:每秒分配概率");
-    const s2 = getScoreboardSlider("lw_p1:任务开始发布时间");
-    const s3 = getScoreboardSlider("lw_p1:单个任务限时");
-    const s4 = getScoreboardSlider("lw_p1:杀手虚假任务限时");
-    const s5 = getScoreboardSlider("lw_p1:任务完成奖励");
+    const s1 = getConfigMeta("taskChance");
+    const s2 = getConfigMeta("taskFirstDelay");
+    const s3 = getConfigMeta("taskLimit");
+    const s4 = getConfigMeta("fakeTaskLimit");
+    const s5 = getConfigMeta("taskReward");
     new ModalFormData()
         .title(t("lw_p1.ui.task.title"))
         .header(t("lw_p1.ui.task.probHeader"))
-        .slider(t("lw_p1.ui.task.probDesc", s1.defaultValue), s1.min, s1.max, { valueStep: s1.step, defaultValue: getSco("lw_p1:每秒分配概率") })
+        .slider(t("lw_p1.ui.task.probDesc", s1.default), s1.min, s1.max, { valueStep: s1.step, defaultValue: getConfig("taskChance") })
         .header(t("lw_p1.ui.task.startHeader"))
-        .slider(t("lw_p1.ui.task.startDesc", s2.defaultValue), s2.min, s2.max, { valueStep: s2.step, defaultValue: getSco("lw_p1:任务开始发布时间") })
+        .slider(t("lw_p1.ui.task.startDesc", s2.default), s2.min, s2.max, { valueStep: s2.step, defaultValue: getConfig("taskFirstDelay") })
         .header(t("lw_p1.ui.task.limitHeader"))
-        .slider(t("lw_p1.ui.task.limitDesc", s3.defaultValue), s3.min, s3.max, { valueStep: s3.step, defaultValue: getSco("lw_p1:单个任务限时") })
+        .slider(t("lw_p1.ui.task.limitDesc", s3.default), s3.min, s3.max, { valueStep: s3.step, defaultValue: getConfig("taskLimit") })
         .header(t("lw_p1.ui.task.fakeHeader"))
-        .slider(t("lw_p1.ui.task.fakeDesc", s4.defaultValue), s4.min, s4.max, { valueStep: s4.step, defaultValue: getSco("lw_p1:杀手虚假任务限时") })
+        .slider(t("lw_p1.ui.task.fakeDesc", s4.default), s4.min, s4.max, { valueStep: s4.step, defaultValue: getConfig("fakeTaskLimit") })
         .header(t("lw_p1.ui.task.rewardHeader"))
-        .slider(t("lw_p1.ui.task.rewardDesc", s5.defaultValue), s5.min, s5.max, { valueStep: s5.step, defaultValue: getSco("lw_p1:任务完成奖励") })
+        .slider(t("lw_p1.ui.task.rewardDesc", s5.default), s5.min, s5.max, { valueStep: s5.step, defaultValue: getConfig("taskReward") })
         .show(player).then(res => {
             if (res.canceled) { showGameSettingForm(player); return; }
             try {
                 const vals = res.formValues.filter(v => v !== null && v !== undefined);
-                mc.world.scoreboard.getObjective("lw_p1:每秒分配概率").setScore("lw_p1:全局", Number(vals[0]));
-                mc.world.scoreboard.getObjective("lw_p1:任务开始发布时间").setScore("lw_p1:全局", Number(vals[1]));
-                mc.world.scoreboard.getObjective("lw_p1:单个任务限时").setScore("lw_p1:全局", Number(vals[2]));
-                mc.world.scoreboard.getObjective("lw_p1:杀手虚假任务限时").setScore("lw_p1:全局", Number(vals[3]));
-                mc.world.scoreboard.getObjective("lw_p1:任务完成奖励").setScore("lw_p1:全局", Number(vals[4]));
+                setConfig("taskChance", Number(vals[0]));
+                setConfig("taskFirstDelay", Number(vals[1]));
+                setConfig("taskLimit", Number(vals[2]));
+                setConfig("fakeTaskLimit", Number(vals[3]));
+                setConfig("taskReward", Number(vals[4]));
                 player.sendMessage(t("lw_p1.ui.task.saved"));
             } catch (e) {
                 player.sendMessage(t("lw_p1.ui.saveFail", String(e)));
@@ -204,7 +195,7 @@ function showTaskConfigModal(player) {
 }
 
 
-// 主界面/全局游戏配置/恢复默认配置
+// ===== 主界面/全局游戏配置/恢复默认配置 =====
 function resetAllScoresToDefault(player) {
     if (!player.isValid) return;
 
@@ -215,16 +206,8 @@ function resetAllScoresToDefault(player) {
         .button2(t("lw_p1.ui.confirmReset"))
         .show(player).then(res => {
             if (res.selection === 1) {
-                const fakePlayer = "lw_p1:全局";
-                // 预设分数统一取自 worldConfig.js 的 SCOREBOARD_CONFIG
-                const defaults = getAllScoreboardDefaults();
-
-                for (const objName in defaults) {
-                    try {
-                        const obj = mc.world.scoreboard.getObjective(objName);
-                        if (obj) obj.setScore(fakePlayer, defaults[objName]);
-                    } catch (e) { }
-                }
+                // 全部可调参数恢复预设值
+                resetConfigDefaults();
 
                 // 局内开关同样恢复默认（开启）
                 const cfg = getWorldConfig();
@@ -243,7 +226,7 @@ function resetAllScoresToDefault(player) {
 }
 
 
-// 主界面/地图区域配置
+// ===== 主界面/地图区域配置 =====
 function showMapSettingForm(player) {
     if (!player.isValid) return;
 
@@ -278,7 +261,7 @@ function showMapSettingForm(player) {
 }
 
 
-// 主界面/地图区域配置/站台&车头坐标
+// ===== 主界面/地图区域配置/站台&车头坐标 =====
 function showStationEngineCoordModal(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -339,7 +322,7 @@ function showStationEngineCoordModal(player) {
 }
 
 
-// 主界面/地图区域配置/列车区域坐标
+// ===== 主界面/地图区域配置/列车区域坐标 =====
 function showTrainAreaCoordModal(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -389,7 +372,7 @@ function showTrainAreaCoordModal(player) {
 }
 
 
-// 主界面/地图区域配置/车头透气区坐标
+// ===== 主界面/地图区域配置/车头透气区坐标 =====
 function showEngineVentCoordModal(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -440,7 +423,7 @@ function showEngineVentCoordModal(player) {
 }
 
 
-// 主界面/地图区域配置/车尾透气区坐标
+// ===== 主界面/地图区域配置/车尾透气区坐标 =====
 function showTailVentCoordModal(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -491,7 +474,7 @@ function showTailVentCoordModal(player) {
 }
 
 
-// 主界面/地图区域配置/蹲坑坐标管理
+// ===== 主界面/地图区域配置/蹲坑坐标管理 =====
 function showToiletList(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -529,7 +512,7 @@ function showToiletList(player) {
 }
 
 
-// 主界面/地图区域配置/蹲坑坐标管理/编辑
+// ===== 主界面/地图区域配置/蹲坑坐标管理/编辑 =====
 function editToiletCoordinate(player, index) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -569,7 +552,7 @@ function editToiletCoordinate(player, index) {
 }
 
 
-// 主界面/地图区域配置/随机传送坐标管理
+// ===== 主界面/地图区域配置/随机传送坐标管理 =====
 function showRandomList(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -607,7 +590,7 @@ function showRandomList(player) {
 }
 
 
-// 主界面/地图区域配置/随机传送坐标管理/编辑
+// ===== 主界面/地图区域配置/随机传送坐标管理/编辑 =====
 function editRandomCoordinate(player, index) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -647,20 +630,20 @@ function editRandomCoordinate(player, index) {
 }
 
 
-// 主界面/地图区域配置/房间数配置
+// ===== 主界面/地图区域配置/房间数配置 =====
 function showRoomCountModal(player) {
     if (!player.isValid) return;
-    const s = getScoreboardSlider("lw_p1:房间数");
+    const s = getConfigMeta("roomCount");
     new ModalFormData()
         .title(t("lw_p1.ui.room.title"))
         .header(t("lw_p1.ui.room.header"))
-        .slider(t("lw_p1.ui.room.desc", s.defaultValue), s.min, s.max, { valueStep: s.step, defaultValue: getSco("lw_p1:房间数") })
+        .slider(t("lw_p1.ui.room.desc", s.default), s.min, s.max, { valueStep: s.step, defaultValue: getConfig("roomCount") })
         .show(player).then(res => {
             if (res.canceled) { showMapSettingForm(player); return; }
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             const n = Number(vals[0]);
             if (Number.isFinite(n) && n >= s.min && n <= s.max) {
-                mc.world.scoreboard.getObjective("lw_p1:房间数")?.setScore("lw_p1:全局", n);
+                setConfig("roomCount", n);
                 player.sendMessage(t("lw_p1.ui.room.set", n));
             }
             showMapSettingForm(player);
@@ -668,7 +651,7 @@ function showRoomCountModal(player) {
 }
 
 
-// 主界面/地图区域配置/清空所有地图坐标
+// ===== 主界面/地图区域配置/清空所有地图坐标 =====
 function confirmClearAllCoord(player) {
     if (!player.isValid) return;
     new MessageFormData()
@@ -686,40 +669,10 @@ function confirmClearAllCoord(player) {
 }
 
 
-// 物品ID转贴图路径；支持两类输入：
-// 1. 完整贴图路径（含任意层级子目录，如 "textures/items/饮品/champagne"）-> 直接原样返回
-// 2. 物品ID（如 "minecraft:cooked_beef" / "lw_p1:pistol"）-> 查询特判映射，查不到则用 textures/items/ 下同名
-// 若添加新的特殊物品，直接在 ITEM_ICON_MAP 追加一行即可
-const ITEM_ICON_MAP = {
-    cooked_beef: "beef_cooked",
-    cooked_salmon: "fish_salmon_cooked",
-    cooked_porkchop: "porkchop_cooked",
-    cooked_chicken: "chicken_cooked",
-    cooked_mutton: "mutton_cooked",
-    cooked_rabbit: "rabbit_cooked",
-    cooked_cod: "cod_cooked",
-    baked_potato: "potato_baked",
-    poisonous_potato: "potato_poisonous",
-    golden_apple: "apple_golden",
-    enchanted_golden_apple: "apple_golden",
-    golden_carrot: "carrot_golden",
-    melon_slice: "melon",
-    // 刷怪蛋没有自己的物品贴图（外观由客户端实体定义的 spawn_egg 配色生成），复用其对应实体的图标
-    firecracker_spawn_egg: "firecracker",
-};
-
-export function itemIdToIconPath(itemId) {
-    const rawName = itemId.includes(":") ? itemId.split(":")[1] : itemId;
-
-    // 输入本身是完整路径（含路径分隔符，非纯物品名）则直接返回，支持任意子目录
-    if (rawName.includes("/")) return itemId;
-
-    // 命中特判映射则用之，否则用 textures/items/ 下同名贴图
-    return `textures/items/${ITEM_ICON_MAP[rawName] ?? rawName}`;
-}
 
 
-// 主界面/食物&饮品配置
+
+// ===== 主界面/食物&饮品配置 =====
 function showFoodDrinkForm(player) {
     if (!player.isValid) return;
     const form = new ActionFormData();
@@ -772,7 +725,7 @@ function confirmResetFoodDrink(player) {
 }
 
 
-// 主界面/食物&饮品配置/管理合法食物
+// ===== 主界面/食物&饮品配置/管理合法食物 =====
 function showFoodListForm(player) {
     const config = getWorldConfig();
     const form = new ActionFormData();
@@ -801,7 +754,7 @@ function showFoodListForm(player) {
 }
 
 
-// 主界面/食物&饮品配置/管理合法饮品
+// ===== 主界面/食物&饮品配置/管理合法饮品 =====
 function showDrinkListForm(player) {
     const config = getWorldConfig();
     const form = new ActionFormData();
@@ -830,7 +783,7 @@ function showDrinkListForm(player) {
 }
 
 
-// 主界面/食物&饮品配置/管理合法食物（饮品）/编辑
+// ===== 主界面/食物&饮品配置/管理合法食物（饮品）/编辑 =====
 function showEditModal(player, type, index) {
     if (!player.isValid) return;
     const config = getWorldConfig();
@@ -861,7 +814,7 @@ function showEditModal(player, type, index) {
 }
 
 
-// 主界面/食物&饮品配置/管理合法食物（饮品）/单项操作/新增
+// ===== 主界面/食物&饮品配置/管理合法食物（饮品）/单项操作/新增 =====
 function showAddModal(player, type) {
     if (!player.isValid) return;
     const config = getWorldConfig();
@@ -893,7 +846,7 @@ const FOOD_TRAY_IDS = [
     "lw_p1:food_tray_wood"
 ];
 
-// 主界面/食物&饮品配置/食物托盘配置
+// ===== 主界面/食物&饮品配置/食物托盘配置 =====
 function showFoodTrayMenu(player) {
     if (!player.isValid) return;
     const form = new ActionFormData();
@@ -917,7 +870,7 @@ function showFoodTrayMenu(player) {
 }
 
 
-// 主界面/食物&饮品配置/食物托盘配置/物品列表
+// ===== 主界面/食物&饮品配置/食物托盘配置/物品列表 =====
 function showFoodTrayItemList(player, trayId) {
     if (!player.isValid) return;
     const config = getWorldConfig();
@@ -950,7 +903,7 @@ function showFoodTrayItemList(player, trayId) {
 }
 
 
-// 主界面/食物&饮品配置/食物托盘配置/物品列表/新增
+// ===== 主界面/食物&饮品配置/食物托盘配置/物品列表/新增 =====
 function showFoodTrayAddModal(player, trayId) {
     if (!player.isValid) return;
     new ModalFormData()
@@ -970,7 +923,7 @@ function showFoodTrayAddModal(player, trayId) {
 }
 
 
-// 主界面/食物&饮品配置/食物托盘配置/物品列表/编辑
+// ===== 主界面/食物&饮品配置/食物托盘配置/物品列表/编辑 =====
 function showFoodTrayEditModal(player, trayId, index) {
     if (!player.isValid) return;
     const config = getWorldConfig();
@@ -998,7 +951,7 @@ function showFoodTrayEditModal(player, trayId, index) {
 }
 
 
-// 主界面/商店配置
+// ===== 主界面/商店配置 =====
 function showShopForm(player) {
     if (!player.isValid) return;
     const form = new ActionFormData();
@@ -1047,7 +1000,7 @@ function confirmResetShop(player) {
 }
 
 
-// 主界面/商店配置/杀手商店配置
+// ===== 主界面/商店配置/杀手商店配置 =====
 function showkillerStoreForm(player) {
     if (!player.isValid) return;
     const config = getWorldConfig();
@@ -1080,7 +1033,7 @@ function showkillerStoreForm(player) {
 }
 
 
-// 主界面/商店配置/贩卖机配置
+// ===== 主界面/商店配置/贩卖机配置 =====
 function showVendingMachineForm(player) {
     if (!player.isValid) return;
     const config = getWorldConfig();
@@ -1113,7 +1066,7 @@ function showVendingMachineForm(player) {
 }
 
 
-// 主界面/商店配置/杀手商店（贩卖机）/编辑
+// ===== 主界面/商店配置/杀手商店（贩卖机）/编辑 =====
 function showEditShopItemModal(player, shopType, index) {
     const config = getWorldConfig();
     const list = shopType === "killer" ? config.killerStoreItems : config.vendingMachineItems;
@@ -1150,7 +1103,7 @@ function showEditShopItemModal(player, shopType, index) {
 }
 
 
-// 主界面/商店配置/杀手商店（贩卖机）/单项操作/新增
+// ===== 主界面/商店配置/杀手商店（贩卖机）/单项操作/新增 =====
 function showAddShopItemModal(player, shopType) {
     const config = getWorldConfig();
     const list = shopType === "killer" ? config.killerStoreItems : config.vendingMachineItems;
@@ -1181,31 +1134,31 @@ function showAddShopItemModal(player, shopType) {
 }
 
 
-// // 主界面/商店配置/初始金币
+// ===== 主界面/商店配置/初始金币 =====
 function showInitialCoinsForm(player) {
     if (!player.isValid) return;
-    const s1 = getScoreboardSlider("lw_p1:杀手初始金币");
-    const s2 = getScoreboardSlider("lw_p1:平民初始金币");
-    const s3 = getScoreboardSlider("lw_p1:杀手金币增速");
-    const s4 = getScoreboardSlider("lw_p1:平民金币增速");
+    const s1 = getConfigMeta("killerGold");
+    const s2 = getConfigMeta("civilGold");
+    const s3 = getConfigMeta("killerGoldRate");
+    const s4 = getConfigMeta("civilGoldRate");
     new ModalFormData()
         .title(t("lw_p1.ui.initialCoins.title"))
         .header(t("lw_p1.ui.initialCoins.killerHeader"))
-        .slider(t("lw_p1.ui.initialCoins.killerDesc", s1.defaultValue), s1.min, s1.max, { valueStep: s1.step, defaultValue: getSco("lw_p1:杀手初始金币") })
+        .slider(t("lw_p1.ui.initialCoins.killerDesc", s1.default), s1.min, s1.max, { valueStep: s1.step, defaultValue: getConfig("killerGold") })
         .header(t("lw_p1.ui.initialCoins.civilHeader"))
-        .slider(t("lw_p1.ui.initialCoins.civilDesc", s2.defaultValue), s2.min, s2.max, { valueStep: s2.step, defaultValue: getSco("lw_p1:平民初始金币") })
+        .slider(t("lw_p1.ui.initialCoins.civilDesc", s2.default), s2.min, s2.max, { valueStep: s2.step, defaultValue: getConfig("civilGold") })
         .header(t("lw_p1.ui.initialCoins.killerRateHeader"))
-        .slider(t("lw_p1.ui.initialCoins.killerRateDesc", s3.defaultValue), s3.min, s3.max, { valueStep: s3.step, defaultValue: getSco("lw_p1:杀手金币增速") })
+        .slider(t("lw_p1.ui.initialCoins.killerRateDesc", s3.default), s3.min, s3.max, { valueStep: s3.step, defaultValue: getConfig("killerGoldRate") })
         .header(t("lw_p1.ui.initialCoins.civilRateHeader"))
-        .slider(t("lw_p1.ui.initialCoins.civilRateDesc", s4.defaultValue), s4.min, s4.max, { valueStep: s4.step, defaultValue: getSco("lw_p1:平民金币增速") })
+        .slider(t("lw_p1.ui.initialCoins.civilRateDesc", s4.default), s4.min, s4.max, { valueStep: s4.step, defaultValue: getConfig("civilGoldRate") })
         .show(player).then(res => {
             if (res.canceled) { showShopForm(player); return; }
             try {
                 const vals = res.formValues.filter(v => v !== null && v !== undefined);
-                mc.world.scoreboard.getObjective("lw_p1:杀手初始金币").setScore("lw_p1:全局", Number(vals[0]));
-                mc.world.scoreboard.getObjective("lw_p1:平民初始金币").setScore("lw_p1:全局", Number(vals[1]));
-                mc.world.scoreboard.getObjective("lw_p1:杀手金币增速").setScore("lw_p1:全局", Number(vals[2]));
-                mc.world.scoreboard.getObjective("lw_p1:平民金币增速").setScore("lw_p1:全局", Number(vals[3]));
+                setConfig("killerGold", Number(vals[0]));
+                setConfig("civilGold", Number(vals[1]));
+                setConfig("killerGoldRate", Number(vals[2]));
+                setConfig("civilGoldRate", Number(vals[3]));
             } catch (e) {
                 player.sendMessage(t("lw_p1.ui.initialCoins.fail", String(e)));
             }
@@ -1215,7 +1168,7 @@ function showInitialCoinsForm(player) {
 
 
 
-// 主界面/其他
+// ===== 主界面/其他 =====
 function showOtherMenu(player) {
     if (!player.isValid) return;
     const otherForm = new ActionFormData()
@@ -1240,7 +1193,7 @@ function showOtherMenu(player) {
 }
 
 
-// 主界面/其他/设置地图信息
+// ===== 主界面/其他/设置地图信息 =====
 function showMapInfoForm(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
@@ -1264,7 +1217,7 @@ function showMapInfoForm(player) {
 }
 
 
-// 主界面/其他/修改更多当前不可用配置
+// ===== 主界面/其他/修改更多当前不可用配置 =====
 function showUnusedConfigUI(player) {
     if (!player.isValid) return;
     new ActionFormData().title(t("lw_p1.ui.unused.title")).body(t("lw_p1.ui.unused.body")).button(t("lw_p1.ui.back"))
@@ -1272,7 +1225,7 @@ function showUnusedConfigUI(player) {
 }
 
 
-// 主界面/其他/关于Addon开发者
+// ===== 主界面/其他/关于Addon开发者 =====
 function showDeveloperAboutUI(player) {
     if (!player.isValid) return;
     new ActionFormData().title(t("lw_p1.ui.about.title")).body(t("lw_p1.ui.about.body")).button(t("lw_p1.ui.back"))
@@ -1280,7 +1233,7 @@ function showDeveloperAboutUI(player) {
 }
 
 
-// 主界面/其他/赞助&加入我们
+// ===== 主界面/其他/赞助&加入我们 =====
 function showSponsorJoinUI(player) {
     if (!player.isValid) return;
     new ActionFormData().title(t("lw_p1.ui.sponsor.title")).body(t("lw_p1.ui.sponsor.body")).button(t("lw_p1.ui.back"))

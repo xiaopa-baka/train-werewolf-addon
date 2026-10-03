@@ -3,8 +3,9 @@
 
 import * as mc from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
-import { getWorldConfig } from "./config/worldConfig";
-import { t } from "./i18n/i18n.js";
+import { getWorldConfig } from "../config/worldConfig.js";
+import { t } from "../core/i18n.js";
+import { getPlayerState } from "../core/state.js";
 
 
 function getGuidePages() {
@@ -92,12 +93,12 @@ function showGuidePage(player, pageIndex) {
 
 function giveGuideBook(player) {
     if (!player.isValid) return;
-    if (player.hasTag("lw_p1:已领取物品")) return;
+    if (getPlayerState(player).guideClaimed) return;
 
     try {
         player.runCommand(`give @s lw_p1:guide_book`);
         player.runCommand(`give @s lw_p1:tp_game`)
-        player.addTag("lw_p1:已领取物品");
+        getPlayerState(player).guideClaimed = true;
     } catch (e) { }
 }
 

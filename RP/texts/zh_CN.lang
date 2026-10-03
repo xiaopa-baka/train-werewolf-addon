@@ -72,6 +72,9 @@ entity.lw_p1:player_name.name=玩家名
 
 ## 通用
 lw_p1.common.notSet=未设置
+lw_p1.common.unknownPlayer=未知玩家
+lw_p1.common.none=无
+lw_p1.common.listSep=、
 
 ## 身份
 lw_p1.role.killer=§c杀手
@@ -107,7 +110,6 @@ lw_p1.shop.notEnough=§c金币不足，购买失败！
 lw_p1.shop.fail=§c购买失败，请重试
 lw_p1.shop.success=§a成功购买 %s
 lw_p1.shop.invFull=§c物品栏已满，金币已退还
-lw_p1.shop.noScoreboard=§c内部错误：金币计分板未找到
 
 ## 配置界面 - 通用
 lw_p1.ui.close=§c关闭
@@ -156,7 +158,7 @@ lw_p1.ui.game.settings=游戏相关配置
 lw_p1.ui.game.task=任务相关配置
 lw_p1.ui.game.settingsTitle=游戏相关配置
 lw_p1.ui.game.autoHeader=自动开始时间
-lw_p1.ui.game.autoDesc=当所有玩家都位于列车时，游戏自动开始倒计时。\n也可通过以下指令手动开始游戏\n/function lw_p1:gameStart\n默认 %s\n自动开始时间（秒）
+lw_p1.ui.game.autoDesc=当所有玩家都位于列车时，游戏自动开始倒计时。\n也可通过以下指令手动开始游戏\n/lw_p1:start\n默认 %s\n自动开始时间（秒）
 lw_p1.ui.game.autoToggle=启用自动开始游戏
 lw_p1.ui.game.minHeader=\n最低开局人数
 lw_p1.ui.game.minDesc=当列车内玩家数量达到此值时，游戏可以开始。\n默认 %s\n最低开局人数（个）
@@ -309,12 +311,6 @@ lw_p1.ui.about.body=§b列车狼人杀Addon\n§f版本：正式版 1.0\n§f适�
 lw_p1.ui.sponsor.title=赞助 & 团队招募
 lw_p1.ui.sponsor.body=§b欢迎支持本项目开发！\n\n§f【赞助说明】\n如果您喜欢本Addon，愿意支持我们，可以通过以下方式赞助：\n• 在社交媒体上宣传此Addon\n• 为此Addon制作玩法地图并发布\n\n工作室正在积极招新中，欢迎热爱MC的你加入我们！\n§f【招募岗位】\n• 地图建筑\n• 项目策划\n• 运营及宣传\n• 指令设计、模组与插件开发\n• 贴图与建模制作\n• 皮肤设计\n\n\n工作室交流群：180568043\n§a欢迎热爱MC的小伙伴加入！\n加入我们，一起创造更精彩的MC冒险体验！
 
-## 通用提示
-lw_p1.common.unknownPlayer=未知玩家
-
-## 游戏消息
-lw_p1.msg.killer.civilianDeath=§e有平民死亡，获得 100 金币，倒计时延长 60 秒
-
 ## 道具交互
 lw_p1.prop.pistol.killerBlocked=§c杀手无法使用这把枪
 lw_p1.prop.pistol.lostRight=§c你已失去使用手枪的资格
@@ -338,15 +334,12 @@ lw_p1.prop.note.received=§7%s 的便条§f: %s
 lw_p1.prop.note.sent=§a已向 %s 发送便条
 lw_p1.prop.note.corpse=§e[便条] §f%s
 
-## 通用（补充）
-lw_p1.common.none=无
-lw_p1.common.listSep=、
-
 ## 活动栏 HUD
 lw_p1.hud.stamina=§b体力 %s §f%s
 lw_p1.hud.stamina.exhausted=§c体力 %s §f%s
 
-## 游戏消息（补充）
+## 游戏消息
+lw_p1.msg.killer.civilianDeath=§e有平民死亡，获得 100 金币，倒计时延长 60 秒
 lw_p1.msg.boarded=已登车 %s / %s 人
 lw_p1.msg.gameStart=§a游戏开始！
 lw_p1.msg.notEnoughPlayers=§c人数不足，无法开始游戏（当前 %s / 最低 %s）
@@ -365,7 +358,7 @@ lw_p1.end.message=§6【游戏结束】\n%s\n§f结束原因：%s\n§f杀手：%
 lw_p1.door.crowbarLocked=§c这扇门被撬开了，无法关闭
 lw_p1.door.crowbarCooldown=§c这扇门被撬棍卡住了，稍后才能打开
 
-## 身份提示（mcfunction：title 放短核心词，subtitle 放长句，避免文本溢出屏幕）
+## 身份提示（title 放短核心词，subtitle 放长句，避免文本溢出屏幕）
 lw_p1.roleWelcome=欢迎登车
 lw_p1.roleTitle.killer=§c§l杀手
 lw_p1.roleTitle.officer=§b§l警员
@@ -375,7 +368,7 @@ lw_p1.roleGoal.killer=隐藏身份，解决所有人
 lw_p1.roleGoal.officer=保护乘客，找出杀手
 lw_p1.roleGoal.passenger=配合警员，安全下车
 
-## 任务提示（mcfunction）
+## 任务提示
 lw_p1.task.1.hint1=§a你感觉有点闷，去透透气吧
 lw_p1.task.1.hint2=§6你有点喘不过来气，去透透气吧
 lw_p1.task.1.hint3=§c你快闷死了，现在必须马上去透气！

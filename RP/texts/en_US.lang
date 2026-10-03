@@ -1,5 +1,5 @@
 ## ADDON-RP en_US.lang
-pack.name=Train Werewolf
+pack.name=Train Werewolf - RP
 pack.description=A werewolf-style game addon for the train map.\nBy Xiaopa
 
 ## Items
@@ -72,6 +72,9 @@ entity.lw_p1:player_name.name=Player Name
 
 ## Common
 lw_p1.common.notSet=Not set
+lw_p1.common.unknownPlayer=Unknown
+lw_p1.common.none=None
+lw_p1.common.listSep=, 
 
 ## Roles
 lw_p1.role.killer=§cKiller
@@ -107,7 +110,6 @@ lw_p1.shop.notEnough=§cNot enough gold, purchase failed!
 lw_p1.shop.fail=§cPurchase failed, please try again
 lw_p1.shop.success=§aPurchased %s
 lw_p1.shop.invFull=§cInventory full, gold refunded
-lw_p1.shop.noScoreboard=§cInternal error: gold scoreboard not found
 
 ## Config UI - common
 lw_p1.ui.close=§cClose
@@ -156,7 +158,7 @@ lw_p1.ui.game.settings=Game settings
 lw_p1.ui.game.task=Task settings
 lw_p1.ui.game.settingsTitle=Game settings
 lw_p1.ui.game.autoHeader=Auto start time
-lw_p1.ui.game.autoDesc=When every player is on the train, the auto start countdown begins.\nYou can also start manually with\n/function lw_p1:gameStart\nDefault %s\nAuto start time (s)
+lw_p1.ui.game.autoDesc=When every player is on the train, the auto start countdown begins.\nYou can also start manually with\n/lw_p1:start\nDefault %s\nAuto start time (s)
 lw_p1.ui.game.autoToggle=Enable auto start
 lw_p1.ui.game.minHeader=\nMinimum players
 lw_p1.ui.game.minDesc=The game can start once this many players are on the train.\nDefault %s\nMinimum players
@@ -309,12 +311,6 @@ lw_p1.ui.about.body=§bTrain Werewolf Addon\n§fVersion: 1.0\n§fCompatible: Min
 lw_p1.ui.sponsor.title=Sponsorship & Recruitment
 lw_p1.ui.sponsor.body=§bThanks for supporting this project!\n\n§f[How to support]\nIf you enjoy this addon and would like to support us:\n• Share this addon on social media\n• Build and publish a gameplay map for it\n\nOur studio is actively recruiting — if you love MC, join us!\n§f[Open roles]\n• Map building\n• Project design\n• Operations & promotion\n• Command design, mod and plugin development\n• Textures and modeling\n• Skin design\n\n\nStudio group: 180568043\n§aEvery MC fan is welcome!\nJoin us and create even better MC adventures together!
 
-## Common
-lw_p1.common.unknownPlayer=Unknown
-
-## Game messages
-lw_p1.msg.killer.civilianDeath=§eA civilian died: +100 gold, timer extended by 60 seconds
-
 ## Prop interactions
 lw_p1.prop.pistol.killerBlocked=§cKillers cannot use this gun
 lw_p1.prop.pistol.lostRight=§cYou have lost the right to use the pistol
@@ -338,15 +334,12 @@ lw_p1.prop.note.received=§7Note from %s§f: %s
 lw_p1.prop.note.sent=§aNote sent to %s
 lw_p1.prop.note.corpse=§e[Note] §f%s
 
-## Common (additional)
-lw_p1.common.none=None
-lw_p1.common.listSep=, 
-
 ## Action bar HUD
 lw_p1.hud.stamina=§bStamina %s §f%s
 lw_p1.hud.stamina.exhausted=§cStamina %s §f%s
 
-## Game messages (additional)
+## Game messages
+lw_p1.msg.killer.civilianDeath=§eA civilian died: +100 gold, timer extended by 60 seconds
 lw_p1.msg.boarded=Boarded %s / %s
 lw_p1.msg.gameStart=§aGame start!
 lw_p1.msg.notEnoughPlayers=§cNot enough players to start (current %s / minimum %s)
@@ -365,7 +358,7 @@ lw_p1.end.message=§6[Game Over]\n%s\n§fReason: %s\n§fKiller: %s\n§fOfficer: 
 lw_p1.door.crowbarLocked=§cThis door was pried open and can no longer be closed
 lw_p1.door.crowbarCooldown=§cThis door is jammed by a crowbar, try again later
 
-## Role titles (mcfunction: short core in title, long line in subtitle, so English does not overflow)
+## Role titles (short core in title, long line in subtitle, so English does not overflow)
 lw_p1.roleWelcome=Welcome aboard
 lw_p1.roleTitle.killer=§c§lKiller
 lw_p1.roleTitle.officer=§b§lOfficer
@@ -375,7 +368,7 @@ lw_p1.roleGoal.killer=Stay hidden and eliminate everyone
 lw_p1.roleGoal.officer=Protect the passengers and find the Killer
 lw_p1.roleGoal.passenger=Work with the Officer and get off safely
 
-## Task hints (mcfunction)
+## Task hints
 lw_p1.task.1.hint1=§aYou feel a bit stuffy, go get some air
 lw_p1.task.1.hint2=§6You are struggling to breathe, go get some air
 lw_p1.task.1.hint3=§cYou are suffocating, get some air right now!

@@ -1,11 +1,12 @@
 // @ts-check
-// shopSystem.js - 商店系统
+// shop.js - 商店系统（含贩卖机多方块逻辑）
 
 import * as mc from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
-import { getWorldConfig } from "./config/worldConfig.js";
-import { itemIdToIconPath } from "./config/configUI.js";
-import { t, tConfigName } from "./i18n/i18n.js";
+import { getWorldConfig, getConfig } from "../config/worldConfig.js";
+import { itemIdToIconPath } from "../core/itemIcons.js";
+import { getGold, addGold, isInGame, isKiller } from "../core/state.js";
+import { t, tConfigName } from "../core/i18n.js";
 
 
 // 使用物品 lw_p1:killer_store 打开杀手商店界面
@@ -43,27 +44,21 @@ mc.world.beforeEvents.playerInteractWithBlock.subscribe(event => {
 });
 
 
-// 获取玩家金币分数
+// 获取玩家金币（经统一访问器）
 function getGoldScore(player) {
-    const objective = mc.world.scoreboard.getObjective("lw_p1:金币");
-    try { return objective?.getScore(player) ?? 0; } catch { return 0; }
+    return getGold(player);
 }
 
 
-// 扣除玩家金币分数
+// 扣除玩家金币（经统一访问器）
 function deductGold(player, amount) {
-    const objective = mc.world.scoreboard.getObjective("lw_p1:金币");
-    if (!objective) {
-        try { player.sendMessage(t("lw_p1.shop.noScoreboard")); } catch { }
+    if (getGold(player) < amount) return false;
+    try {
+        addGold(player, -amount);
+        return true;
+    } catch (e) {
         return false;
     }
-    try {
-        const before = objective.getScore(player) ?? 0;
-        if (before < amount) return false;
-        objective.addScore(player, -amount);
-        const after = objective.getScore(player) ?? 0;
-        return true;
-    } catch (e) { }
 }
 
 
@@ -93,29 +88,25 @@ const purchaseLock = new Set();
 // 游戏开始后每 10 秒按角色发放自然金币
 const goldAccumulator = new Map();
 mc.system.runInterval(() => {
-    const goldObj = mc.world.scoreboard.getObjective("lw_p1:金币");
-    if (!goldObj) return;
-    const killerRateObj = mc.world.scoreboard.getObjective("lw_p1:杀手金币增速");
-    const civilRateObj = mc.world.scoreboard.getObjective("lw_p1:平民金币增速");
-    const killerRate = killerRateObj?.getScore("lw_p1:全局") ?? 15;
-    const civilRate = civilRateObj?.getScore("lw_p1:全局") ?? 0;
+    const killerRate = getConfig("killerGoldRate");
+    const civilRate = getConfig("civilGoldRate");
 
     const players = mc.world.getPlayers();
     for (const player of players) {
         if (!player.isValid) continue;
-        if (!player.hasTag("lw_p1:游戏中")) {
+        if (!isInGame(player)) {
             goldAccumulator.delete(player.id);
             continue;
         }
 
         const acc = (goldAccumulator.get(player.id) ?? 0) + 1;
         goldAccumulator.set(player.id, acc);
-        if (acc < 200) continue;
+        if (acc < 200) continue; // 累计 200 tick = 10 秒发放一次
 
         goldAccumulator.set(player.id, 0);
-        const rate = player.hasTag("lw_p1:杀手") ? killerRate : civilRate;
+        const rate = isKiller(player) ? killerRate : civilRate;
         if (rate > 0) {
-            goldObj.addScore(player, rate);
+            addGold(player, rate);
         }
     }
 }, 1);
@@ -161,7 +152,7 @@ function openkillerStore(player) {
             purchaseLock.delete(player.name);
         } else {
             try {
-                mc.world.scoreboard.getObjective("lw_p1:金币")?.addScore(player, target.price);
+                addGold(player, target.price);
                 player.sendMessage(t("lw_p1.shop.invFull"));
             } catch (e) { }
             purchaseLock.delete(player.name);
@@ -178,7 +169,7 @@ function openVendingMachine(player) {
     let items = Array.isArray(config.vendingMachineItems) ? config.vendingMachineItems : [];
 
     // 杀手打开贩卖机时，不显示左轮手枪
-    if (player.hasTag("lw_p1:杀手")) {
+    if (isKiller(player)) {
         items = items.filter(item => item.id !== "lw_p1:pistol");
     }
 
@@ -216,10 +207,126 @@ function openVendingMachine(player) {
             purchaseLock.delete(player.name);
         } else {
             try {
-                mc.world.scoreboard.getObjective("lw_p1:金币")?.addScore(player, target.price);
+                addGold(player, target.price);
                 player.sendMessage(t("lw_p1.shop.invFull"));
             } catch (e) { }
             purchaseLock.delete(player.name);
         }
     });
 }
+
+
+// ===== 自动贩卖机（多方块放置 / 破坏 / 联动） =====
+
+const VENDING_ID = "lw_p1:vending_machine";
+/** @type {any} */
+const S_CARDINAL = "minecraft:cardinal_direction";
+/** @type {any} */
+const S_PART = "lw_p1:part";
+
+
+function isVending(block) {
+    return !!block && block.typeId === VENDING_ID;
+}
+
+// 贩卖机的另一半
+function halfMachine(block) {
+    const up = block.above();
+    const down = block.below();
+    if (up && isVending(up) && up.permutation.getState(S_PART) === "upper") return up;
+    if (down && isVending(down) && down.permutation.getState(S_PART) === "lower") return down;
+    return null;
+}
+
+
+// 放置时，设置 part=lower，并在上方生成 part=upper
+mc.world.afterEvents.playerPlaceBlock.subscribe((event) => {
+    const { block, player } = event;
+    if (!block || !isVending(block)) return;
+    if (!player?.isValid) return;
+
+    const aboveBlock = block.above();
+    if (!aboveBlock || (!aboveBlock.isAir && !aboveBlock.isLiquid)) {
+        try { block.setType("minecraft:air"); } catch (e) { }
+        return;
+    }
+
+    const placedCardinal = block.permutation.getState(S_CARDINAL);
+    mc.system.run(() => {
+        try {
+            const dim = block.dimension;
+            const loc = { x: block.x, y: block.y, z: block.z };
+            const upLoc = { x: block.x, y: block.y + 1, z: block.z };
+            const cardinal = String(placedCardinal) || "north";
+            const lower = mc.BlockPermutation.resolve(block.typeId)
+                .withState(S_CARDINAL, cardinal)
+                .withState(S_PART, "lower");
+            const upper = mc.BlockPermutation.resolve(block.typeId)
+                .withState(S_CARDINAL, cardinal)
+                .withState(S_PART, "upper");
+            dim.getBlock(loc)?.setPermutation(lower);
+            dim.getBlock(upLoc)?.setPermutation(upper);
+        } catch (e) { }
+    });
+});
+
+
+// 记录整台贩卖机被破坏的掉落信息
+const pendingBreaks = new Map();
+
+mc.world.beforeEvents.playerBreakBlock.subscribe((event) => {
+    const block = event.block;
+    if (!block || !isVending(block)) return;
+
+    const part = block.permutation.getState(S_PART);
+    let lowerBlock = null;
+    let upperBlock = null;
+
+    if (part === "lower") {
+        lowerBlock = block;
+        const a = block.above();
+        if (a && isVending(a) && a.permutation.getState(S_PART) === "upper") upperBlock = a;
+    } else if (part === "upper") {
+        upperBlock = block;
+        const b = block.below();
+        if (b && isVending(b) && b.permutation.getState(S_PART) === "lower") lowerBlock = b;
+    }
+
+    // 非完整结构（孤立的一半）按普通方块破坏处理，不拦截
+    if (!lowerBlock || !upperBlock) return;
+
+    const brokenKey = `${block.x},${block.y},${block.z}`;
+    pendingBreaks.set(brokenKey, {
+        lowerLoc: { x: lowerBlock.x, y: lowerBlock.y, z: lowerBlock.z },
+        upperLoc: { x: upperBlock.x, y: upperBlock.y, z: upperBlock.z },
+    });
+});
+
+mc.world.afterEvents.playerBreakBlock.subscribe((event) => {
+    const block = event.block;
+    const player = event.player;
+    if (!block) return;
+
+    const brokenKey = `${block.x},${block.y},${block.z}`;
+    const info = pendingBreaks.get(brokenKey);
+    if (!info) return;
+    pendingBreaks.delete(brokenKey);
+
+    const dim = event.dimension;
+    mc.system.run(() => {
+        // 移除另一半（被破坏格已由引擎移除）
+        for (const loc of [info.lowerLoc, info.upperLoc]) {
+            try {
+                const b = dim.getBlock(loc);
+                if (b && isVending(b)) b.setType("minecraft:air");
+            } catch (e) { }
+        }
+        // 创造模式破坏不掉落物品
+        const isCreative = player?.isValid && player.getGameMode() === mc.GameMode.Creative;
+        if (!isCreative) {
+            try {
+                dim.spawnItem(new mc.ItemStack(VENDING_ID, 1), info.lowerLoc);
+            } catch (e) { }
+        }
+    });
+});

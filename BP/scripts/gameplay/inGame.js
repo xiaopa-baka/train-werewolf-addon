@@ -1,9 +1,11 @@
 // @ts-check
-// inGameSystem.js - 局内系统（体力 + 跳跃）
+// inGame.js - 局内系统（体力 + 跳跃）
 
 import * as mc from "@minecraft/server";
-import { getWorldConfig } from "./config/worldConfig.js";
-import { t } from "./i18n/i18n.js";
+import { getWorldConfig } from "../config/worldConfig.js";
+import { t } from "../core/i18n.js";
+import { isInGame, isKiller } from "../core/state.js";
+import { registerActionBarProvider } from "../core/hud.js";
 
 
 // 体力（疾跑耐久）系统
@@ -14,9 +16,6 @@ const REGEN_DELAY_TICKS = 60;     // 停止疾跑后延迟多久才开始恢复�
 const RECOVER_THRESHOLD = 30;     // 体力回到该值才解除禁跑
 const EXHAUST_HUNGER = 2;         // 力竭时把饱食度压到 2（≤6 无法疾跑；取 2 以防和平模式自然恢复过快）
 const MIN_SPRINT_HUNGER = 7;      // 解除力竭时至少恢复到 7（>6 才能疾跑）
-
-// 排查用日志开关：打开后每秒输出一次每个玩家的体力状态；确认无误后可关掉
-const DEBUG_LOG = false;
 
 // 力竭期间记录"力竭前的饱食度"，存玩家动态属性以便跨会话保留（避免退出后卡在低饱食度）
 const HUNGER_LOCK_KEY = "lw_p1:staminaHungerLock";
@@ -47,7 +46,7 @@ function isStaminaExempt(player) {
     let isCreative = false;
     try { isCreative = player.getGameMode() === mc.GameMode.Creative; } catch (e) { }
     if (isCreative) return true;
-    if (!killerStamina && player.hasTag("lw_p1:杀手")) return true;
+    if (!killerStamina && isKiller(player)) return true;
     return false;
 }
 
@@ -122,9 +121,9 @@ function staminaBar(value) {
 }
 
 
-// 体力条文案（由 main.js 注册到活动栏调度器）：仅玩家自己看得到（活动栏天然按玩家单独下发）
+// 体力条文案（由本模块注册到活动栏调度器）：仅玩家自己看得到（活动栏天然按玩家单独下发）
 export function staminaHudText(player) {
-    if (!staminaEnabled || !player.hasTag("lw_p1:游戏中")) return undefined;
+    if (!staminaEnabled || !isInGame(player)) return undefined;
     if (isStaminaExempt(player)) return undefined;
 
     const state = staminaMap.get(player.id);
@@ -154,7 +153,7 @@ mc.system.runInterval(() => {
 
         // 只在"游戏中"生效：体力系统关闭、不在局内、或免体力（创造 / 关闭杀手体力后的杀手）时，
         // 清状态并还原可能被压制的饱食度
-        if (!staminaEnabled || !player.hasTag("lw_p1:游戏中") || isStaminaExempt(player)) {
+        if (!staminaEnabled || !isInGame(player) || isStaminaExempt(player)) {
             staminaMap.delete(player.id);
             restoreFromLock(player);
             continue;
@@ -195,10 +194,6 @@ mc.system.runInterval(() => {
                 restoreHunger(player, state);
             }
         }
-
-        if (DEBUG_LOG && tick % 20 === 0) {
-            console.log(`[体力] ${player.name} 疾跑=${sprinting} 体力=${state.value.toFixed(1)} 力竭=${state.exhausted}`);
-        }
     }
 }, 1);
 
@@ -217,7 +212,7 @@ mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
         // 只在"游戏中"生效；局外一律恢复可跳跃，避免出局后仍被禁跳
-        const allowJump = !player.hasTag("lw_p1:游戏中") || jumpEnabled;
+        const allowJump = !isInGame(player) || jumpEnabled;
         try {
             player.inputPermissions.setPermissionCategory(mc.InputPermissionCategory.Jump, allowJump);
         } catch (e) { }
@@ -226,7 +221,7 @@ mc.system.runInterval(() => {
 
 
 // 局内隐藏 HUD：生命条 / 饥饿条 / 状态效果
-// 用 /hud 指令控制，按玩家持久保存；只在"游戏中"标签出现/消失导致状态变化时才下发一次
+// 用 /hud 指令控制，按玩家持久保存；只在"游戏中"状态位出现/消失导致状态变化时才下发一次
 const HUD_ELEMENTS = ["health", "hunger", "status_effects"];
 const hudHiddenMap = new Map();   // playerId -> 当前是否已对该玩家隐藏
 
@@ -241,9 +236,13 @@ function applyHudVisibility(player, hide) {
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
-        const shouldHide = player.hasTag("lw_p1:游戏中");
+        const shouldHide = isInGame(player);
         if (hudHiddenMap.get(player.id) === shouldHide) continue;
         applyHudVisibility(player, shouldHide);
         hudHiddenMap.set(player.id, shouldHide);
     }
 }, 20);
+
+
+// 各功能的注册（weight 越大，轮播中停留的份额越多）
+registerActionBarProvider("lw_p1:stamina", (player) => staminaHudText(player), { weight: 1 });

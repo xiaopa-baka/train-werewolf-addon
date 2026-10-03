@@ -1,10 +1,12 @@
 // @ts-check
-// propSystem.js - 道具系统
+// props.js - 道具系统
 
 import * as mc from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
-import { getWorldConfig } from "./config/worldConfig.js";
-import { t } from "./i18n/i18n.js";
+import { getWorldConfig } from "../config/worldConfig.js";
+import { getRemainSeconds, setTaskProgress, getPlayerState, isInGame, isKiller, isOfficer } from "../core/state.js";
+import { t } from "../core/i18n.js";
+import { registerActionBarProvider } from "../core/hud.js";
 
 
 // 判断玩家是否为创造模式
@@ -54,7 +56,7 @@ function poisonKill(player) {
 }
 
 
-// 匕首
+// ===== 匕首 =====
 const chargeStartTick = new Map();
 // 获取玩家正前方一格的方块上站着的其他玩家
 function getPlayerInFront(player) {
@@ -85,7 +87,6 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
         const player = event.source;
         if (!player?.isValid || event.itemStack?.typeId !== "lw_p1:dagger") return;
 
-        // 创造模式跳过冷却检查
         if (!isCreative(player)) {
             try {
                 if (player.getItemCooldown("lw_p1_dagger") > 0) {
@@ -116,7 +117,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 
         const target = getPlayerInFront(player);
         if (target) {
-            target.addTag("lw_p1:受到伤害");
+            getPlayerState(target).hurt = true;
             try {
                 target.runCommand(`playsound dagger_2 @a ~ ~ ~ 1`);
             } catch (e) { }
@@ -136,13 +137,12 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 });
 
 
-// 爆竹
+// ===== 爆竹 =====
 mc.world.afterEvents.entitySpawn.subscribe((event) => {
     const entity = event.entity;
     if (entity.typeId === "lw_p1:firecracker") {
         entity.setDynamicProperty("lw_p1:spawnTick", mc.system.currentTick);
         try {
-            // 爆竹生成时火焰粒子
             entity.runCommand(`particle minecraft:basic_flame_particle ^0.1 ^0.1 ^0.06`);
         } catch (e) { }
     }
@@ -163,16 +163,16 @@ mc.system.runInterval(() => {
             if (typeof spawnTick !== "number") continue;
             const age = mc.system.currentTick - spawnTick;
 
+            // 每 5 tick 喷一次烟
             if (age % 5 === 0) {
                 try {
-                    // 中间过程烟雾粒子
                     fc.runCommand(`particle minecraft:basic_smoke_particle ^0.1 ^0.1 ^0.06`);
                 } catch (e) { }
             }
 
+            // 15 秒后爆炸（300 tick = 15 秒）
             if (age >= 300) {
                 try {
-                    // 爆竹爆炸播放音效，炸裂粒子
                     fc.runCommand(`playsound firecracker @a ~ ~ ~ 4`);
                     fc.runCommand(`particle minecraft:lava_particle ~ ~ ~`);
                     fc.runCommand(`particle minecraft:lava_particle ~ ~ ~`);
@@ -185,7 +185,7 @@ mc.system.runInterval(() => {
 }, 1);
 
 
-// 手枪
+// ===== 手枪 =====
 // 根据玩家朝向计算子弹初始速度方向
 function getBulletVelocity(player) {
     const view = player.getViewDirection();
@@ -235,7 +235,6 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
         if (!player?.isValid) return;
         if (typeId !== "lw_p1:pistol" && typeId !== "lw_p1:pistol_mini") return;
 
-        // 创造模式跳过冷却检查
         const cooldownCategory = typeId === "lw_p1:pistol" ? "lw_p1_pistol" : "lw_p1_pistol_mini";
         if (!isCreative(player)) {
             try {
@@ -262,25 +261,20 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 
         const cooldownCategory = typeId === "lw_p1:pistol" ? "lw_p1_pistol" : "lw_p1_pistol_mini";
 
-        // 开枪音效
         try {
             player.runCommand(`playsound pistol @a ~ ~ ~ 2`);
         } catch (e) { }
 
-        // 生成子弹
         spawnBullet(player, typeId);
 
-        // 开枪粒子
         try {
             player.runCommand(`particle minecraft:campfire_smoke_particle ^-0.5 ^1.5 ^0.2`);
         } catch (e) { }
 
-        // 后坐力
         try {
             player.runCommand(`camerashake add @s 0.4 0.15 positional`);
         } catch (e) { }
 
-        // 启动 10 秒冷却（创造模式跳过）
         if (!isCreative(player)) {
             try {
                 player.startItemCooldown(cooldownCategory, 200);
@@ -302,7 +296,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
     });
 });
 
-// 子弹
+// ===== 子弹 =====
 mc.system.runInterval(() => {
     for (const dimName of ["overworld", "nether", "the_end"]) {
         let dimension;
@@ -318,7 +312,6 @@ mc.system.runInterval(() => {
             if (typeof spawnTick !== "number") { bullet.remove(); continue; }
             const age = mc.system.currentTick - spawnTick;
 
-            // 子弹拖尾粒子
             try {
                 bullet.runCommand(`particle minecraft:white_smoke_particle ~ ~ ~`);
             } catch (e) { }
@@ -355,7 +348,6 @@ mc.system.runInterval(() => {
                 const loc = bullet.location;
                 const next = { x: loc.x + vx, y: loc.y + vy, z: loc.z + vz };
 
-                // 方块碰撞检测
                 try {
                     const dirLen = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1;
                     const dir = { x: vx / dirLen, y: vy / dirLen, z: vz / dirLen };
@@ -400,7 +392,6 @@ mc.system.runInterval(() => {
                 } catch (e) { }
             }
 
-            // 命中判定
             const shooterId = bullet.getDynamicProperty("lw_p1:shooterId");
             const weaponType = bullet.getDynamicProperty("lw_p1:weaponType");
             const bLoc = bullet.location;
@@ -417,7 +408,7 @@ mc.system.runInterval(() => {
 
                 let d2;
                 if (hasLast) {
-                    // 线段 (lastX,lastY,lastZ) - (bLoc) 到玩家中心的最短距离
+                    // 求线段（上一位置→当前位置）到玩家中心的最短距离
                     const ax = lastX, ay = lastY, az = lastZ;
                     const bx = bLoc.x, by = bLoc.y, bz = bLoc.z;
                     const abx = bx - ax, aby = by - ay, abz = bz - az;
@@ -433,6 +424,7 @@ mc.system.runInterval(() => {
                     d2 = (cx - bLoc.x) ** 2 + (cy - bLoc.y) ** 2 + (cz - bLoc.z) ** 2;
                 }
 
+                // 0.81 = 0.9²，命中半径 0.9 格（用平方距离比较，省去开方）
                 if (d2 <= 0.81) {
                     hit = p;
                     break;
@@ -440,15 +432,14 @@ mc.system.runInterval(() => {
             }
 
             if (hit) {
-                hit.addTag("lw_p1:受到伤害");
+                getPlayerState(hit).hurt = true;
                 bullet.setDynamicProperty("lw_p1:hasHit", true);
 
                 // 左轮手枪误伤平民，掉落手枪实体
-                if (weaponType === "lw_p1:pistol" && !hit.hasTag("lw_p1:杀手")) {
+                if (weaponType === "lw_p1:pistol" && !isKiller(hit)) {
                     try {
                         const shooter = Array.from(mc.world.getPlayers()).find(p => p.id === shooterId);
                         if (shooter && shooter.isValid && !isCreative(shooter)) {
-                            // 清除背包中的左轮手枪
                             const container = shooter.getComponent("minecraft:inventory")?.container;
                             if (container) {
                                 for (let i = 0; i < container.size; i++) {
@@ -459,15 +450,13 @@ mc.system.runInterval(() => {
                                     }
                                 }
                             }
-                            // 在开枪者前方生成手枪实体
                             const vd = shooter.getViewDirection();
                             shooter.dimension.spawnEntity("lw_p1:pistol", {
                                 x: shooter.location.x + vd.x,
                                 y: shooter.location.y + 1.0,
                                 z: shooter.location.z + vd.z
                             });
-                            // 标记禁用手枪
-                            shooter.addTag("lw_p1:禁用手枪");
+                            getPlayerState(shooter).pistolDisabled = true;
                         }
                     } catch (e) { }
                 }
@@ -488,17 +477,16 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
     event.cancel = true;
 
     // 杀手无法拾取
-    if (player.hasTag("lw_p1:杀手")) {
+    if (isKiller(player)) {
         try { player.sendMessage(t("lw_p1.prop.pistol.killerBlocked")); } catch (e) { }
         return;
     }
     // 掉落过枪的人无法拾取
-    if (player.hasTag("lw_p1:禁用手枪")) {
+    if (getPlayerState(player).pistolDisabled) {
         try { player.sendMessage(t("lw_p1.prop.pistol.lostRight")); } catch (e) { }
         return;
     }
 
-    // 给玩家左轮手枪
     const targetId = target.id;
     mc.system.run(() => {
         if (!player.isValid) return;
@@ -522,7 +510,7 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
 });
 
 
-// 球棒
+// ===== 球棒 =====
 mc.world.afterEvents.entityHurt.subscribe((event) => {
     const hurt = event.hurtEntity;
     if (!hurt?.isValid) return;
@@ -540,7 +528,7 @@ mc.world.afterEvents.entityHurt.subscribe((event) => {
     try {
         if (attackerPlayer.getItemCooldown("lw_p1_bat") > 0) return;
         attackerPlayer.startItemCooldown("lw_p1_bat", 40);
-        hurt.addTag("lw_p1:受到伤害");
+        getPlayerState(hurt).hurt = true;
     } catch (e) { }
 });
 
@@ -550,11 +538,10 @@ const batFrenzy = new Set();
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
-        if (!player.hasTag('lw_p1:杀手')) continue;
-        if (!player.hasTag('lw_p1:游戏中')) continue;
+        if (!isKiller(player)) continue;
+        if (!isInGame(player)) continue;
         if (batFrenzy.has(player.id)) continue;
 
-        // 检测背包中是否有球棍
         let hasBat = false;
         try {
             const container = player.getComponent('inventory').container;
@@ -567,7 +554,6 @@ mc.system.runInterval(() => {
         } catch (e) { }
         if (!hasBat) continue;
 
-        // 进入狂暴状态
         batFrenzy.add(player.id);
         try { player.addEffect('minecraft:speed', 600, { amplifier: 2, showParticles: true }); } catch (e) { }
 
@@ -598,14 +584,13 @@ mc.system.runInterval(() => {
 }, 20);
 
 
-// 香烟
+// ===== 香烟 =====
 mc.world.beforeEvents.itemUse.subscribe((event) => {
     const player = event.source;
     const item = event.itemStack;
     if (!player?.isValid || !item) return;
     if (item.typeId !== 'lw_p1:cigarette') return;
 
-    // 播放粒子，消耗
     const slot = player.selectedSlotIndex;
     mc.system.run(() => {
         try {
@@ -622,22 +607,19 @@ mc.world.beforeEvents.itemUse.subscribe((event) => {
         } catch (e) { }
     });
 
-    if (player.hasTag('lw_p1:任务6')) {
-        try {
-            mc.world.scoreboard.getObjective('lw_p1:任务中')?.setScore(player, 300);
-        } catch (e) { }
+    if (getPlayerState(player).taskId === 6) {
+        setTaskProgress(player, 300);
     }
 });
 
 
-// 矿泉水
+// ===== 矿泉水 =====
 mc.world.afterEvents.itemCompleteUse.subscribe((event) => {
     const player = event.source;
     const item = event.itemStack;
     if (!player?.isValid || !item) return;
 
     if (item.typeId === 'lw_p1:mineral_water') {
-        // 饮用后消耗矿泉水，获得矿泉水瓶
         const slot = player.selectedSlotIndex;
         mc.system.run(() => {
             try {
@@ -650,7 +632,6 @@ mc.world.afterEvents.itemCompleteUse.subscribe((event) => {
                         else { c.setItem(slot, undefined); }
                     }
                 };
-                // 给玩家矿泉水瓶
                 const bottle = new mc.ItemStack('lw_p1:mineral_water_bottle', 1);
                 c.addItem(bottle);
             } catch (e) { }
@@ -660,13 +641,13 @@ mc.world.afterEvents.itemCompleteUse.subscribe((event) => {
 });
 
 
-// 矿泉水瓶
+// ===== 矿泉水瓶 =====
 mc.world.beforeEvents.itemUse.subscribe((event) => {
     const player = event.source;
     const item = event.itemStack;
     if (!player?.isValid || !item) return;
     if (item.typeId !== 'lw_p1:mineral_water_bottle') return;
-    if (!player.hasTag('lw_p1:任务2')) return;
+    if (getPlayerState(player).taskId !== 2) return;
 
     const slot = player.selectedSlotIndex;
     mc.system.run(() => {
@@ -680,13 +661,13 @@ mc.world.beforeEvents.itemUse.subscribe((event) => {
                     else { c.setItem(slot, undefined); }
                 }
             };
-            mc.world.scoreboard.getObjective('lw_p1:任务中')?.setScore(player, 200);
+            setTaskProgress(player, 200);
         } catch (e) { }
     });
 });
 
 
-// 饮料
+// ===== 饮料 =====
 const DRINK_IDS = new Set([
     "lw_p1:royal_jelly",
     "lw_p1:champagne",
@@ -719,15 +700,15 @@ mc.world.afterEvents.itemCompleteUse.subscribe((event) => {
 });
 
 
-// 断电装置
+// ===== 断电装置 =====
 mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.beforeEvents.itemUse.subscribe((event) => {
         const player = event.source;
         const item = event.itemStack;
         if (!player?.isValid || !item) return;
         if (item.typeId !== 'lw_p1:power_cut') return;
-        if (!player.hasTag('lw_p1:杀手')) return;
-        if (!player.hasTag('lw_p1:游戏中')) return;
+        if (!isKiller(player)) return;
+        if (!isInGame(player)) return;
 
         event.cancel = true;
 
@@ -735,7 +716,6 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
             try {
                 if (!player.isValid) return;
 
-                // 清除背包中的断电装置
                 const container = player.getComponent('inventory').container;
                 for (let i = 0; i < container.size; i++) {
                     const it = container.getItem(i);
@@ -747,12 +727,12 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
                 // 所有非杀手玩家失明 20 秒，杀手隐身 20 秒
                 for (const p of mc.world.getPlayers()) {
                     if (!p.isValid) continue;
-                    if (p.hasTag('lw_p1:杀手')) {
+                    if (isKiller(p)) {
                         try {
                             p.addEffect('minecraft:invisibility', 400, { amplifier: 0, showParticles: false });
                         } catch (e) { }
                     };
-                    if (!p.hasTag('lw_p1:游戏中')) continue;
+                    if (!isInGame(p)) continue;
                     try {
                         p.addEffect('minecraft:blindness', 400, { amplifier: 0, showParticles: false });
                     } catch (e) { }
@@ -763,7 +743,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 });
 
 
-// 手榴弹
+// ===== 手榴弹 =====
 function getGrenadeVelocity(player) {
     const view = player.getViewDirection();
     const len = Math.sqrt(view.x * view.x + view.y * view.y + view.z * view.z) || 1;
@@ -798,7 +778,6 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
             try {
                 if (!player.isValid) return;
 
-                // 消耗手榴弹
                 if (!isCreative(player)) {
                     const c = player.getComponent('inventory').container;
                     const it = c.getItem(slot);
@@ -808,7 +787,6 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
                     }
                 }
 
-                // 生成手榴弹实体
                 const loc = player.location;
                 const headY = (loc.y ?? 0) + 1.62;
                 const spawnLoc = { x: loc.x, y: headY, z: loc.z };
@@ -827,7 +805,6 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
                 grenade.setDynamicProperty('lw_p1:vy', velocity.y);
                 grenade.setDynamicProperty('lw_p1:vz', velocity.z);
 
-                // 投掷音效
                 try {
                     player.runCommand(`playsound random.bow @a ~ ~ ~ 1 1.5`);
                 } catch (e) { }
@@ -866,14 +843,13 @@ mc.system.runInterval(() => {
                 continue;
             }
 
-            // 应用重力
+            // 每 tick 竖直速度递减 0.1（重力）
             const newVy = vy + -0.1;
             grenade.setDynamicProperty('lw_p1:vy', newVy);
 
             const loc = grenade.location;
             const next = { x: loc.x + vx, y: loc.y + newVy, z: loc.z + vz };
 
-            // 方块碰撞检测
             try {
                 const dirLen = Math.sqrt(vx * vx + newVy * newVy + vz * vz) || 1;
                 const dir = { x: vx / dirLen, y: newVy / dirLen, z: vz / dirLen };
@@ -900,17 +876,14 @@ function explodeGrenade(grenade) {
     const loc = grenade.location;
     const dim = grenade.dimension;
 
-    // 爆炸音效
     try {
         dim.runCommand(`playsound random.explode @a ~ ~ ~ 10 1`);
     } catch (e) { }
 
-    // 爆炸粒子
     try {
         grenade.runCommand(`particle minecraft:huge_explosion_emitter ~ ~ ~`);
     } catch (e) { }
 
-    // 对范围内的玩家造成伤害
     try {
         const shooterId = grenade.getDynamicProperty('lw_p1:shooterId');
         for (const player of mc.world.getPlayers()) {
@@ -922,7 +895,7 @@ function explodeGrenade(grenade) {
             // 爆炸半径
             const radius = 3.0
             if (distSq <= radius * radius) {
-                player.addTag('lw_p1:受到伤害');
+                getPlayerState(player).hurt = true;
             }
         }
     } catch (e) { }
@@ -931,7 +904,7 @@ function explodeGrenade(grenade) {
 }
 
 
-// 神奇的海螺
+// ===== 神奇的海螺 =====
 mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
     const player = event.player;
     const target = event.target;
@@ -947,18 +920,15 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
 
     event.cancel = true;
 
-    // 找到目标对应的玩家
     const targetPlayer = Array.from(mc.world.getPlayers()).find(p => p.id === target.id);
     if (!targetPlayer?.isValid) return;
 
-    // 判断目标身份
     let role = t("lw_p1.role.passenger");
-    if (targetPlayer.hasTag("lw_p1:杀手")) role = t("lw_p1.role.killer");
-    else if (targetPlayer.hasTag("lw_p1:警员")) role = t("lw_p1.role.officer");
+    if (isKiller(targetPlayer)) role = t("lw_p1.role.killer");
+    else if (isOfficer(targetPlayer)) role = t("lw_p1.role.officer");
 
     try { player.sendMessage(t("lw_p1.prop.conch", targetPlayer.name, role)); } catch (e) { }
 
-    // 使用后消失
     if (!isCreative(player)) {
         const slot = player.selectedSlotIndex;
         mc.system.run(() => {
@@ -980,19 +950,12 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
 });
 
 
-// 父亲的怀表
+// ===== 父亲的怀表 =====
 const watchCharging = new Set();
 
 function watchRemainText() {
     try {
-        const gt = mc.world.scoreboard.getObjective("lw_p1:游戏时间");
-        const bt = mc.world.scoreboard.getObjective("lw_p1:单局游戏基础时长");
-        const ex = mc.world.scoreboard.getObjective("lw_p1:死亡加时");
-        if (!gt || !bt) return t("lw_p1.prop.time.none");
-        const elapsed = Math.floor((gt.getScore("lw_p1:全局") ?? 0) / 20);
-        const base = bt.getScore("lw_p1:全局") ?? 600;
-        const extra = ex?.getScore("lw_p1:全局") ?? 0;
-        const remain = Math.max(0, base + extra - elapsed);
+        const remain = getRemainSeconds();
         const m = Math.floor(remain / 60), s = remain % 60;
         return t("lw_p1.prop.time.remaining", m, String(s).padStart(2, "0"));
     } catch (e) {
@@ -1027,7 +990,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.afterEvents.itemStopUse.subscribe(stop);
 });
 
-// 蓄力期间活动栏显示剩余时间（由 main.js 注册到活动栏调度器）
+// 蓄力期间活动栏显示剩余时间（由本模块注册到活动栏调度器）
 export function watchHudText(player) {
     if (!watchCharging.has(player.id)) return undefined;
     return watchRemainText();
@@ -1036,7 +999,7 @@ export function watchHudText(player) {
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
-        if (!player.hasTag("lw_p1:受到伤害")) continue;
+        if (!getPlayerState(player).hurt) continue;
 
         let foundSlot = -1;
         try {
@@ -1060,16 +1023,16 @@ mc.system.runInterval(() => {
                 }
             } catch (e) { }
             player.sendMessage(t("lw_p1.prop.watch.saved"))
-            player.removeTag("lw_p1:受到伤害");
+            getPlayerState(player).hurt = false;
         } else {
             poisonKill(player);
-            player.removeTag("lw_p1:受到伤害");
+            getPlayerState(player).hurt = false;
         }
     }
 }, 20);
 
 
-// 食物托盘，毒药，野生蜂王浆
+// ===== 食物托盘，毒药，野生蜂王浆 =====
 const FOOD_TRAY_IDS = [
     "lw_p1:food_tray",
     "lw_p1:food_tray_ceramic",
@@ -1097,7 +1060,6 @@ function handleFoodTrayInteract(player, block) {
     if (!player?.isValid || !block) return;
     if (!FOOD_TRAY_IDS.includes(block.typeId)) return;
 
-    // 获取玩家当前手持物品
     let hand = null;
     try {
         const c = player.getComponent("inventory").container;
@@ -1121,7 +1083,6 @@ function handleFoodTrayInteract(player, block) {
         POISONED_TRAYS.set(tKey, { poisonerId: player.id });
         try { player.sendMessage(t("lw_p1.prop.tray.poisoned")); } catch (e) { }
 
-        // 消耗毒药
         if (!isCreative(player)) {
             mc.system.run(() => {
                 try {
@@ -1157,7 +1118,6 @@ function handleFoodTrayInteract(player, block) {
         return;
     }
 
-    // 检测玩家背包是否已有托盘中物品
     try {
         const container = player.getComponent("inventory").container;
         for (let i = 0; i < container.size; i++) {
@@ -1261,7 +1221,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 });
 
 
-// 便条
+// ===== 便条 =====
 const noteEntityInteracted = new Set();
 const noteCooldown = new Map();
 const NOTE_COOLDOWN_TICKS = 100;
@@ -1366,3 +1326,7 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
 
     try { player.sendMessage(t("lw_p1.prop.note.corpse", String(noteContent))); } catch (e) { }
 });
+
+
+// 各功能的注册（weight 越大，轮播中停留的份额越多）
+registerActionBarProvider("lw_p1:watch", (player) => watchHudText(player), { weight: 4 });

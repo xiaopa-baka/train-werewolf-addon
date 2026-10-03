@@ -2,7 +2,7 @@
 // keydoor.js - 钥匙门逻辑
 
 import * as mc from "@minecraft/server";
-import { t } from "../i18n/i18n.js";
+import { t } from "../core/i18n.js";
 
 
 const DOOR_IDS = new Set(
@@ -293,7 +293,7 @@ function handleKeydoorInteract(player, block) {
         } catch (e) { }
     });
 
-    // 开门 3 秒后自动关门
+    // 开门 3 秒（= 60 tick）后自动关门
     if (nextOpen) {
         mc.system.runTimeout(() => {
             try {
@@ -326,7 +326,7 @@ mc.world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
 });
 
 
-// 按钮检测自动开门,门上半后方/前方一格左右两边有激活按钮则开门
+// ===== 按钮检测自动开门，门上半后方/前方一格左右两边有激活按钮则开门 =====
 const CARDINAL_BACK = {
     "north": [0, 0, -1],
     "south": [0, 0, 1],
@@ -414,6 +414,7 @@ function openDoorWithAutoClose(block) {
         toggleOpen(block, true);
         try { dim.playSound("open.wooden_door", lowerLoc, { pitch: 1.0, volume: 1.5 }); } catch (e) { }
     });
+    // 3 秒（= 60 tick）后自动关门
     mc.system.runTimeout(() => {
         try {
             const low = dim.getBlock({ x: lowerLoc.x, y: lowerLoc.y, z: lowerLoc.z });
@@ -429,7 +430,7 @@ function openDoorWithAutoClose(block) {
 }
 
 
-// 供 main.js 在游戏结束时调用，清除所有撬棍锁定并关闭被撬开的门
+// 供 gameEnd.js 在游戏结束时调用，清除所有撬棍锁定并关闭被撬开的门
 export function clearCrowbaredDoors() {
     const dim = mc.world.getDimension("overworld");
     for (const [key, expiry] of CROWBARED_DOORS) {
