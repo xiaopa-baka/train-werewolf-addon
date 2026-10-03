@@ -3,7 +3,7 @@
 
 import * as mc from "@minecraft/server";
 import {ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
-import { getWorldConfig, saveWorldConfig, getEmptyConfig } from "./worldConfig.js";
+import { getWorldConfig, saveWorldConfig, getEmptyConfig, getScoreboardDefault, getScoreboardSlider, getAllScoreboardDefaults } from "./worldConfig.js";
 
 
 // 将玩家位置转换为方块坐标，并提供一个函数将方块坐标转换为方块中心坐标，方便UI输入输出
@@ -26,7 +26,7 @@ function intPosToCenter(intX, intY, intZ) {
 
 
 // 获取全局计分板分数
-function getSco(objName, def = 0) {
+function getSco(objName, def = getScoreboardDefault(objName)) {
     try {
         return mc.world.scoreboard.getObjective(objName).getScore("lw_p1:全局") ?? def;
     } catch {
@@ -107,6 +107,9 @@ function showInGameSettingModal(player) {
     new ModalFormData()
         .title("局内相关配置")
         .toggle("体力系统：仅局内生效，关闭后疾跑不再消耗体力", { defaultValue: cfg.staminaEnabled !== false })
+        .slider("疾跑每秒消耗体力\n默认 10\n体力 / 秒", 2, 20, { valueStep: 2, defaultValue: cfg.staminaDrainPerSecond ?? 10 })
+        .slider("停止疾跑后每秒恢复体力\n默认 4\n体力 / 秒", 2, 20, { valueStep: 2, defaultValue: cfg.staminaRegenPerSecond ?? 4 })
+        .toggle("杀手体力值：关闭后杀手没有体力值，可以无限疾跑", { defaultValue: cfg.killerStamina !== false })
         .toggle("允许跳跃：仅局内生效，关闭后玩家无法跳跃", { defaultValue: cfg.jumpEnabled !== false })
         .show(player).then(res => {
             if (!player.isValid) return;
@@ -115,7 +118,10 @@ function showInGameSettingModal(player) {
                 const vals = res.formValues.filter(v => v !== null && v !== undefined);
                 const latest = getWorldConfig();
                 latest.staminaEnabled = vals[0] === true;
-                latest.jumpEnabled = vals[1] === true;
+                latest.staminaDrainPerSecond = Number(vals[1]);
+                latest.staminaRegenPerSecond = Number(vals[2]);
+                latest.killerStamina = vals[3] === true;
+                latest.jumpEnabled = vals[4] === true;
                 saveWorldConfig(latest);
                 player.sendMessage("§a局内相关配置已保存");
             } catch (e) {
@@ -129,19 +135,19 @@ function showInGameSettingModal(player) {
 // 主界面/全局游戏配置/游戏相关配置
 function showGameConfigModal(player) {
     if (!player.isValid) return;
-    const val0 = getSco("lw_p1:是否自动开始", 1);
-    const val1 = getSco("lw_p1:游戏自动开始时间", 10);
-    const val2 = getSco("lw_p1:最低开局人数", 5);
-    const val3 = getSco("lw_p1:单局游戏基础时长", 600);
+    const val0 = getSco("lw_p1:是否自动开始");
+    const s1 = getScoreboardSlider("lw_p1:游戏自动开始时间");
+    const s2 = getScoreboardSlider("lw_p1:最低开局人数");
+    const s3 = getScoreboardSlider("lw_p1:单局游戏基础时长");
     new ModalFormData()
         .title("游戏相关配置")
         .header("自动开始时间")
-        .slider("当所有玩家都位于列车时，游戏自动开始倒计时。\n也可通过以下指令手动开始游戏\n/function lw_p1:gameStart\n默认 10\n自动开始时间（秒）", 0, 60, { valueStep: 5, defaultValue: val1 })
+        .slider(`当所有玩家都位于列车时，游戏自动开始倒计时。\n也可通过以下指令手动开始游戏\n/function lw_p1:gameStart\n默认 ${s1.defaultValue}\n自动开始时间（秒）`, s1.min, s1.max, { valueStep: s1.step, defaultValue: getSco("lw_p1:游戏自动开始时间") })
         .toggle("启用自动开始游戏", { defaultValue: val0 !== 0 })
         .header("\n最低开局人数")
-        .slider("当列车内玩家数量达到此值时，游戏可以开始。\n默认 5\n最低开局人数（个）", 5, 15, { valueStep: 1, defaultValue: val2 })
+        .slider(`当列车内玩家数量达到此值时，游戏可以开始。\n默认 ${s2.defaultValue}\n最低开局人数（个）`, s2.min, s2.max, { valueStep: s2.step, defaultValue: getSco("lw_p1:最低开局人数") })
         .header("\n游戏基础时长")
-        .slider("单局游戏的基础时长，每死亡一位平民时长加60秒。\n默认 600\n游戏时长（秒）", 300, 1200, { valueStep: 20, defaultValue: val3 })
+        .slider(`单局游戏的基础时长，每死亡一位平民时长加60秒。\n默认 ${s3.defaultValue}\n游戏时长（秒）`, s3.min, s3.max, { valueStep: s3.step, defaultValue: getSco("lw_p1:单局游戏基础时长") })
         .show(player).then(res => {
             if (res.canceled) { showGameSettingForm(player); return; }
             try {
@@ -162,23 +168,23 @@ function showGameConfigModal(player) {
 // 主界面/全局游戏配置/任务相关配置
 function showTaskConfigModal(player) {
     if (!player.isValid) return;
-    const val1 = getSco("lw_p1:每秒分配概率", 3);
-    const val2 = getSco("lw_p1:任务开始发布时间", 20);
-    const val3 = getSco("lw_p1:单个任务限时", 100);
-    const val4 = getSco("lw_p1:杀手虚假任务限时", 50);
-    const val5 = getSco("lw_p1:任务完成奖励", 25);
+    const s1 = getScoreboardSlider("lw_p1:每秒分配概率");
+    const s2 = getScoreboardSlider("lw_p1:任务开始发布时间");
+    const s3 = getScoreboardSlider("lw_p1:单个任务限时");
+    const s4 = getScoreboardSlider("lw_p1:杀手虚假任务限时");
+    const s5 = getScoreboardSlider("lw_p1:任务完成奖励");
     new ModalFormData()
         .title("任务相关配置")
         .header("任务分配概率")
-        .slider("每秒给未分配任务玩家发布任务的概率。\n默认 3\n分配概率（百分比）", 0, 20, { valueStep: 1, defaultValue: val1 })
+        .slider(`每秒给未分配任务玩家发布任务的概率。\n默认 ${s1.defaultValue}\n分配概率（百分比）`, s1.min, s1.max, { valueStep: s1.step, defaultValue: getSco("lw_p1:每秒分配概率") })
         .header("\n任务开始发布时间")
-        .slider("游戏开始后，首次尝试发布任务的时间。\n默认 20\n首个任务发布时间（秒）", 0, 60, { valueStep: 10, defaultValue: val2 })
+        .slider(`游戏开始后，首次尝试发布任务的时间。\n默认 ${s2.defaultValue}\n首个任务发布时间（秒）`, s2.min, s2.max, { valueStep: s2.step, defaultValue: getSco("lw_p1:任务开始发布时间") })
         .header("\n单个任务限时")
-        .slider("单个任务必须在该时间内完成，超时视为任务失败。\n默认 100\n单个任务限时（秒）", 60, 180, { valueStep: 10, defaultValue: val3 })
+        .slider(`单个任务必须在该时间内完成，超时视为任务失败。\n默认 ${s3.defaultValue}\n单个任务限时（秒）`, s3.min, s3.max, { valueStep: s3.step, defaultValue: getSco("lw_p1:单个任务限时") })
         .header("\n杀手虚假任务限时")
-        .slider("杀手虚假任务可选择完成的限时，超过该时间未完成则虚假任务结束。\n默认 50\n虚假任务限时（秒）", 20, 60, { valueStep: 10, defaultValue: val4 })
+        .slider(`杀手虚假任务可选择完成的限时，超过该时间未完成则虚假任务结束。\n默认 ${s4.defaultValue}\n虚假任务限时（秒）`, s4.min, s4.max, { valueStep: s4.step, defaultValue: getSco("lw_p1:杀手虚假任务限时") })
         .header("\n任务完成奖励")
-        .slider("平民/警员每完成一个任务获得的金币数。\n默认 25\n任务完成奖励（金币）", 10, 50, { valueStep: 5, defaultValue: val5 })
+        .slider(`平民/警员每完成一个任务获得的金币数。\n默认 ${s5.defaultValue}\n任务完成奖励（金币）`, s5.min, s5.max, { valueStep: s5.step, defaultValue: getSco("lw_p1:任务完成奖励") })
         .show(player).then(res => {
             if (res.canceled) { showGameSettingForm(player); return; }
             try {
@@ -209,21 +215,8 @@ function resetAllScoresToDefault(player) {
         .show(player).then(res => {
             if (res.selection === 1) {
                 const fakePlayer = "lw_p1:全局";
-                const defaults = {
-                    "lw_p1:是否自动开始": 1,
-                    "lw_p1:游戏自动开始时间": 10,
-                    "lw_p1:最低开局人数": 5,
-                    "lw_p1:单局游戏基础时长": 600,
-                    "lw_p1:每秒分配概率": 3,
-                    "lw_p1:任务开始发布时间": 20,
-                    "lw_p1:单个任务限时": 100,
-                    "lw_p1:杀手虚假任务限时": 50,
-                    "lw_p1:任务完成奖励": 25,
-                    "lw_p1:杀手初始金币": 100,
-                    "lw_p1:平民初始金币": 0,
-                    "lw_p1:杀手金币增速": 15,
-                    "lw_p1:平民金币增速": 0
-                };
+                // 预设分数统一取自 worldConfig.js 的 SCOREBOARD_CONFIG
+                const defaults = getAllScoreboardDefaults();
 
                 for (const objName in defaults) {
                     try {
@@ -236,6 +229,9 @@ function resetAllScoresToDefault(player) {
                 const cfg = getWorldConfig();
                 cfg.staminaEnabled = true;
                 cfg.jumpEnabled = true;
+                cfg.staminaDrainPerSecond = 10;
+                cfg.staminaRegenPerSecond = 4;
+                cfg.killerStamina = true;
                 saveWorldConfig(cfg);
 
                 player.sendMessage("§a已成功恢复所有任务/游戏配置为默认值！");
@@ -653,16 +649,16 @@ function editRandomCoordinate(player, index) {
 // 主界面/地图区域配置/房间数配置
 function showRoomCountModal(player) {
     if (!player.isValid) return;
-    const current = getSco("lw_p1:房间数", 8);
+    const s = getScoreboardSlider("lw_p1:房间数");
     new ModalFormData()
         .title("房间数配置")
         .header("房间数量")
-        .slider("游戏开始时，钥匙数量（1-N），若玩家数超过房间数则循环分配。\n默认 8\n房间数量", 1, 8, { valueStep: 1, defaultValue: current })
+        .slider(`游戏开始时，钥匙数量（1-N），若玩家数超过房间数则循环分配。\n默认 ${s.defaultValue}\n房间数量`, s.min, s.max, { valueStep: s.step, defaultValue: getSco("lw_p1:房间数") })
         .show(player).then(res => {
             if (res.canceled) { showMapSettingForm(player); return; }
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             const n = Number(vals[0]);
-            if (Number.isFinite(n) && n >= 1 && n <= 8) {
+            if (Number.isFinite(n) && n >= s.min && n <= s.max) {
                 mc.world.scoreboard.getObjective("lw_p1:房间数")?.setScore("lw_p1:全局", n);
                 player.sendMessage(`§a房间数已设为 ${n}`);
             }
@@ -1189,20 +1185,20 @@ function showAddShopItemModal(player, shopType) {
 // // 主界面/商店配置/初始金币
 function showInitialCoinsForm(player) {
     if (!player.isValid) return;
-    const val = getSco("lw_p1:杀手初始金币", 0);
-    const val2 = getSco("lw_p1:平民初始金币", 0);
-    const val3 = getSco("lw_p1:杀手金币增速", 15);
-    const val4 = getSco("lw_p1:平民金币增速", 0);
+    const s1 = getScoreboardSlider("lw_p1:杀手初始金币");
+    const s2 = getScoreboardSlider("lw_p1:平民初始金币");
+    const s3 = getScoreboardSlider("lw_p1:杀手金币增速");
+    const s4 = getScoreboardSlider("lw_p1:平民金币增速");
     new ModalFormData()
         .title("初始金币设置")
         .header("杀手初始金币")
-        .slider("游戏开始后，杀手玩家持有的初始金币数。\n默认 100\n杀手初始金币", 0, 500, { valueStep: 50, defaultValue: val })
+        .slider(`游戏开始后，杀手玩家持有的初始金币数。\n默认 ${s1.defaultValue}\n杀手初始金币`, s1.min, s1.max, { valueStep: s1.step, defaultValue: getSco("lw_p1:杀手初始金币") })
         .header("\n平民初始金币")
-        .slider("游戏开始后，非杀手玩家持有的初始金币数。\n默认 0\n平民初始金币", 0, 500, { valueStep: 50, defaultValue: val2 })
+        .slider(`游戏开始后，非杀手玩家持有的初始金币数。\n默认 ${s2.defaultValue}\n平民初始金币`, s2.min, s2.max, { valueStep: s2.step, defaultValue: getSco("lw_p1:平民初始金币") })
         .header("\n杀手金币成长")
-        .slider("游戏开始后，杀手玩家每 10 秒自然获得的金币数。\n默认 15\n每10秒金币", 0, 30, { valueStep: 5, defaultValue: val3 })
+        .slider(`游戏开始后，杀手玩家每 10 秒自然获得的金币数。\n默认 ${s3.defaultValue}\n每10秒金币`, s3.min, s3.max, { valueStep: s3.step, defaultValue: getSco("lw_p1:杀手金币增速") })
         .header("\n平民金币成长")
-        .slider("游戏开始后，非杀手玩家每 10 秒自然获得的金币数。\n默认 0\n每10秒金币", 0, 10, { valueStep: 2, defaultValue: val4 })
+        .slider(`游戏开始后，非杀手玩家每 10 秒自然获得的金币数。\n默认 ${s4.defaultValue}\n每10秒金币`, s4.min, s4.max, { valueStep: s4.step, defaultValue: getSco("lw_p1:平民金币增速") })
         .show(player).then(res => {
             if (res.canceled) { showShopForm(player); return; }
             try {

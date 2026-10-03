@@ -6,10 +6,9 @@ import { getWorldConfig } from "./config/worldConfig.js";
 
 
 // 体力（疾跑耐久）系统
-// 可调参数
+// 固定阈值在此；消耗 / 恢复速率由 worldConfig.js 提供（单位：点 / 秒）
 const STAMINA_MAX = 100;          // 体力上限
-const DRAIN_PER_TICK = 0.5;       // 疾跑每 tick 消耗（200 tick ≈ 10 秒耗尽）
-const REGEN_PER_TICK = 0.2;       // 恢复每 tick 回复（500 tick ≈ 25 秒回满）
+const TICKS_PER_SECOND = 20;      // 1 秒 = 20 tick
 const REGEN_DELAY_TICKS = 60;     // 停止疾跑后延迟多久才开始恢复（3 秒）
 const RECOVER_THRESHOLD = 30;     // 体力回到该值才解除禁跑
 const EXHAUST_HUNGER = 2;         // 力竭时把饱食度压到 2（≤6 无法疾跑；取 2 以防和平模式自然恢复过快）
@@ -25,8 +24,11 @@ const HUNGER_LOCK_KEY = "lw_p1:staminaHungerLock";
 // playerId -> { value, exhausted, lastSprintTick, savedHunger }
 const staminaMap = new Map();
 
-// 体力系统是否启用（由世界配置决定，每条 tick 刷新）
+// 以下参数由世界配置决定，每 tick 刷新
 let staminaEnabled = true;
+let staminaDrainPerTick = 0.5;    // 疾跑每 tick 消耗（= 每秒消耗 / 20）
+let staminaRegenPerTick = 0.2;    // 恢复每 tick 回复（= 每秒恢复 / 20）
+let killerStamina = true;         // 杀手是否有体力值
 
 
 // 获取玩家的 hunger 属性组件（读写饱食度）
@@ -36,6 +38,16 @@ function getHunger(player) {
     } catch (e) {
         return undefined;
     }
+}
+
+
+// 是否免体力：创造模式，或关闭"杀手体力值"后的杀手（可无限疾跑）
+function isStaminaExempt(player) {
+    let isCreative = false;
+    try { isCreative = player.getGameMode() === mc.GameMode.Creative; } catch (e) { }
+    if (isCreative) return true;
+    if (!killerStamina && player.hasTag("lw_p1:杀手")) return true;
+    return false;
 }
 
 
@@ -112,10 +124,7 @@ function staminaBar(value) {
 // 体力条文案（由 main.js 注册到活动栏调度器）：仅玩家自己看得到（活动栏天然按玩家单独下发）
 export function staminaHudText(player) {
     if (!staminaEnabled || !player.hasTag("lw_p1:游戏中")) return undefined;
-
-    let isCreative = false;
-    try { isCreative = player.getGameMode() === mc.GameMode.Creative; } catch (e) { }
-    if (isCreative) return undefined;
+    if (isStaminaExempt(player)) return undefined;
 
     const state = staminaMap.get(player.id);
     if (!state) return undefined;
@@ -133,22 +142,22 @@ export function staminaHudText(player) {
 
 mc.system.runInterval(() => {
     const tick = mc.system.currentTick;
-    staminaEnabled = getWorldConfig().staminaEnabled !== false;
+    const config = getWorldConfig();
+    staminaEnabled = config.staminaEnabled !== false;
+    killerStamina = config.killerStamina !== false;
+    staminaDrainPerTick = (config.staminaDrainPerSecond ?? 10) / TICKS_PER_SECOND;
+    staminaRegenPerTick = (config.staminaRegenPerSecond ?? 4) / TICKS_PER_SECOND;
 
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
 
-        // 只在"游戏中"生效：开关关闭、或玩家不在局内时，清状态并还原可能被压制的饱食度
-        if (!staminaEnabled || !player.hasTag("lw_p1:游戏中")) {
+        // 只在"游戏中"生效：体力系统关闭、不在局内、或免体力（创造 / 关闭杀手体力后的杀手）时，
+        // 清状态并还原可能被压制的饱食度
+        if (!staminaEnabled || !player.hasTag("lw_p1:游戏中") || isStaminaExempt(player)) {
             staminaMap.delete(player.id);
             restoreFromLock(player);
             continue;
         }
-
-        // 创造模式跳过
-        let isCreative = false;
-        try { isCreative = player.getGameMode() === mc.GameMode.Creative; } catch (e) { }
-        if (isCreative) continue;
 
         let state = staminaMap.get(player.id);
         if (!state) {
@@ -164,7 +173,7 @@ mc.system.runInterval(() => {
         if (sprinting && !state.exhausted) {
             // 疾跑中：持续消耗体力
             state.lastSprintTick = tick;
-            state.value -= DRAIN_PER_TICK;
+            state.value -= staminaDrainPerTick;
             if (state.value <= 0) {
                 state.value = 0;
                 state.exhausted = true;
@@ -173,7 +182,7 @@ mc.system.runInterval(() => {
         } else if (tick - state.lastSprintTick >= REGEN_DELAY_TICKS) {
             // 停止疾跑（或已力竭）一段时间后：缓慢恢复
             if (state.value < STAMINA_MAX) {
-                state.value = Math.min(STAMINA_MAX, state.value + REGEN_PER_TICK);
+                state.value = Math.min(STAMINA_MAX, state.value + staminaRegenPerTick);
             }
         }
 
@@ -196,6 +205,7 @@ mc.system.runInterval(() => {
 // 玩家离开：清理内存状态（动态属性锁保留，供下次上线还原）
 mc.world.afterEvents.playerLeave.subscribe((event) => {
     staminaMap.delete(event.playerId);
+    hudHiddenMap.delete(event.playerId);
 });
 
 
@@ -210,5 +220,29 @@ mc.system.runInterval(() => {
         try {
             player.inputPermissions.setPermissionCategory(mc.InputPermissionCategory.Jump, allowJump);
         } catch (e) { }
+    }
+}, 20);
+
+
+// 局内隐藏 HUD：生命条 / 饥饿条 / 状态效果
+// 用 /hud 指令控制，按玩家持久保存；只在"游戏中"标签出现/消失导致状态变化时才下发一次
+const HUD_ELEMENTS = ["health", "hunger", "status_effects"];
+const hudHiddenMap = new Map();   // playerId -> 当前是否已对该玩家隐藏
+
+function applyHudVisibility(player, hide) {
+    for (const element of HUD_ELEMENTS) {
+        try {
+            player.runCommand(`hud @s ${hide ? "hide" : "reset"} ${element}`);
+        } catch (e) { }
+    }
+}
+
+mc.system.runInterval(() => {
+    for (const player of mc.world.getPlayers()) {
+        if (!player.isValid) continue;
+        const shouldHide = player.hasTag("lw_p1:游戏中");
+        if (hudHiddenMap.get(player.id) === shouldHide) continue;
+        applyHudVisibility(player, shouldHide);
+        hudHiddenMap.set(player.id, shouldHide);
     }
 }, 20);

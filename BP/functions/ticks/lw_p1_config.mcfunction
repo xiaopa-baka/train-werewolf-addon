@@ -1,4 +1,5 @@
 # 该函数始终执行，用于预设一些游戏数据或状态（如果有）
+# 该函数用于锁死部分预设，也可选择在 scripts\config\worldConfig.js 中仅修改所有预设默认值
 
 gamerule commandblockoutput false
 gamerule sendcommandfeedback false

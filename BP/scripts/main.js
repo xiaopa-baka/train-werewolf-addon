@@ -11,7 +11,7 @@ import "./shopSystem.js";
 import { watchHudText } from "./propSystem.js";
 import "./guideBook.js";
 import "./config/configUI.js";
-import { getWorldConfig } from "./config/worldConfig.js";
+import { getWorldConfig, getAllScoreboardDefaults } from "./config/worldConfig.js";
 import { staminaHudText } from "./inGameSystem.js";
 import "./blocks/vending_machine.js";
 import { clearCrowbaredDoors } from "./blocks/keydoor.js";
@@ -62,25 +62,13 @@ mc.system.runInterval(() => {
 
 // 初始化计分板默认值（仅当无数据时）
 function initScoreboardDefaults() {
+    // 仅作初始值的预设分数（不在配置UI 暴露，故不放入 SCOREBOARD_CONFIG）
     const scoreDefaults = {
-        "lw_p1:是否自动开始": 1,
-        "lw_p1:游戏自动开始时间": 10,
-        "lw_p1:最低开局人数": 5,
-        "lw_p1:单局游戏基础时长": 600,
+        ...getAllScoreboardDefaults(),
         "lw_p1:游戏时间": 0,
-        "lw_p1:每秒分配概率": 3,
-        "lw_p1:任务开始发布时间": 20,
-        "lw_p1:单个任务限时": 100,
-        "lw_p1:杀手虚假任务限时": 50,
         "lw_p1:任务数": 6,
-        "lw_p1:杀手初始金币": 100,
-        "lw_p1:平民初始金币": 0,
-        "lw_p1:杀手金币增速": 15,
-        "lw_p1:平民金币增速": 0,
-        "lw_p1:任务完成奖励": 25,
         "lw_p1:死亡加时": 0,
         "lw_p1:手动开局请求": 0,
-        "lw_p1:房间数": 8
     };
 
     const fakePlayer = "lw_p1:全局";
