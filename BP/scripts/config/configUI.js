@@ -3,7 +3,7 @@
 
 import * as mc from "@minecraft/server";
 import {ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
-import { getWorldConfig, saveWorldConfig, getEmptyConfig } from "./worldConfig.js";
+import { getWorldConfig, saveWorldConfig, getEmptyConfig, getScoreboardDefault, getScoreboardSlider, getAllScoreboardDefaults } from "./worldConfig.js";
 import { t, tBlock, tConfigName } from "../i18n/i18n.js";
 
 
@@ -27,7 +27,7 @@ function intPosToCenter(intX, intY, intZ) {
 
 
 // 获取全局计分板分数
-function getSco(objName, def = 0) {
+function getSco(objName, def = getScoreboardDefault(objName)) {
     try {
         return mc.world.scoreboard.getObjective(objName).getScore("lw_p1:全局") ?? def;
     } catch {
@@ -108,6 +108,9 @@ function showInGameSettingModal(player) {
     new ModalFormData()
         .title(t("lw_p1.ui.inGame.title"))
         .toggle(t("lw_p1.ui.inGame.staminaToggle"), { defaultValue: cfg.staminaEnabled !== false })
+        .slider(t("lw_p1.ui.inGame.drainDesc", cfg.staminaDrainPerSecond ?? 10), 2, 20, { valueStep: 2, defaultValue: cfg.staminaDrainPerSecond ?? 10 })
+        .slider(t("lw_p1.ui.inGame.regenDesc", cfg.staminaRegenPerSecond ?? 4), 2, 20, { valueStep: 2, defaultValue: cfg.staminaRegenPerSecond ?? 4 })
+        .toggle(t("lw_p1.ui.inGame.killerToggle"), { defaultValue: cfg.killerStamina !== false })
         .toggle(t("lw_p1.ui.inGame.jumpToggle"), { defaultValue: cfg.jumpEnabled !== false })
         .show(player).then(res => {
             if (!player.isValid) return;
@@ -116,7 +119,10 @@ function showInGameSettingModal(player) {
                 const vals = res.formValues.filter(v => v !== null && v !== undefined);
                 const latest = getWorldConfig();
                 latest.staminaEnabled = vals[0] === true;
-                latest.jumpEnabled = vals[1] === true;
+                latest.staminaDrainPerSecond = Number(vals[1]);
+                latest.staminaRegenPerSecond = Number(vals[2]);
+                latest.killerStamina = vals[3] === true;
+                latest.jumpEnabled = vals[4] === true;
                 saveWorldConfig(latest);
                 player.sendMessage(t("lw_p1.ui.inGame.saved"));
             } catch (e) {
@@ -130,19 +136,19 @@ function showInGameSettingModal(player) {
 // 主界面/全局游戏配置/游戏相关配置
 function showGameConfigModal(player) {
     if (!player.isValid) return;
-    const val0 = getSco("lw_p1:是否自动开始", 1);
-    const val1 = getSco("lw_p1:游戏自动开始时间", 10);
-    const val2 = getSco("lw_p1:最低开局人数", 5);
-    const val3 = getSco("lw_p1:单局游戏基础时长", 600);
+    const val0 = getSco("lw_p1:是否自动开始");
+    const s1 = getScoreboardSlider("lw_p1:游戏自动开始时间");
+    const s2 = getScoreboardSlider("lw_p1:最低开局人数");
+    const s3 = getScoreboardSlider("lw_p1:单局游戏基础时长");
     new ModalFormData()
         .title(t("lw_p1.ui.game.settingsTitle"))
         .header(t("lw_p1.ui.game.autoHeader"))
-        .slider(t("lw_p1.ui.game.autoDesc"), 0, 60, { valueStep: 5, defaultValue: val1 })
+        .slider(t("lw_p1.ui.game.autoDesc", s1.defaultValue), s1.min, s1.max, { valueStep: s1.step, defaultValue: getSco("lw_p1:游戏自动开始时间") })
         .toggle(t("lw_p1.ui.game.autoToggle"), { defaultValue: val0 !== 0 })
         .header(t("lw_p1.ui.game.minHeader"))
-        .slider(t("lw_p1.ui.game.minDesc"), 5, 15, { valueStep: 1, defaultValue: val2 })
+        .slider(t("lw_p1.ui.game.minDesc", s2.defaultValue), s2.min, s2.max, { valueStep: s2.step, defaultValue: getSco("lw_p1:最低开局人数") })
         .header(t("lw_p1.ui.game.baseHeader"))
-        .slider(t("lw_p1.ui.game.baseDesc"), 300, 1200, { valueStep: 20, defaultValue: val3 })
+        .slider(t("lw_p1.ui.game.baseDesc", s3.defaultValue), s3.min, s3.max, { valueStep: s3.step, defaultValue: getSco("lw_p1:单局游戏基础时长") })
         .show(player).then(res => {
             if (res.canceled) { showGameSettingForm(player); return; }
             try {
@@ -163,23 +169,23 @@ function showGameConfigModal(player) {
 // 主界面/全局游戏配置/任务相关配置
 function showTaskConfigModal(player) {
     if (!player.isValid) return;
-    const val1 = getSco("lw_p1:每秒分配概率", 3);
-    const val2 = getSco("lw_p1:任务开始发布时间", 20);
-    const val3 = getSco("lw_p1:单个任务限时", 100);
-    const val4 = getSco("lw_p1:杀手虚假任务限时", 50);
-    const val5 = getSco("lw_p1:任务完成奖励", 25);
+    const s1 = getScoreboardSlider("lw_p1:每秒分配概率");
+    const s2 = getScoreboardSlider("lw_p1:任务开始发布时间");
+    const s3 = getScoreboardSlider("lw_p1:单个任务限时");
+    const s4 = getScoreboardSlider("lw_p1:杀手虚假任务限时");
+    const s5 = getScoreboardSlider("lw_p1:任务完成奖励");
     new ModalFormData()
         .title(t("lw_p1.ui.task.title"))
         .header(t("lw_p1.ui.task.probHeader"))
-        .slider(t("lw_p1.ui.task.probDesc"), 0, 20, { valueStep: 1, defaultValue: val1 })
+        .slider(t("lw_p1.ui.task.probDesc", s1.defaultValue), s1.min, s1.max, { valueStep: s1.step, defaultValue: getSco("lw_p1:每秒分配概率") })
         .header(t("lw_p1.ui.task.startHeader"))
-        .slider(t("lw_p1.ui.task.startDesc"), 0, 60, { valueStep: 10, defaultValue: val2 })
+        .slider(t("lw_p1.ui.task.startDesc", s2.defaultValue), s2.min, s2.max, { valueStep: s2.step, defaultValue: getSco("lw_p1:任务开始发布时间") })
         .header(t("lw_p1.ui.task.limitHeader"))
-        .slider(t("lw_p1.ui.task.limitDesc"), 60, 180, { valueStep: 10, defaultValue: val3 })
+        .slider(t("lw_p1.ui.task.limitDesc", s3.defaultValue), s3.min, s3.max, { valueStep: s3.step, defaultValue: getSco("lw_p1:单个任务限时") })
         .header(t("lw_p1.ui.task.fakeHeader"))
-        .slider(t("lw_p1.ui.task.fakeDesc"), 20, 60, { valueStep: 10, defaultValue: val4 })
+        .slider(t("lw_p1.ui.task.fakeDesc", s4.defaultValue), s4.min, s4.max, { valueStep: s4.step, defaultValue: getSco("lw_p1:杀手虚假任务限时") })
         .header(t("lw_p1.ui.task.rewardHeader"))
-        .slider(t("lw_p1.ui.task.rewardDesc"), 10, 50, { valueStep: 5, defaultValue: val5 })
+        .slider(t("lw_p1.ui.task.rewardDesc", s5.defaultValue), s5.min, s5.max, { valueStep: s5.step, defaultValue: getSco("lw_p1:任务完成奖励") })
         .show(player).then(res => {
             if (res.canceled) { showGameSettingForm(player); return; }
             try {
@@ -210,21 +216,8 @@ function resetAllScoresToDefault(player) {
         .show(player).then(res => {
             if (res.selection === 1) {
                 const fakePlayer = "lw_p1:全局";
-                const defaults = {
-                    "lw_p1:是否自动开始": 1,
-                    "lw_p1:游戏自动开始时间": 10,
-                    "lw_p1:最低开局人数": 5,
-                    "lw_p1:单局游戏基础时长": 600,
-                    "lw_p1:每秒分配概率": 3,
-                    "lw_p1:任务开始发布时间": 20,
-                    "lw_p1:单个任务限时": 100,
-                    "lw_p1:杀手虚假任务限时": 50,
-                    "lw_p1:任务完成奖励": 25,
-                    "lw_p1:杀手初始金币": 100,
-                    "lw_p1:平民初始金币": 0,
-                    "lw_p1:杀手金币增速": 15,
-                    "lw_p1:平民金币增速": 0
-                };
+                // 预设分数统一取自 worldConfig.js 的 SCOREBOARD_CONFIG
+                const defaults = getAllScoreboardDefaults();
 
                 for (const objName in defaults) {
                     try {
@@ -237,6 +230,9 @@ function resetAllScoresToDefault(player) {
                 const cfg = getWorldConfig();
                 cfg.staminaEnabled = true;
                 cfg.jumpEnabled = true;
+                cfg.staminaDrainPerSecond = 10;
+                cfg.staminaRegenPerSecond = 4;
+                cfg.killerStamina = true;
                 saveWorldConfig(cfg);
 
                 player.sendMessage(t("lw_p1.ui.reset.done"));
@@ -654,16 +650,16 @@ function editRandomCoordinate(player, index) {
 // 主界面/地图区域配置/房间数配置
 function showRoomCountModal(player) {
     if (!player.isValid) return;
-    const current = getSco("lw_p1:房间数", 8);
+    const s = getScoreboardSlider("lw_p1:房间数");
     new ModalFormData()
         .title(t("lw_p1.ui.room.title"))
         .header(t("lw_p1.ui.room.header"))
-        .slider(t("lw_p1.ui.room.desc"), 1, 8, { valueStep: 1, defaultValue: current })
+        .slider(t("lw_p1.ui.room.desc", s.defaultValue), s.min, s.max, { valueStep: s.step, defaultValue: getSco("lw_p1:房间数") })
         .show(player).then(res => {
             if (res.canceled) { showMapSettingForm(player); return; }
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             const n = Number(vals[0]);
-            if (Number.isFinite(n) && n >= 1 && n <= 8) {
+            if (Number.isFinite(n) && n >= s.min && n <= s.max) {
                 mc.world.scoreboard.getObjective("lw_p1:房间数")?.setScore("lw_p1:全局", n);
                 player.sendMessage(t("lw_p1.ui.room.set", n));
             }
@@ -1188,20 +1184,20 @@ function showAddShopItemModal(player, shopType) {
 // // 主界面/商店配置/初始金币
 function showInitialCoinsForm(player) {
     if (!player.isValid) return;
-    const val = getSco("lw_p1:杀手初始金币", 0);
-    const val2 = getSco("lw_p1:平民初始金币", 0);
-    const val3 = getSco("lw_p1:杀手金币增速", 15);
-    const val4 = getSco("lw_p1:平民金币增速", 0);
+    const s1 = getScoreboardSlider("lw_p1:杀手初始金币");
+    const s2 = getScoreboardSlider("lw_p1:平民初始金币");
+    const s3 = getScoreboardSlider("lw_p1:杀手金币增速");
+    const s4 = getScoreboardSlider("lw_p1:平民金币增速");
     new ModalFormData()
         .title(t("lw_p1.ui.initialCoins.title"))
         .header(t("lw_p1.ui.initialCoins.killerHeader"))
-        .slider(t("lw_p1.ui.initialCoins.killerDesc"), 0, 500, { valueStep: 50, defaultValue: val })
+        .slider(t("lw_p1.ui.initialCoins.killerDesc", s1.defaultValue), s1.min, s1.max, { valueStep: s1.step, defaultValue: getSco("lw_p1:杀手初始金币") })
         .header(t("lw_p1.ui.initialCoins.civilHeader"))
-        .slider(t("lw_p1.ui.initialCoins.civilDesc"), 0, 500, { valueStep: 50, defaultValue: val2 })
+        .slider(t("lw_p1.ui.initialCoins.civilDesc", s2.defaultValue), s2.min, s2.max, { valueStep: s2.step, defaultValue: getSco("lw_p1:平民初始金币") })
         .header(t("lw_p1.ui.initialCoins.killerRateHeader"))
-        .slider(t("lw_p1.ui.initialCoins.killerRateDesc"), 0, 30, { valueStep: 5, defaultValue: val3 })
+        .slider(t("lw_p1.ui.initialCoins.killerRateDesc", s3.defaultValue), s3.min, s3.max, { valueStep: s3.step, defaultValue: getSco("lw_p1:杀手金币增速") })
         .header(t("lw_p1.ui.initialCoins.civilRateHeader"))
-        .slider(t("lw_p1.ui.initialCoins.civilRateDesc"), 0, 10, { valueStep: 2, defaultValue: val4 })
+        .slider(t("lw_p1.ui.initialCoins.civilRateDesc", s4.defaultValue), s4.min, s4.max, { valueStep: s4.step, defaultValue: getSco("lw_p1:平民金币增速") })
         .show(player).then(res => {
             if (res.canceled) { showShopForm(player); return; }
             try {

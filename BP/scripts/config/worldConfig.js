@@ -4,6 +4,35 @@
 import * as mc from "@minecraft/server";
 
 
+// 计分板参数统一配置表
+// 字段说明：
+//   default          预设分数（计分板初始值 / 恢复默认值）
+//   min / max / step 配置UI 滑块范围；未写 min 的项不提供滑块（即不可调）
+export const SCOREBOARD_CONFIG = {
+    // 游戏相关
+    "lw_p1:是否自动开始":     { default: 1 },
+    "lw_p1:游戏自动开始时间": { default: 10,  min: 0,   max: 60,   step: 5 },
+    "lw_p1:最低开局人数":     { default: 5,   min: 5,   max: 15,   step: 1 },
+    "lw_p1:单局游戏基础时长": { default: 600, min: 300, max: 1200, step: 20 },
+
+    // 任务相关
+    "lw_p1:每秒分配概率":     { default: 3,   min: 0,   max: 20,   step: 1 },
+    "lw_p1:任务开始发布时间": { default: 20,  min: 0,   max: 60,   step: 10 },
+    "lw_p1:单个任务限时":     { default: 100, min: 60,  max: 180,  step: 10 },
+    "lw_p1:杀手虚假任务限时": { default: 50,  min: 20,  max: 60,   step: 10 },
+    "lw_p1:任务完成奖励":     { default: 25,  min: 10,  max: 50,   step: 5 },
+
+    // 金币相关
+    "lw_p1:杀手初始金币":     { default: 100, min: 0,   max: 500,  step: 50 },
+    "lw_p1:平民初始金币":     { default: 0,   min: 0,   max: 500,  step: 50 },
+    "lw_p1:杀手金币增速":     { default: 15,  min: 0,   max: 30,   step: 5 },
+    "lw_p1:平民金币增速":     { default: 0,   min: 0,   max: 10,   step: 2 },
+
+    // 地图相关
+    "lw_p1:房间数":           { default: 8,   min: 1,   max: 8,    step: 1 },
+};
+
+
 // 获取世界配置对象
 export function getEmptyConfig() {
     return {
@@ -195,6 +224,9 @@ export function getEmptyConfig() {
         // 局内相关开关
         staminaEnabled: true,           // 体力系统：关闭后疾跑不再消耗体力
         jumpEnabled: true,              // 是否允许跳跃：关闭后玩家无法跳跃
+        staminaDrainPerSecond: 10,      // 疾跑每秒消耗的体力（范围 2-20，步长 2）
+        staminaRegenPerSecond: 4,       // 停止疾跑后每秒恢复的体力（范围 2-20，步长 2）
+        killerStamina: true,            // 杀手体力值：关闭后杀手没有体力值，可以无限疾跑
 
         // 地图信息
         worldInformation: {
@@ -238,4 +270,29 @@ export function getWorldConfig() {
 // 保存世界配置
 export function saveWorldConfig(config) {
     mc.world.setDynamicProperty("lw_p1:config", JSON.stringify(config));
+}
+
+
+// 取某计分板的预设分数（表中没有则返回 fallback）
+export function getScoreboardDefault(name, fallback = 0) {
+    const item = SCOREBOARD_CONFIG[name];
+    return item ? item.default : fallback;
+}
+
+
+// 取某计分板的滑块参数（不可调则返回 undefined）
+export function getScoreboardSlider(name) {
+    const item = SCOREBOARD_CONFIG[name];
+    if (!item || item.min === undefined) return undefined;
+    return { min: item.min, max: item.max, step: item.step, defaultValue: item.default };
+}
+
+
+// 生成"全部可调计分板"的预设分数对象（用于计分板初始化 / 恢复默认配置）
+export function getAllScoreboardDefaults() {
+    const result = {};
+    for (const name in SCOREBOARD_CONFIG) {
+        result[name] = SCOREBOARD_CONFIG[name].default;
+    }
+    return result;
 }
