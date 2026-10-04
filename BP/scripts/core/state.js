@@ -127,7 +127,6 @@ export function addGold(player, amount) {
  * @property {boolean} taskFailed            任务失败
  * @property {boolean} rewardGiven           已发奖励
  * @property {boolean} killRewardGiven       已击杀奖励
- * @property {boolean} guideClaimed          已领取物品
  */
 
 /** @type {Map<string, PlayerState>} */
@@ -142,8 +141,7 @@ export function getPlayerState(player) {
             pistolDisabled: false, hurt: false,
             ventilating: false, squatting: false, sleeping: false, socializing: false,
             taskId: 0, taskCountdown: false, taskRequestCountdown: false, taskHinted: false,
-            taskDone: false, taskFailed: false, rewardGiven: false, killRewardGiven: false,
-            guideClaimed: false
+            taskDone: false, taskFailed: false, rewardGiven: false, killRewardGiven: false
         };
         playerStates.set(player.id, ps);
     }

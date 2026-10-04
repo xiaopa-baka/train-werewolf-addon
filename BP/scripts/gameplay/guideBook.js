@@ -5,7 +5,7 @@ import * as mc from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { getWorldConfig } from "../config/worldConfig.js";
 import { t } from "../core/i18n.js";
-import { getPlayerState } from "../core/state.js";
+import { isInGame } from "../core/state.js";
 
 
 function getGuidePages() {
@@ -91,15 +91,40 @@ function showGuidePage(player, pageIndex) {
     }).catch(() => { });
 }
 
+// 确保玩家背包中有一份指定物品：已有则跳过，缺失才补发（reload 幂等，不会重复发放）
+// 发放时加 lock_in_inventory，禁止玩家丢弃
+function ensureItem(player, typeId) {
+    try {
+        const container = player.getComponent("inventory")?.container;
+        if (container) {
+            for (let i = 0; i < container.size; i++) {
+                if (container.getItem(i)?.typeId === typeId) return;
+            }
+        }
+        player.runCommand(`give @s ${typeId} 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`);
+    } catch (e) { }
+}
+
+// 移除玩家背包中的指定物品（用于局内收回 tp_game）
+function removeItem(player, typeId) {
+    try {
+        const container = player.getComponent("inventory")?.container;
+        if (!container) return;
+        for (let i = 0; i < container.size; i++) {
+            if (container.getItem(i)?.typeId === typeId) container.setItem(i, undefined);
+        }
+    } catch (e) { }
+}
+
+// 指南书全程持有（局内 gameFlow 会重新发放）；传送至车头仅非对局阶段持有
 function giveGuideBook(player) {
     if (!player.isValid) return;
-    if (getPlayerState(player).guideClaimed) return;
-
-    try {
-        player.runCommand(`give @s lw_p1:guide_book`);
-        player.runCommand(`give @s lw_p1:tp_game`)
-        getPlayerState(player).guideClaimed = true;
-    } catch (e) { }
+    ensureItem(player, "lw_p1:guide_book");
+    if (isInGame(player)) {
+        removeItem(player, "lw_p1:tp_game");
+    } else {
+        ensureItem(player, "lw_p1:tp_game");
+    }
 }
 
 mc.system.runInterval(() => {
