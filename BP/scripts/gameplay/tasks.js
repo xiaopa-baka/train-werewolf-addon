@@ -304,9 +304,15 @@ mc.system.runInterval(function () {
     const tailMinZ = Math.min(tailStart.z, tailEnd.z);
     const tailMaxZ = Math.max(tailStart.z, tailEnd.z) + 1;
 
+    // 局内玩家脱离列车区域（如站在车顶）同样视为通风中；需列车区域已配置
+    const trainCoords = latestConfig.trainCoordinates;
+    const offTrainEnabled = !!(trainCoords && trainCoords.start && trainCoords.end);
+
     for (const player of allPlayers) {
         if (!player.isValid) continue;
         const pos = player.location;
+
+        const offTrain = offTrainEnabled && isInGame(player) && !getPlayerState(player).inTrain;
 
         const inEngine =
             pos.x >= engMinX && pos.x < engMaxX &&
@@ -318,7 +324,7 @@ mc.system.runInterval(function () {
             pos.y >= tailMinY && pos.y < tailMaxY &&
             pos.z >= tailMinZ && pos.z < tailMaxZ;
 
-        if (inEngine || inTail) {
+        if (inEngine || inTail || offTrain) {
             if (!getPlayerState(player).ventilating) {
                 getPlayerState(player).ventilating = true;
             }

@@ -26,6 +26,21 @@ export function setGameTime(mode) {
 }
 
 
+// 工具函数，设置游戏天气。
+// 注意：基岩版天气是全局的（按键维度/区域区分不可行），此处仅切换主世界天气。
+// mode: "thunder" 雷暴雨 / "rain" 下雨 / "clear" 晴天
+export function setGameWeather(mode) {
+    const weatherMap = {
+        thunder: mc.WeatherType.Thunder,
+        rain: mc.WeatherType.Rain,
+        clear: mc.WeatherType.Clear
+    };
+    const weatherType = weatherMap[mode];
+    if (weatherType === undefined) return;
+    try { mc.world.getDimension("overworld").setWeather(weatherType); } catch (e) { }
+}
+
+
 // 使用物品 lw_p1:tp_game 传送至车头
 mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.afterEvents.itemUse.subscribe(event => {

@@ -181,6 +181,7 @@ lw_p1.ui.inGame.button=局内相关配置
 lw_p1.ui.inGame.title=局内相关配置
 lw_p1.ui.inGame.staminaToggle=体力系统：仅局内生效，关闭后疾跑不再消耗体力
 lw_p1.ui.inGame.jumpToggle=允许跳跃：仅局内生效，关闭后玩家无法跳跃
+lw_p1.ui.inGame.weatherToggle=天气：开启后开局设为雷暴雨、结束时恢复晴天
 lw_p1.ui.inGame.drainDesc=疾跑每秒消耗体力\n默认 %s\n体力 / 秒
 lw_p1.ui.inGame.regenDesc=停止疾跑后每秒恢复体力\n默认 %s\n体力 / 秒
 lw_p1.ui.inGame.killerToggle=杀手体力值：关闭后杀手没有体力值，可以无限疾跑

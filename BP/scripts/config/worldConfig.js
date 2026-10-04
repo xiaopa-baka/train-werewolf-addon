@@ -272,6 +272,7 @@ export function getEmptyConfig() {
         // 局内相关开关与速率（仅对局内生效）。消费方：inGame.js
         staminaEnabled: true,           // 体力系统：关闭后疾跑不再消耗体力
         jumpEnabled: true,              // 是否允许跳跃：关闭后玩家无法跳跃
+        weatherEnabled: true,           // 天气：开启后开局设为雷暴雨、结束时恢复晴天。消费方：gameFlow.js / gameEnd.js
         staminaDrainPerSecond: 10,      // 疾跑每秒消耗的体力（范围 2-20，步长 2）
         staminaRegenPerSecond: 4,       // 停止疾跑后每秒恢复的体力（范围 2-20，步长 2）
         killerStamina: true,            // 杀手体力值：关闭后杀手没有体力值，可以无限疾跑

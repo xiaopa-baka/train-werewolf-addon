@@ -9,7 +9,8 @@ import {
 } from "../core/state.js";
 import { t } from "../core/i18n.js";
 import { clearCrowbaredDoors } from "../blocks/keydoor.js";
-import { setGameTime } from "./environment.js";
+import { setGameTime, setGameWeather } from "./environment.js";
+import { fadeBlackTransition } from "../core/hud.js";
 
 
 // 结束原因内部代号 → 语言键
@@ -86,14 +87,11 @@ mc.system.runInterval(() => {
             gameSession.endTriggered = true;
             // 收集本局职业名单
             collectGameResult(endMsg.reason, endMsg.winner);
-            // 标记收尾信号 endFlag（后续轮询据此触发收尾清理）
+            // 标记收尾信号 endFlag（后续轮询据此触发收尾清理与结束转场）
+            // 结果广播改到转场（黑屏恢复）之后，见收尾清理轮询
             for (const p of inGame) {
                 if (!getPlayerState(p).endFlag) getPlayerState(p).endFlag = true;
             }
-            // 广播结束消息
-            mc.system.runTimeout(() => {
-                broadcastEndMessage();
-            }, 20);
         }
     } catch (e) { }
 }, 1);
@@ -111,6 +109,19 @@ function collectGameResult(reason, winner) {
         policeNames: policeP.map(p => p.name),
         civilNames: civilP.map(p => p.name)
     };
+}
+
+
+// 清除本局生成的实体（三个维度）；放到全黑瞬间执行，避免尸体刚生成就被清掉
+function clearGameEntities() {
+    for (const dimName of ["overworld", "nether", "the_end"]) {
+        let dimension;
+        try { dimension = mc.world.getDimension(dimName); } catch { continue; }
+        if (!dimension) continue;
+        for (const typeId of ["lw_p1:corpes", "lw_p1:player_name", "lw_p1:firecracker", "lw_p1:pistol", "minecraft:item"]) {
+            try { dimension.runCommand(`kill @e[type=${typeId}]`); } catch (e) { }
+        }
+    }
 }
 
 
@@ -141,16 +152,6 @@ mc.system.runInterval(() => {
         try { player.runCommand(`give @s lw_p1:tp_game 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`); } catch (e) { }
     }
 
-    // 清除本局生成的实体（三个维度）
-    for (const dimName of ["overworld", "nether", "the_end"]) {
-        let dimension;
-        try { dimension = mc.world.getDimension(dimName); } catch { continue; }
-        if (!dimension) continue;
-        for (const typeId of ["lw_p1:corpes", "lw_p1:player_name", "lw_p1:firecracker", "lw_p1:pistol", "minecraft:item"]) {
-            try { dimension.runCommand(`kill @e[type=${typeId}]`); } catch (e) { }
-        }
-    }
-
     // 清除所有撬棍锁定
     clearCrowbaredDoors();
 
@@ -164,14 +165,29 @@ mc.system.runInterval(() => {
     const latestConfig = getWorldConfig();
     const trainStation = latestConfig.trainStationCoordinates;
 
-    if (trainStation && typeof trainStation.x === "number") {
-        for (const player of allPlayers) {
-            if (!player.isValid) continue;
-            try {
-                player.teleport(trainStation);
-            } catch (e) { }
-        }
+    // 结束天气：开关开启时恢复晴天（与开局雷暴雨对应）
+    if (latestConfig.weatherEnabled !== false) {
+        setGameWeather("clear");
     }
+
+    // 结束转场：先等 2 秒让尸体正常显示，再缓慢黑屏；
+    // 全黑瞬间执行实体清理与传送回站台（都被黑屏遮住），缓慢恢复后再广播结算
+    mc.system.runTimeout(() => {
+        const fadeTargets = Array.from(mc.world.getPlayers());
+        fadeBlackTransition(fadeTargets, { fadeInTime: 2, holdTime: 0.5, fadeOutTime: 2 }, () => {
+            clearGameEntities();
+            if (trainStation && typeof trainStation.x === "number") {
+                for (const player of mc.world.getPlayers()) {
+                    if (!player.isValid) continue;
+                    try {
+                        player.teleport(trainStation);
+                    } catch (e) { }
+                }
+            }
+        });
+        // 转场总时长 4.5 秒（90 tick），走完再结算
+        mc.system.runTimeout(() => broadcastEndMessage(), 90);
+    }, 40);
 }, 1);
 
 
