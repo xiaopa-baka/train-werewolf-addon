@@ -137,8 +137,8 @@ mc.system.runInterval(() => {
         try { player.setGameMode(mc.GameMode.Adventure); } catch (e) { }
         try { player.runCommand("clear @s"); } catch (e) { }
         try { player.runCommand("effect @s clear"); } catch (e) { }
-        try { player.runCommand("give @s lw_p1:guide_book"); } catch (e) { }
-        try { player.runCommand("give @s lw_p1:tp_game"); } catch (e) { }
+        try { player.runCommand(`give @s lw_p1:guide_book 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`); } catch (e) { }
+        try { player.runCommand(`give @s lw_p1:tp_game 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`); } catch (e) { }
     }
 
     // 清除本局生成的实体（三个维度）
