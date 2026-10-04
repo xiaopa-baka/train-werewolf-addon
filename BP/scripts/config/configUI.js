@@ -103,6 +103,7 @@ function showInGameSettingModal(player) {
         .slider(t("lw_p1.ui.inGame.regenDesc", cfg.staminaRegenPerSecond ?? 4), 2, 20, { valueStep: 2, defaultValue: cfg.staminaRegenPerSecond ?? 4 })
         .toggle(t("lw_p1.ui.inGame.killerToggle"), { defaultValue: cfg.killerStamina !== false })
         .toggle(t("lw_p1.ui.inGame.jumpToggle"), { defaultValue: cfg.jumpEnabled !== false })
+        .toggle(t("lw_p1.ui.inGame.weatherToggle"), { defaultValue: cfg.weatherEnabled !== false })
         .show(player).then(res => {
             if (!player.isValid) return;
             if (res.canceled) { showGameSettingForm(player); return; }
@@ -114,6 +115,7 @@ function showInGameSettingModal(player) {
                 latest.staminaRegenPerSecond = Number(vals[2]);
                 latest.killerStamina = vals[3] === true;
                 latest.jumpEnabled = vals[4] === true;
+                latest.weatherEnabled = vals[5] === true;
                 saveWorldConfig(latest);
                 player.sendMessage(t("lw_p1.ui.inGame.saved"));
             } catch (e) {
@@ -216,6 +218,7 @@ function resetAllScoresToDefault(player) {
                 cfg.staminaDrainPerSecond = 10;
                 cfg.staminaRegenPerSecond = 4;
                 cfg.killerStamina = true;
+                cfg.weatherEnabled = true;
                 saveWorldConfig(cfg);
 
                 player.sendMessage(t("lw_p1.ui.reset.done"));

@@ -9,7 +9,7 @@ import {
 } from "../core/state.js";
 import { t } from "../core/i18n.js";
 import { clearCrowbaredDoors } from "../blocks/keydoor.js";
-import { setGameTime } from "./environment.js";
+import { setGameTime, setGameWeather } from "./environment.js";
 import { fadeBlackTransition } from "../core/hud.js";
 
 
@@ -164,6 +164,11 @@ mc.system.runInterval(() => {
 
     const latestConfig = getWorldConfig();
     const trainStation = latestConfig.trainStationCoordinates;
+
+    // 结束天气：开关开启时恢复晴天（与开局雷暴雨对应）
+    if (latestConfig.weatherEnabled !== false) {
+        setGameWeather("clear");
+    }
 
     // 结束转场：先等 2 秒让尸体正常显示，再缓慢黑屏；
     // 全黑瞬间执行实体清理与传送回站台（都被黑屏遮住），缓慢恢复后再广播结算

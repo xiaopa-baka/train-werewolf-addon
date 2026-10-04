@@ -181,6 +181,7 @@ lw_p1.ui.inGame.button=In-game settings
 lw_p1.ui.inGame.title=In-game settings
 lw_p1.ui.inGame.staminaToggle=Stamina system (in-game only): disable to stop sprint draining stamina
 lw_p1.ui.inGame.jumpToggle=Allow jumping (in-game only): disable to prevent players from jumping
+lw_p1.ui.inGame.weatherToggle=Weather: thunderstorm on game start, clear when the game ends
 lw_p1.ui.inGame.drainDesc=Stamina drained per second while sprinting.\nDefault %s\nStamina / second
 lw_p1.ui.inGame.regenDesc=Stamina restored per second after you stop sprinting.\nDefault %s\nStamina / second
 lw_p1.ui.inGame.killerToggle=Killer stamina: disable so killers have no stamina and can sprint endlessly
