@@ -80,3 +80,35 @@ export function showTitle(text, subtitle) {
         });
     }
 }
+
+
+// ===== 屏幕转场 =====
+
+/**
+ * 黑屏转场：缓慢变黑 → 全黑瞬间执行回调 → 缓慢恢复
+ * @param {mc.Player[]} players 应用转场的玩家
+ * @param {{ fadeInTime?: number, holdTime?: number, fadeOutTime?: number }} [options] 各段时长（秒）
+ * @param {() => void} [onFullBlack] 全黑瞬间执行（如传送）
+ */
+export function fadeBlackTransition(players, options, onFullBlack) {
+    const fadeInTime = options?.fadeInTime ?? 1.5;
+    const holdTime = options?.holdTime ?? 0.5;
+    const fadeOutTime = options?.fadeOutTime ?? 1.5;
+
+    for (const player of players) {
+        if (!player?.isValid) continue;
+        try {
+            player.camera.fade({
+                fadeColor: { red: 0, green: 0, blue: 0 },
+                fadeTime: { fadeInTime, holdTime, fadeOutTime }
+            });
+        } catch (e) { }
+    }
+
+    // Camera.fade 只在客户端播放，服务端以时长估算"全黑"时刻
+    if (onFullBlack) {
+        mc.system.runTimeout(() => {
+            try { onFullBlack(); } catch (e) { }
+        }, Math.max(1, Math.ceil(fadeInTime * 20)));
+    }
+}

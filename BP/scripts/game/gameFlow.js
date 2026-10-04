@@ -9,7 +9,7 @@ import {
     clearAllPlayerStates, gameSession,
 } from "../core/state.js";
 import { t } from "../core/i18n.js";
-import { registerActionBarProvider, showTitle, clearTitle } from "../core/hud.js";
+import { registerActionBarProvider, showTitle, clearTitle, fadeBlackTransition } from "../core/hud.js";
 import { setGameTime } from "./environment.js";
 
 
@@ -126,13 +126,17 @@ export function startGameNow(allPlayers) {
             try { player.setGameMode(mc.GameMode.Adventure); } catch (e) { }
         }
 
-        teleportPlayersToRandomCoords(allPlayers);
+        // 开局转场：所有参与玩家缓慢黑屏，全黑瞬间随机传送，再缓慢恢复
+        fadeBlackTransition(allPlayers, { fadeInTime: 2, holdTime: 0.5, fadeOutTime: 2 }, () => {
+            teleportPlayersToRandomCoords(allPlayers);
+        });
         setGameTime("night");
 
         // 立即完成本局职业分配
         checkRoleAssign();
-        mc.system.runTimeout(() => showRoleTitle(), 20);
-        mc.system.runTimeout(() => showRoleGoal(), 60);
+        // 职业提示推迟到转场（约 4.5 秒）结束后，避免被黑屏遮挡
+        mc.system.runTimeout(() => showRoleTitle(), 100);
+        mc.system.runTimeout(() => showRoleGoal(), 140);
     } catch (e) { }
 }
 
