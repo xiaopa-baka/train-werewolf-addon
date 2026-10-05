@@ -344,6 +344,7 @@ lw_p1.msg.killer.civilianDeath=§e有平民死亡，获得 100 金币，倒计�
 lw_p1.msg.boarded=已登车 %s / %s 人
 lw_p1.msg.gameStart=§a游戏开始！
 lw_p1.msg.notEnoughPlayers=§c人数不足，无法开始游戏（当前 %s / 最低 %s）
+lw_p1.msg.corpsesCleared=§a已清除全部尸体与名牌
 lw_p1.msg.autoStart.title=§e%s
 lw_p1.msg.autoStart.subtitle=§f秒后游戏开始
 
@@ -351,6 +352,7 @@ lw_p1.msg.autoStart.subtitle=§f秒后游戏开始
 lw_p1.end.winner.killer=§c游戏结束，杀手胜利！
 lw_p1.end.winner.civil=§a游戏结束，平民胜利！
 lw_p1.end.reason.killerDead=杀手死亡
+lw_p1.end.reason.killerLeft=杀手退出了游戏
 lw_p1.end.reason.timeUp=时间耗尽，平民存活
 lw_p1.end.reason.civilsDead=平民全部阵亡
 lw_p1.end.message=§6【游戏结束】\n%s\n§f结束原因：%s\n§f杀手：%s\n§f警员：%s\n§f平民：%s

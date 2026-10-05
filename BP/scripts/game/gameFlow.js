@@ -10,10 +10,12 @@ import {
 } from "../core/state.js";
 import { t } from "../core/i18n.js";
 import { registerActionBarProvider, showTitle, clearTitle, fadeBlackTransition } from "../core/hud.js";
-import { setGameTime, setGameWeather } from "./environment.js";
+import { setGameTime, setGameWeather, clearGameEntities } from "./environment.js";
+import { clearCrowbaredDoors } from "../blocks/keydoor.js";
 
 
 // 开局角色提示
+// 直接用 onScreenDisplay.setTitle 接收 RawMessage，避免 titleraw 命令对 JSON 格式的额外要求
 function showRoleTitle() {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid || !isInGame(player)) continue;
@@ -21,8 +23,12 @@ function showRoleTitle() {
             : isOfficer(player) ? "lw_p1.roleTitle.officer"
                 : "lw_p1.roleTitle.passenger";
         try {
-            player.runCommand(`titleraw @s title ${JSON.stringify(t(roleKey))}`);
-            player.runCommand(`titleraw @s subtitle ${JSON.stringify(t("lw_p1.roleWelcome"))}`);
+            player.onScreenDisplay.setTitle(t(roleKey), {
+                fadeInDuration: 5,
+                stayDuration: 50,
+                fadeOutDuration: 10,
+                subtitle: t("lw_p1.roleWelcome")
+            });
         } catch (e) { }
     }
 }
@@ -35,8 +41,12 @@ function showRoleGoal() {
             : isOfficer(player) ? "lw_p1.roleGoal.officer"
                 : "lw_p1.roleGoal.passenger";
         try {
-            player.runCommand(`titleraw @s title ${JSON.stringify(t("lw_p1.roleGoalTitle"))}`);
-            player.runCommand(`titleraw @s subtitle ${JSON.stringify(t(goalKey))}`);
+            player.onScreenDisplay.setTitle(t("lw_p1.roleGoalTitle"), {
+                fadeInDuration: 5,
+                stayDuration: 50,
+                fadeOutDuration: 10,
+                subtitle: t(goalKey)
+            });
         } catch (e) { }
     }
 }
@@ -110,6 +120,15 @@ export function startGameNow(allPlayers) {
         const boardedPlayers = allPlayers.filter(p => p.isValid && getPlayerState(p).inTrain);
         clearAllPlayerStates();
 
+        // 开局清理：清除上一局残留、避免影响新对局
+        // clearAllPlayerStates 已把全部对局状态归零（含"失去手枪资格" pistolDisabled）
+        clearGameEntities();     // 残留尸体 / 名牌 / 爆竹 / 掉落手枪 / 子弹 / 手榴弹 / 掉落物
+        clearCrowbaredDoors();   // 残留的撬棍锁定门
+        for (const player of allPlayers) {
+            if (!player.isValid) continue;
+            try { player.setDynamicProperty("lw_p1:noteMessage", undefined); } catch (e) { }
+        }
+
         showTitle(t("lw_p1.msg.gameStart"));
         mc.system.runTimeout(() => {
             clearTitle();
@@ -140,7 +159,7 @@ export function startGameNow(allPlayers) {
         checkRoleAssign();
         // 职业提示推迟到转场（约 4.5 秒）结束后，避免被黑屏遮挡
         mc.system.runTimeout(() => showRoleTitle(), 100);
-        mc.system.runTimeout(() => showRoleGoal(), 140);
+        mc.system.runTimeout(() => showRoleGoal(), 180);
     } catch (e) { }
 }
 
@@ -258,11 +277,6 @@ async function checkRoleAssign() {
 
     } catch (err) { }
 }
-
-mc.system.runInterval(() => {
-    checkRoleAssign();
-}, 20);
-
 
 // 游戏进行中，记录游戏总 Tick
 mc.system.runInterval(() => {

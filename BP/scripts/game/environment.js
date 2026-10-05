@@ -41,6 +41,20 @@ export function setGameWeather(mode) {
 }
 
 
+// 清除本局残留的实体（三个维度）：尸体 / 名牌 / 爆竹 / 掉落手枪 / 子弹 / 手榴弹 / 掉落物。
+// 开局与结束共用，避免上一局残留影响新对局。
+export function clearGameEntities() {
+    for (const dimName of ["overworld", "nether", "the_end"]) {
+        let dimension;
+        try { dimension = mc.world.getDimension(dimName); } catch { continue; }
+        if (!dimension) continue;
+        for (const typeId of ["lw_p1:corpes", "lw_p1:player_name", "lw_p1:firecracker", "lw_p1:pistol", "lw_p1:bullet", "lw_p1:grenade", "minecraft:item"]) {
+            try { dimension.runCommand(`kill @e[type=${typeId}]`); } catch (e) { }
+        }
+    }
+}
+
+
 // 使用物品 lw_p1:tp_game 传送至车头
 mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.afterEvents.itemUse.subscribe(event => {

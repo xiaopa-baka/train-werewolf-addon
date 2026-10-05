@@ -344,6 +344,7 @@ lw_p1.msg.killer.civilianDeath=§eA civilian died: +100 gold, timer extended by 
 lw_p1.msg.boarded=Boarded %s / %s
 lw_p1.msg.gameStart=§aGame start!
 lw_p1.msg.notEnoughPlayers=§cNot enough players to start (current %s / minimum %s)
+lw_p1.msg.corpsesCleared=§aAll corpses and name tags removed
 lw_p1.msg.autoStart.title=§e%s
 lw_p1.msg.autoStart.subtitle=§funtil the game starts
 
@@ -351,6 +352,7 @@ lw_p1.msg.autoStart.subtitle=§funtil the game starts
 lw_p1.end.winner.killer=§cGame over — the Killer wins!
 lw_p1.end.winner.civil=§aGame over — the Passengers win!
 lw_p1.end.reason.killerDead=the Killer died
+lw_p1.end.reason.killerLeft=the Killer left the game
 lw_p1.end.reason.timeUp=time ran out, the passengers survived
 lw_p1.end.reason.civilsDead=all passengers died
 lw_p1.end.message=§6[Game Over]\n%s\n§fReason: %s\n§fKiller: %s\n§fOfficer: %s\n§fPassengers: %s

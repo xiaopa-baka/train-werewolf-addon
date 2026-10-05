@@ -4,7 +4,7 @@
 import * as mc from "@minecraft/server";
 import { getWorldConfig } from "../config/worldConfig.js";
 import { t } from "../core/i18n.js";
-import { isInGame, isKiller } from "../core/state.js";
+import { isInGame, isKiller, isGameDead } from "../core/state.js";
 import { registerActionBarProvider } from "../core/hud.js";
 
 
@@ -123,7 +123,7 @@ function staminaBar(value) {
 
 // 体力条文案（由本模块注册到活动栏调度器）：仅玩家自己看得到（活动栏天然按玩家单独下发）
 export function staminaHudText(player) {
-    if (!staminaEnabled || !isInGame(player)) return undefined;
+    if (!staminaEnabled || !isInGame(player) || isGameDead(player)) return undefined;
     if (isStaminaExempt(player)) return undefined;
 
     const state = staminaMap.get(player.id);
@@ -151,9 +151,9 @@ mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
 
-        // 只在"游戏中"生效：体力系统关闭、不在局内、或免体力（创造 / 关闭杀手体力后的杀手）时，
-        // 清状态并还原可能被压制的饱食度
-        if (!staminaEnabled || !isInGame(player) || isStaminaExempt(player)) {
+        // 只在"游戏中"生效：体力系统关闭、不在局内、已淘汰（旁观）、
+        // 或免体力（创造 / 关闭杀手体力后的杀手）时，清状态并还原可能被压制的饱食度
+        if (!staminaEnabled || !isInGame(player) || isGameDead(player) || isStaminaExempt(player)) {
             staminaMap.delete(player.id);
             restoreFromLock(player);
             continue;
@@ -211,8 +211,8 @@ mc.system.runInterval(() => {
 
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
-        // 只在"游戏中"生效；局外一律恢复可跳跃，避免出局后仍被禁跳
-        const allowJump = !isInGame(player) || jumpEnabled;
+        // 只在"游戏中"生效；局外或已淘汰（旁观）一律恢复可跳跃，避免出局后仍被禁跳
+        const allowJump = !isInGame(player) || isGameDead(player) || jumpEnabled;
         try {
             player.inputPermissions.setPermissionCategory(mc.InputPermissionCategory.Jump, allowJump);
         } catch (e) { }

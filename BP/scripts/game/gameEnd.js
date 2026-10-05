@@ -9,13 +9,14 @@ import {
 } from "../core/state.js";
 import { t } from "../core/i18n.js";
 import { clearCrowbaredDoors } from "../blocks/keydoor.js";
-import { setGameTime, setGameWeather } from "./environment.js";
+import { setGameTime, setGameWeather, clearGameEntities } from "./environment.js";
 import { fadeBlackTransition } from "../core/hud.js";
 
 
 // 结束原因内部代号 → 语言键
 const END_REASON_KEYS = {
     "杀手死亡": "lw_p1.end.reason.killerDead",
+    "杀手退出": "lw_p1.end.reason.killerLeft",
     "时间耗尽": "lw_p1.end.reason.timeUp",
     "平民全部死亡": "lw_p1.end.reason.civilsDead"
 };
@@ -47,6 +48,28 @@ function broadcastEndMessage() {
     gameSession.pendingEndMsg = null;
 }
 
+// 强制结束命令：任何时刻执行都会走与正常结束相同的收尾流程
+// （清空状态、结束转场、清理实体、传送回站台并结算；不产出胜负名单）
+mc.system.beforeEvents.startup.subscribe((init) => {
+    init.customCommandRegistry.registerCommand({
+        name: "lw_p1:end",
+        description: "Force end the game",
+        permissionLevel: mc.CommandPermissionLevel.GameDirectors,
+    }, () => {
+        mc.system.run(() => forceEndGame());
+        return { status: mc.CustomCommandStatus.Success };
+    });
+});
+
+// 触发强制结束：为所有玩家打上收尾标记，交由收尾轮询执行与正常结束一致的流程
+export function forceEndGame() {
+    gameSession.endTriggered = true;
+    for (const player of mc.world.getPlayers()) {
+        if (!player.isValid) continue;
+        if (!getPlayerState(player).endFlag) getPlayerState(player).endFlag = true;
+    }
+}
+
 // 结算判定
 // 规则1：游戏中只存在杀手一个冒险模式，杀手胜利
 // 规则2：杀手的游戏模式不是冒险模式，平民胜利
@@ -67,12 +90,14 @@ mc.system.runInterval(() => {
         const civils = inGame.filter(p => !isKiller(p));
         const hasKiller = killers.length > 0;
         const killerDead = hasKiller && killers.every(p => !isAlive(p));
+        // 本局职业已分配、但场上已无杀手 → 杀手退出/离线，按杀手出局判定
+        const killerLeft = !hasKiller && gameSession.roleRewardsGiven;
         const civilsAllDead = civils.length > 0 && civils.every(p => !isAlive(p));
 
         let endMsg = null;
 
-        if (killerDead) {
-            endMsg = { winner: "平民", reason: "杀手死亡" };
+        if (killerDead || killerLeft) {
+            endMsg = { winner: "平民", reason: killerLeft ? "杀手退出" : "杀手死亡" };
         }
         else if (hasKiller && civilsAllDead) {
             endMsg = { winner: "杀手", reason: "平民全部死亡" };
@@ -112,19 +137,6 @@ function collectGameResult(reason, winner) {
 }
 
 
-// 清除本局生成的实体（三个维度）；放到全黑瞬间执行，避免尸体刚生成就被清掉
-function clearGameEntities() {
-    for (const dimName of ["overworld", "nether", "the_end"]) {
-        let dimension;
-        try { dimension = mc.world.getDimension(dimName); } catch { continue; }
-        if (!dimension) continue;
-        for (const typeId of ["lw_p1:corpes", "lw_p1:player_name", "lw_p1:firecracker", "lw_p1:pistol", "minecraft:item"]) {
-            try { dimension.runCommand(`kill @e[type=${typeId}]`); } catch (e) { }
-        }
-    }
-}
-
-
 // 全局游戏结束
 mc.system.runInterval(() => {
     const allPlayers = Array.from(mc.world.getPlayers());
@@ -140,12 +152,11 @@ mc.system.runInterval(() => {
     resetGameClock();
     clearAllTaskProgress();
 
-    // 清空经验、金币、背包与效果，设置模式并补发物品
+    // 清空经验、金币、背包与效果并补发物品（游戏模式改到黑屏阶段再切换，避免被看到瞬间变身）
     for (const player of allPlayers) {
         if (!player.isValid) continue;
         try { setGold(player, 0); } catch (e) { }
         try { player.addLevels(-1000); } catch (e) { }
-        try { player.setGameMode(mc.GameMode.Adventure); } catch (e) { }
         try { player.runCommand("clear @s"); } catch (e) { }
         try { player.runCommand("effect @s clear"); } catch (e) { }
         try { player.runCommand(`give @s lw_p1:guide_book 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`); } catch (e) { }
@@ -171,14 +182,16 @@ mc.system.runInterval(() => {
     }
 
     // 结束转场：先等 2 秒让尸体正常显示，再缓慢黑屏；
-    // 全黑瞬间执行实体清理与传送回站台（都被黑屏遮住），缓慢恢复后再广播结算
+    // 全黑瞬间执行实体清理、切换游戏模式与传送回站台（都被黑屏遮住），缓慢恢复后再广播结算
     mc.system.runTimeout(() => {
         const fadeTargets = Array.from(mc.world.getPlayers());
         fadeBlackTransition(fadeTargets, { fadeInTime: 2, holdTime: 0.5, fadeOutTime: 2 }, () => {
             clearGameEntities();
-            if (trainStation && typeof trainStation.x === "number") {
-                for (const player of mc.world.getPlayers()) {
-                    if (!player.isValid) continue;
+            for (const player of mc.world.getPlayers()) {
+                if (!player.isValid) continue;
+                // 与实体清理、传送一起在全黑阶段执行，避免切换模式被看到
+                try { player.setGameMode(mc.GameMode.Adventure); } catch (e) { }
+                if (trainStation && typeof trainStation.x === "number") {
                     try {
                         player.teleport(trainStation);
                     } catch (e) { }

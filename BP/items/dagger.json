@@ -15,7 +15,7 @@
             "minecraft:use_animation": "spear",
             "minecraft:use_modifiers": {
                 "use_duration": 30.0,
-                "movement_modifier": 0.35
+                "movement_modifier": 1.0
             },
             "minecraft:cooldown": {
                 "category": "lw_p1_dagger",

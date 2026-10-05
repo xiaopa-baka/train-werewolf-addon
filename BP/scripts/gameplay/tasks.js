@@ -6,7 +6,7 @@ import { getWorldConfig, getConfig } from "../config/worldConfig.js";
 import {
     getGameTicks,
     getTaskProgress, setTaskProgress, addTaskProgress, resetTaskProgress, clearTaskProgress,
-    addGold, addDeathExtra, getPlayerState, isInGame, isKiller,
+    addGold, addDeathExtra, getPlayerState, isInGame, isKiller, isGameDead,
 } from "../core/state.js";
 import { t } from "../core/i18n.js";
 import { registerActionBarProvider } from "../core/hud.js";
@@ -129,13 +129,32 @@ mc.system.runInterval(() => {
 
     for (const player of players) {
         if (!player.isValid) continue;
-        if (!isInGame(player) || getPlayerState(player).taskId > 0) continue;
+        if (!isInGame(player) || isGameDead(player) || getPlayerState(player).taskId > 0) continue;
 
         if (Math.random() < chance) {
             const taskNum = Math.floor(Math.random() * maxTask) + 1;
             getPlayerState(player).taskId = taskNum;
             player.addLevels(1);
         }
+    }
+}, 20);
+
+
+// 已淘汰（旁观）的玩家不再持有任务：清空任务状态，停掉倒计时与提示
+mc.system.runInterval(() => {
+    for (const player of mc.world.getPlayers()) {
+        if (!player.isValid) continue;
+        if (!isGameDead(player)) continue;
+        const ps = getPlayerState(player);
+        if (ps.taskId === 0 && !ps.taskCountdown && !ps.taskRequestCountdown) continue;
+        ps.taskId = 0;
+        ps.taskCountdown = false;
+        ps.taskRequestCountdown = false;
+        ps.taskHinted = false;
+        ps.taskHinted2 = false;
+        ps.taskHinted3 = false;
+        ps.taskDone = false;
+        ps.taskFailed = false;
     }
 }, 20);
 
@@ -163,7 +182,15 @@ mc.system.runInterval(() => {
 
         // 倒计时中每秒扣 1 级
         if (isInGame(player) && getPlayerState(player).taskCountdown) {
-            player.addLevels(-1);
+            // 正在做任务（通风/蹲坑/睡觉/社交）时暂停倒计时
+            // 仅对非杀手的累计型任务（有 stateField）生效；事件型任务（进食/饮用）无暂停条件
+            const tId = getTaskId(player);
+            const tDef = TASKS[tId];
+            const doingTask = !isKiller(player) && tDef && tDef.stateField
+                && getPlayerState(player)[tDef.stateField];
+            if (!doingTask) {
+                player.addLevels(-1);
+            }
         }
     }
 }, 20);
@@ -203,15 +230,17 @@ mc.system.runInterval(() => {
             }
         }
         // 进入 40 秒提示
-        if (taskId && level === 40) {
+        if (taskId && level === 40 && !getPlayerState(player).taskHinted2) {
             player.sendMessage(t(`lw_p1.task.${taskId}.hint2`));
+            getPlayerState(player).taskHinted2 = true;
         }
         // 进入 20 秒提示并施加惩罚效果
-        if (taskId && level === 20) {
+        if (taskId && level === 20 && !getPlayerState(player).taskHinted3) {
             player.sendMessage(t(`lw_p1.task.${taskId}.hint3`));
             for (const [effectId, amplifier] of TASK_HINT3_EFFECTS[taskId] ?? []) {
                 try { player.addEffect(effectId, 400, { amplifier, showParticles: true }); } catch (e) { }
             }
+            getPlayerState(player).taskHinted3 = true;
         }
     }
 }, 20);
@@ -237,8 +266,17 @@ mc.system.runInterval(() => {
         }
 
         if (getTaskProgress(player) >= def.threshold) {
-            if (!isKiller(player) && !getPlayerState(player).taskDone) {
-                player.sendMessage(t("lw_p1.task.done"));
+            if (!getPlayerState(player).taskDone) {
+                if (!isKiller(player)) {
+                    player.sendMessage(t("lw_p1.task.done"));
+                }
+                // 睡觉任务完成后自动起床：基岩版传送会唤醒睡眠中的玩家
+                // 延迟几 tick 再传送，避免与任务完成结算同 tick 竞争导致任务未结算
+                if (taskId === 3) {
+                    mc.system.runTimeout(() => {
+                        try { if (player.isValid) player.teleport(player.location); } catch (e) { }
+                    }, 5);
+                }
             }
             getPlayerState(player).taskDone = true;
         }
@@ -262,6 +300,8 @@ mc.system.runInterval(() => {
         getPlayerState(player).taskId = 0;
         getPlayerState(player).taskCountdown = false;
         getPlayerState(player).taskHinted = false;
+        getPlayerState(player).taskHinted2 = false;
+        getPlayerState(player).taskHinted3 = false;
         getPlayerState(player).rewardGiven = false;
 
         resetTaskProgress(player);
@@ -453,8 +493,8 @@ mc.system.runInterval(() => {
             const dz = pPos.z - oPos.z;
             const distSq = dx * dx + dy * dy + dz * dz;
 
-            // 社交判定距离 3 格（3² = 9）
-            if (distSq <= 9) {
+            // 社交判定距离 4 格（4² = 16）
+            if (distSq <= 16) {
                 hasOtherPlayerNearby = true;
                 break;
             }
