@@ -122,7 +122,9 @@ export function addGold(player, amount) {
  * @property {number}  taskId                当前任务 1..6（0 = 无）
  * @property {boolean} taskCountdown         倒计时
  * @property {boolean} taskRequestCountdown  请求倒计时
- * @property {boolean} taskHinted            已提示
+ * @property {boolean} taskHinted            已提示（首次）
+ * @property {boolean} taskHinted2           已提示（40秒）
+ * @property {boolean} taskHinted3           已提示（20秒）
  * @property {boolean} taskDone              任务完成
  * @property {boolean} taskFailed            任务失败
  * @property {boolean} rewardGiven           已发奖励
@@ -132,17 +134,22 @@ export function addGold(player, amount) {
 /** @type {Map<string, PlayerState>} */
 const playerStates = new Map();
 
+/** 生成一份默认对局状态（未开局 / 局外时的初始值） @returns {PlayerState} */
+function createDefaultState(inTrain = false) {
+    return {
+        inGame: false, inTrain, role: null, endFlag: false,
+        pistolDisabled: false, hurt: false,
+        ventilating: false, squatting: false, sleeping: false, socializing: false,
+        taskId: 0, taskCountdown: false, taskRequestCountdown: false, taskHinted: false, taskHinted2: false, taskHinted3: false,
+        taskDone: false, taskFailed: false, rewardGiven: false, killRewardGiven: false
+    };
+}
+
 /** 取玩家对局状态（不存在则初始化） @returns {PlayerState} */
 export function getPlayerState(player) {
     let ps = playerStates.get(player.id);
     if (!ps) {
-        ps = {
-            inGame: false, inTrain: false, role: null, endFlag: false,
-            pistolDisabled: false, hurt: false,
-            ventilating: false, squatting: false, sleeping: false, socializing: false,
-            taskId: 0, taskCountdown: false, taskRequestCountdown: false, taskHinted: false,
-            taskDone: false, taskFailed: false, rewardGiven: false, killRewardGiven: false
-        };
+        ps = createDefaultState();
         playerStates.set(player.id, ps);
     }
     return ps;
@@ -153,8 +160,30 @@ export function isKiller(player) { return getPlayerState(player).role === "kille
 export function isOfficer(player) { return getPlayerState(player).role === "officer"; }
 export function setRole(player, role) { getPlayerState(player).role = role; }
 
+/** 是否为"已淘汰"的局内玩家（局内死亡 = 旁观模式）。
+ *  已淘汰者不再受体力/跳跃等局内限制，也不再参与任务。 */
+export function isGameDead(player) {
+    if (!isInGame(player)) return false;
+    try { return player.getGameMode() === mc.GameMode.Spectator; } catch (e) { return false; }
+}
+
 /** 清空全部玩家对局状态（开局重置 / 收尾清理） */
 export function clearAllPlayerStates() { playerStates.clear(); }
+
+/** 清除"局外"玩家的对局状态：非对局中、且未处于结算流程的玩家，其对局状态整体归零。
+ *  仅保留 inTrain（大厅登车判定需要）。目的：避免局外测试道具（如手枪）残留状态影响后续使用。 */
+export function clearOutOfGameStates() {
+    for (const ps of playerStates.values()) {
+        if (ps.inGame || ps.endFlag) continue;
+        // Object.assign 就地覆盖，保留对象引用与 inTrain
+        Object.assign(ps, createDefaultState(ps.inTrain));
+    }
+}
+
+// 每秒清理一次局外玩家的残留对局状态
+mc.system.runInterval(() => {
+    try { clearOutOfGameStates(); } catch (e) { }
+}, 20);
 
 
 // 跨模块共享的本局运行态（gameFlow 开局流程 与 gameEnd 结算流程 共用）

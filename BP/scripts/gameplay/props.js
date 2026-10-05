@@ -58,25 +58,51 @@ function poisonKill(player) {
 
 // ===== 匕首 =====
 const chargeStartTick = new Map();
-// 获取玩家正前方一格的方块上站着的其他玩家
+// 获取玩家前方一定角度、一定范围内最近的其他玩家（同格也算命中）
 function getPlayerInFront(player) {
     const yaw = player.getRotation().y * Math.PI / 180;
     const dirX = -Math.sin(yaw);
     const dirZ = Math.cos(yaw);
 
     const p = player.location;
-    const targetX = Math.floor(p.x + dirX);
-    const targetY = Math.floor(p.y);
-    const targetZ = Math.floor(p.z + dirZ);
+    const MAX_RANGE = 1.5;              // 最大检测距离（格，水平）
+    const MAX_ANGLE_DEG = 60;           // 视角半角（度）
+    const cosMax = Math.cos(MAX_ANGLE_DEG * Math.PI / 180);
+
+    let bestTarget = null;
+    let bestDistSq = Infinity;
 
     for (const other of mc.world.getPlayers()) {
         if (!other.isValid || other.id === player.id) continue;
+        // 旁观（已淘汰）玩家不参与刺杀判定
+        let otherIsSpec = false;
+        try { otherIsSpec = other.getGameMode() === mc.GameMode.Spectator; } catch (e) { continue; }
+        if (otherIsSpec) continue;
+
         const o = other.location;
-        if (Math.floor(o.x) === targetX && Math.floor(o.z) === targetZ && Math.abs(o.y - targetY) < 1.5) {
-            return other;
+        const dx = o.x - p.x;
+        const dy = o.y - p.y;
+        const dz = o.z - p.z;
+        const distSq = dx * dx + dz * dz;   // 水平距离平方（Y 单独判定）
+
+        if (distSq > MAX_RANGE * MAX_RANGE) continue;
+        if (Math.abs(dy) > 1.5) continue;   // 上下楼层不命中
+
+        // 同格或几乎重合：直接视为在正前方，无需角度判定
+        let inAngle = true;
+        if (distSq > 0.01) {
+            const dist = Math.sqrt(distSq);
+            const dot = (dx * dirX + dz * dirZ) / dist;
+            inAngle = dot >= cosMax;
+        }
+        if (!inAngle) continue;
+
+        if (distSq < bestDistSq) {
+            bestDistSq = distSq;
+            bestTarget = other;
         }
     }
-    return null;
+    return bestTarget;
 }
 
 // 刺杀逻辑
@@ -404,6 +430,10 @@ mc.system.runInterval(() => {
             for (const p of mc.world.getPlayers()) {
                 if (!p.isValid) continue;
                 if (typeof shooterId === "string" && p.id === shooterId) continue;
+                // 旁观（已淘汰）玩家不阻挡弹道，子弹穿过
+                let pIsSpec = false;
+                try { pIsSpec = p.getGameMode() === mc.GameMode.Spectator; } catch (e) { continue; }
+                if (pIsSpec) continue;
                 const cx = p.location.x, cy = p.location.y + 0.9, cz = p.location.z;
 
                 let d2;
@@ -435,10 +465,11 @@ mc.system.runInterval(() => {
                 getPlayerState(hit).hurt = true;
                 bullet.setDynamicProperty("lw_p1:hasHit", true);
 
-                // 左轮手枪误伤平民，掉落手枪实体
-                if (weaponType === "lw_p1:pistol" && !isKiller(hit)) {
+                // 左轮手枪误伤平民，掉落手枪实体（仅局内生效，局外测试不受影响）
+                const shooterP = Array.from(mc.world.getPlayers()).find(p => p.id === shooterId);
+                if (weaponType === "lw_p1:pistol" && !isKiller(hit) && shooterP?.isValid && isInGame(shooterP)) {
                     try {
-                        const shooter = Array.from(mc.world.getPlayers()).find(p => p.id === shooterId);
+                        const shooter = shooterP;
                         if (shooter && shooter.isValid && !isCreative(shooter)) {
                             const container = shooter.getComponent("minecraft:inventory")?.container;
                             if (container) {
@@ -731,7 +762,8 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
                         try {
                             p.addEffect('minecraft:invisibility', 400, { amplifier: 0, showParticles: false });
                         } catch (e) { }
-                    };
+                        continue;   // 杀手只隐身，不吃失明
+                    }
                     if (!isInGame(p)) continue;
                     try {
                         p.addEffect('minecraft:blindness', 400, { amplifier: 0, showParticles: false });
@@ -1000,6 +1032,14 @@ mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
         if (!getPlayerState(player).hurt) continue;
+
+        // 旁观（已淘汰）玩家不再参与伤害结算：清除标记，避免被子弹/匕首/手榴弹误判生成尸体
+        let isSpectator = false;
+        try { isSpectator = player.getGameMode() === mc.GameMode.Spectator; } catch (e) { isSpectator = false; }
+        if (isSpectator) {
+            getPlayerState(player).hurt = false;
+            continue;
+        }
 
         let foundSlot = -1;
         try {
