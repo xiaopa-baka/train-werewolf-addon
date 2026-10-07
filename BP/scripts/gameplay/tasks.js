@@ -6,10 +6,10 @@ import { getWorldConfig, getConfig } from "../config/worldConfig.js";
 import {
     getGameTicks,
     getTaskProgress, setTaskProgress, addTaskProgress, resetTaskProgress, clearTaskProgress,
-    addGold, addDeathExtra, getPlayerState, isInGame, isKiller, isGameDead,
+    addGold, addDeathExtra, getPlayerState, isInGame, isKiller, isOfficer, isGameDead, getGold, gameSession, getRemainSeconds,
 } from "../core/state.js";
 import { t } from "../core/i18n.js";
-import { registerActionBarProvider } from "../core/hud.js";
+import { registerPanelProvider, registerSubPanelProvider } from "../core/hud.js";
 
 
 // ===== 任务定义表 =====
@@ -92,29 +92,6 @@ function getTaskId(player) {
 }
 
 
-// 任务进度条文案（供活动栏调度器使用）；无进度时返回 undefined
-export function getTaskBarText(player) {
-    if (!isInGame(player)) return undefined;
-    if (isKiller(player)) return undefined;
-
-    const value = getTaskProgress(player);
-    if (value <= 0) return undefined;
-
-    const def = TASKS[getTaskId(player)];
-    if (!def) return undefined;
-
-    // 进度条仅在处于该任务的判定状态时显示
-    if (def.stateField && !getPlayerState(player)[def.stateField]) return undefined;
-
-    let bar;
-    for (const step of def.steps) {
-        if (value >= step.at) bar = step.bar;
-        else break;
-    }
-    return bar;
-}
-
-
 // 游戏开始后按概率给无任务玩家分配随机任务
 mc.system.runInterval(() => {
     const players = Array.from(mc.world.getPlayers());
@@ -134,7 +111,8 @@ mc.system.runInterval(() => {
         if (Math.random() < chance) {
             const taskNum = Math.floor(Math.random() * maxTask) + 1;
             getPlayerState(player).taskId = taskNum;
-            player.addLevels(1);
+            getPlayerState(player).taskLimit = 0;
+            getPlayerState(player).taskRemain = 0;
         }
     }
 }, 20);
@@ -148,99 +126,94 @@ mc.system.runInterval(() => {
         const ps = getPlayerState(player);
         if (ps.taskId === 0 && !ps.taskCountdown && !ps.taskRequestCountdown) continue;
         ps.taskId = 0;
+        ps.taskLimit = 0;
+        ps.taskRemain = 0;
         ps.taskCountdown = false;
         ps.taskRequestCountdown = false;
         ps.taskHinted = false;
         ps.taskHinted2 = false;
         ps.taskHinted3 = false;
         ps.taskDone = false;
+        ps.taskDoneTick = 0;
         ps.taskFailed = false;
     }
 }, 20);
 
 
-// 请求倒计时 → 写入限时经验等级 → 每秒扣 1 级
+// 请求倒计时 → 写入本次任务时限（内存计时，不再占用经验条）→ 每秒扣 1 秒
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
 
+        const ps = getPlayerState(player);
+
         // 获得任务后先挂上"请求倒计时"
-        if (isInGame(player) && getPlayerState(player).taskId > 0
-            && !getPlayerState(player).taskCountdown && !getPlayerState(player).taskRequestCountdown) {
-            getPlayerState(player).taskRequestCountdown = true;
+        if (isInGame(player) && ps.taskId > 0
+            && !ps.taskCountdown && !ps.taskRequestCountdown) {
+            ps.taskRequestCountdown = true;
         }
 
-        // 请求倒计时：把限时写入经验等级（杀手用虚假任务限时）
-        if (getPlayerState(player).taskRequestCountdown) {
-            const limit = isKiller(player)
-                ? getConfig("fakeTaskLimit")
-                : getConfig("taskLimit");
-            if (limit > 0) player.addLevels(limit);
-            getPlayerState(player).taskRequestCountdown = false;
-            getPlayerState(player).taskCountdown = true;
+        // 请求倒计时：写入本次任务时限（杀手与平民共用同一限时）
+        if (ps.taskRequestCountdown) {
+            const limit = getConfig("taskLimit");
+            ps.taskLimit = limit > 0 ? limit : 0;
+            ps.taskRemain = ps.taskLimit;
+            ps.taskRequestCountdown = false;
+            ps.taskCountdown = true;
         }
 
-        // 倒计时中每秒扣 1 级
-        if (isInGame(player) && getPlayerState(player).taskCountdown) {
+        // 倒计时中每秒扣 1 秒
+        if (isInGame(player) && ps.taskCountdown) {
             // 正在做任务（通风/蹲坑/睡觉/社交）时暂停倒计时
             // 仅对非杀手的累计型任务（有 stateField）生效；事件型任务（进食/饮用）无暂停条件
-            const tId = getTaskId(player);
-            const tDef = TASKS[tId];
+            const tDef = TASKS[getTaskId(player)];
             const doingTask = !isKiller(player) && tDef && tDef.stateField
-                && getPlayerState(player)[tDef.stateField];
+                && ps[tDef.stateField];
             if (!doingTask) {
-                player.addLevels(-1);
+                ps.taskRemain = Math.max(0, ps.taskRemain - 1);
             }
         }
     }
 }, 20);
 
 
-// 任务提示：每秒按经验等级（=剩余秒数）触发
+// 任务提示：按 剩余时间/任务时限 的比例分档（0.6 / 0.4 / 0.2），不再依赖固定剩余秒数
+// 提示文本本身改到右侧面板常驻显示（见文件末尾的面板文案），此处只维护档位标记与惩罚效果
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
-        if (!getPlayerState(player).taskCountdown) continue;
 
-        const level = player.level;
+        const ps = getPlayerState(player);
+        if (!ps.taskCountdown) continue;
+
+        const ratio = ps.taskLimit > 0 ? ps.taskRemain / ps.taskLimit : 0;
         const taskId = getTaskId(player);
 
         if (isKiller(player)) {
-            // 杀手的虚假任务提示 + 标记已提示 + 临近结束自动完成
-            if (taskId && !getPlayerState(player).taskHinted && level >= 20 && level <= 60) {
-                player.sendMessage(t(`lw_p1.task.fake.${taskId}`));
+            // 杀手的虚假任务：标记已提示 + 临近结束自动完成
+            if (taskId && !ps.taskHinted && ratio <= 0.6) {
+                ps.taskHinted = true;
             }
-            if (getPlayerState(player).taskId > 0 && !getPlayerState(player).taskHinted
-                && level >= 20 && level <= 60) {
-                getPlayerState(player).taskHinted = true;
-            }
-            if (isInGame(player) && getPlayerState(player).taskId > 0 && level === 1) {
-                getPlayerState(player).taskDone = true;
+            if (isInGame(player) && ps.taskId > 0 && ps.taskRemain <= 1) {
+                ps.taskDone = true;
             }
             continue;
         }
 
-        // 首次提示：等级落在 [60,180] 时提示一次
-        if (level >= 60 && level <= 180) {
-            if (taskId && !getPlayerState(player).taskHinted) {
-                player.sendMessage(t(`lw_p1.task.${taskId}.hint1`));
-            }
-            if (getPlayerState(player).taskId > 0 && !getPlayerState(player).taskHinted) {
-                getPlayerState(player).taskHinted = true;
-            }
+        // 剩余 60%：首次提示（进入低档）
+        if (taskId && !ps.taskHinted && ratio <= 0.6) {
+            ps.taskHinted = true;
         }
-        // 进入 40 秒提示
-        if (taskId && level === 40 && !getPlayerState(player).taskHinted2) {
-            player.sendMessage(t(`lw_p1.task.${taskId}.hint2`));
-            getPlayerState(player).taskHinted2 = true;
+        // 剩余 40%：二次提示
+        if (taskId && !ps.taskHinted2 && ratio <= 0.4) {
+            ps.taskHinted2 = true;
         }
-        // 进入 20 秒提示并施加惩罚效果
-        if (taskId && level === 20 && !getPlayerState(player).taskHinted3) {
-            player.sendMessage(t(`lw_p1.task.${taskId}.hint3`));
+        // 剩余 20%：末次提示并施加惩罚效果
+        if (taskId && !ps.taskHinted3 && ratio <= 0.2) {
+            ps.taskHinted3 = true;
             for (const [effectId, amplifier] of TASK_HINT3_EFFECTS[taskId] ?? []) {
                 try { player.addEffect(effectId, 400, { amplifier, showParticles: true }); } catch (e) { }
             }
-            getPlayerState(player).taskHinted3 = true;
         }
     }
 }, 20);
@@ -267,9 +240,7 @@ mc.system.runInterval(() => {
 
         if (getTaskProgress(player) >= def.threshold) {
             if (!getPlayerState(player).taskDone) {
-                if (!isKiller(player)) {
-                    player.sendMessage(t("lw_p1.task.done"));
-                }
+                // 完成提示改由左上角面板第三行显示，不再发聊天栏消息
                 // 睡觉任务完成后自动起床：基岩版传送会唤醒睡眠中的玩家
                 // 延迟几 tick 再传送，避免与任务完成结算同 tick 竞争导致任务未结算
                 if (taskId === 3) {
@@ -277,6 +248,7 @@ mc.system.runInterval(() => {
                         try { if (player.isValid) player.teleport(player.location); } catch (e) { }
                     }, 5);
                 }
+                getPlayerState(player).taskDoneTick = mc.system.currentTick;
             }
             getPlayerState(player).taskDone = true;
         }
@@ -285,10 +257,13 @@ mc.system.runInterval(() => {
 
 
 // 任务完成：清状态位、重置进度与经验、发金币奖励
+// 完成后先停留 2 秒（40 tick）让左上角第三行显示绿色 ✓，再清理状态
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
-        if (!getPlayerState(player).taskDone) continue;
+        const ps = getPlayerState(player);
+        if (!ps.taskDone) continue;
+        if (mc.system.currentTick - (ps.taskDoneTick || 0) < 40) continue;
 
         // 仅平民/警员发奖励
         if (!isKiller(player) && !getPlayerState(player).rewardGiven) {
@@ -298,6 +273,8 @@ mc.system.runInterval(() => {
         }
 
         getPlayerState(player).taskId = 0;
+        getPlayerState(player).taskLimit = 0;
+        getPlayerState(player).taskRemain = 0;
         getPlayerState(player).taskCountdown = false;
         getPlayerState(player).taskHinted = false;
         getPlayerState(player).taskHinted2 = false;
@@ -305,9 +282,9 @@ mc.system.runInterval(() => {
         getPlayerState(player).rewardGiven = false;
 
         resetTaskProgress(player);
-        player.addLevels(-1000);
 
         getPlayerState(player).taskDone = false;
+        getPlayerState(player).taskDoneTick = 0;
     }
 }, 1);
 
@@ -546,8 +523,9 @@ mc.system.runInterval(() => {
             isInGame(player) &&
             getPlayerState(player).taskId > 0 &&
             getPlayerState(player).taskCountdown &&
+            !getPlayerState(player).taskDone &&
             !isKiller(player) &&
-            player.level === 0;
+            getPlayerState(player).taskRemain <= 0;
 
         if (isNeedFail) {
             if (!getPlayerState(player).taskFailed) {
@@ -601,5 +579,100 @@ mc.world.afterEvents.playerLeave.subscribe((event) => {
 });
 
 
-// 任务进度条：进行中独占活动栏
-registerActionBarProvider("lw_p1:taskBar", (player) => getTaskBarText(player), { exclusive: true });
+// 任务进度条已移至左上角面板第三行，不再占用活动栏
+
+
+// ===== 右侧信息面板 / 左上角任务面板 =====
+// 右面板走 title 通道（关键字 lwInfo:）：局内显示 4 行玩家信息，局外显示上一局结算。
+// 左面板走 subtitle 通道（关键字 lwTask:）：局内显示任务提示 + 倒计时进度条 + 任务进度条，局外隐藏。
+// 两条通道由 hud.js 的面板调度器在同一次 setTitle 里下发，彼此独立。
+
+// 把多行文案拼成一条 RawMessage
+function joinLines(lines) {
+    const parts = [];
+    lines.forEach((line, i) => {
+        if (i > 0) parts.push({ text: "\n" });
+        parts.push(line);
+    });
+    return { rawtext: parts };
+}
+
+// 职业名（杀手 / 警员 / 平民）
+function roleText(player) {
+    if (isKiller(player)) return t("lw_p1.role.killer");
+    if (isOfficer(player)) return t("lw_p1.role.officer");
+    return t("lw_p1.role.passenger");
+}
+
+// 右面板：局内 4 行（名字 / 职业 / 金币 / 剩余游戏时长仅杀手）；局外 = 上一局结算
+function getInfoPanelText(player) {
+    if (!isInGame(player)) return gameSession.lastResultText ?? undefined;
+
+    const lines = [
+        t("lw_p1.panel.name", player.name),
+        t("lw_p1.panel.role", roleText(player)),
+        t("lw_p1.panel.gold", getGold(player))
+    ];
+
+    // 第四行：剩余游戏时长（仅杀手），格式 分:秒，与实际对局剩余时间一致
+    if (isKiller(player)) {
+        const remainSec = getRemainSeconds();
+        const m = Math.floor(remainSec / 60);
+        const s = String(remainSec % 60).padStart(2, "0");
+        lines.push(t("lw_p1.panel.time", m, s));
+    }
+    return joinLines(lines);
+}
+
+// 左面板：任务提示（第一行）+ 倒计时进度条（第二行，杀手不显示）+ 任务进度条（第三行）
+// 第三行：需要时间完成的任务（1/2/3/6）显示平滑进度条；任务完成后变为绿色 ✓，停留 2 秒再隐藏
+function getTaskPanelText(player) {
+    if (!isInGame(player)) return undefined;
+
+    const ps = getPlayerState(player);
+    if (ps.taskId <= 0 || !ps.taskCountdown || ps.taskLimit <= 0) return undefined;
+
+    // 提示档位取"已到达的最高档"，避免做任务暂停计时时提示来回跳
+    const stage = ps.taskHinted3 ? 3 : ps.taskHinted2 ? 2 : 1;
+    const hintKey = isKiller(player)
+        ? `lw_p1.task.fake.${ps.taskId}`
+        : `lw_p1.task.${ps.taskId}.hint${stage}`;
+
+    const lines = [t(hintKey)];
+
+    // 杀手不显示倒计时进度条
+    if (!isKiller(player)) {
+        // 剩余时间进度条：10 格，按剩余比例变色
+        const ratio = Math.max(0, Math.min(1, ps.taskRemain / ps.taskLimit));
+        const cells = 10;
+        const filled = Math.max(0, Math.min(cells, Math.round(ratio * cells)));
+        const color = ratio > 0.6 ? "§a" : ratio > 0.3 ? "§e" : "§c";
+        const bar = color + "▓".repeat(filled) + "§8" + "░".repeat(cells - filled);
+        lines.push({ rawtext: [t("lw_p1.task.panel.time", ps.taskRemain), { text: " " }, { text: bar }] });
+    }
+
+    // 第三行：任务完成则显示完成提示；否则需要时间完成的任务显示平滑进度条
+    if (ps.taskDone) {
+        lines.push(t("lw_p1.task.done"));
+    } else {
+        const def = TASKS[ps.taskId];
+        // 仅需要时间完成的任务（有 stateField 的 1/2/3/6）显示进度条；事件型任务（4/5）无此行
+        if (def && def.stateField) {
+            const value = getTaskProgress(player);
+            if (value > 0) {
+                const pRatio = Math.max(0, Math.min(1, value / def.threshold));
+                const pCells = 10;
+                const pFilled = Math.max(0, Math.min(pCells, Math.round(pRatio * pCells)));
+                const pColor = pRatio > 0.6 ? "§a" : pRatio > 0.3 ? "§e" : "§c";
+                const pBar = pColor + "█".repeat(pFilled) + "§8" + "░".repeat(pCells - pFilled);
+                lines.push({ text: pBar });
+            }
+        }
+    }
+
+    return joinLines(lines);
+}
+
+// 注册：右面板（title 通道）与左面板（subtitle 通道）
+registerPanelProvider("lw_p1:infoPanel", (player) => getInfoPanelText(player));
+registerSubPanelProvider("lw_p1:taskPanel", (player) => getTaskPanelText(player));
