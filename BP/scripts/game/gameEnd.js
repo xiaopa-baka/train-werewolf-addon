@@ -32,19 +32,17 @@ function joinNames(names) {
     return { rawtext: parts };
 }
 
-// 广播结束消息
+// 广播结束消息：结算文案改到屏幕右侧面板常驻展示（局外保留上局结果），不再刷聊天栏
 function broadcastEndMessage() {
     if (!gameSession.pendingEndMsg) return;
     const { winner, reason, killerNames, policeNames, civilNames } = gameSession.pendingEndMsg;
     const resultLine = t(winner === "杀手" ? "lw_p1.end.winner.killer" : "lw_p1.end.winner.civil");
     const reasonText = t(END_REASON_KEYS[reason] ?? reason);
-    const killer = joinNames(killerNames);
-    const police = joinNames(policeNames);
-    const civils = joinNames(civilNames);
-    for (const player of mc.world.getPlayers()) {
-        if (!player.isValid) continue;
-        player.sendMessage(t("lw_p1.end.message", resultLine, reasonText, killer, police, civils));
-    }
+    gameSession.lastResultText = t(
+        "lw_p1.end.panel",
+        resultLine, reasonText,
+        joinNames(killerNames), joinNames(policeNames), joinNames(civilNames)
+    );
     gameSession.pendingEndMsg = null;
 }
 
@@ -64,6 +62,7 @@ mc.system.beforeEvents.startup.subscribe((init) => {
 // 触发强制结束：为所有玩家打上收尾标记，交由收尾轮询执行与正常结束一致的流程
 export function forceEndGame() {
     gameSession.endTriggered = true;
+    gameSession.settling = true;
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
         if (!getPlayerState(player).endFlag) getPlayerState(player).endFlag = true;
@@ -110,6 +109,7 @@ mc.system.runInterval(() => {
 
         if (endMsg) {
             gameSession.endTriggered = true;
+            gameSession.settling = true;
             // 收集本局职业名单
             collectGameResult(endMsg.reason, endMsg.winner);
             // 标记收尾信号 endFlag（后续轮询据此触发收尾清理与结束转场）
@@ -197,6 +197,10 @@ mc.system.runInterval(() => {
                     } catch (e) { }
                 }
             }
+            // 传送全部完成，结束“结算/传送中”状态并复位结算标记，允许下一次自动开局
+            gameSession.settling = false;
+            gameSession.endTriggered = false;
+            gameSession.roleRewardsGiven = false;
         });
         // 转场总时长 4.5 秒（90 tick），走完再结算
         mc.system.runTimeout(() => broadcastEndMessage(), 90);
