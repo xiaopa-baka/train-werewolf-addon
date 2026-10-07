@@ -64,13 +64,6 @@ You are the only person on the train who knows what they're doing.
 
 **Your arsenal (see the Item Quick Reference for details):** Dagger, Derringer pistol, Crowbar, Lockpick, Poison, Grenade, Baseball Bat, Blackout Device.
 
-**Killer tips:**
-- Doing tasks is your **best disguise** — do them alongside others and nobody will suspect you
-- Poison is the quietest kill — poison a plate and wait for someone to take and eat it themselves
-- The "blackout + dagger" combo: first black out to blind everyone while you turn invisible, then strike amid the chaos
-- Don't run around carrying the bat all day — the frenzy state instantly gives you away
-- Each kill extends the round time, so you can afford to be patient
-
 ---
 
 ### 🔫 Officer — You Are the Guardian
@@ -84,12 +77,6 @@ You are the only law enforcer on the train, with a revolver — but you must **b
 **A deadly rule — friendly-fire penalty:**
 As soon as your bullet hits a **Civilian**, your pistol will **drop immediately** (fall to the ground, where someone else can pick it up), and you will **permanently lose the right to carry a gun**. Always confirm your target before firing!
 
-**Officer tips:**
-- The pistol is a deterrent, not a tool for spraying shots — aim carefully before firing
-- Buy a "Magic Conch" and confirm a suspect's role before acting
-- The "Father's Pocket Watch" is your second life — acquire it first
-- Communicate with civilians, exchange clues, and don't charge in alone
-
 ---
 
 ### 🧑 Civilian — You Are the Survivor
@@ -101,20 +88,13 @@ You are an ordinary passenger on the train, with no weapon and no privileges, bu
 - Use coins to buy items and stay alive
 - Observe the people around you and work with the Officer to catch the Killer
 
-**Civilian tips:**
-- Buy the "Father's Pocket Watch" first — it can block one fatal hit for you
-- If you find someone suspicious, use the "Magic Conch" to confirm their role
-- Don't act alone — the Killer loves isolated prey
-- Watch for who keeps sneaking around near the plates
-- The Note is your only communication tool — make good use of it
-
 ---
 
 ## 4. Task Guide
 
 Tasks are randomly assigned after the game starts; the countdown shows on the **XP bar**, along with a prompt. As time runs low, various negative effects are applied to you — this is the system warning you: **hurry up and do your task!**
 
-> A Civilian's or Officer's task timing out = instant death (leaving a corpse). A task the Killer receives is only a disguise — timing out won't kill them.
+> A Civilian's or Officer's task timing out = instant death. A task the Killer receives is only a disguise — timing out won't kill them.
 
 | # | Task | How to do it | Tips |
 |:--:|------|------|------|
@@ -154,7 +134,7 @@ A **stamina system** is enabled in-round (it can be toggled by the admin):
 | Poison | Poison a **plate**; someone who takes the poisoned food and eats it gets nauseous after about **5 seconds** and dies of poison in **60 seconds** (Royal Jelly cures it) |
 | Blackout Device | Killer only: all players on the map are **blinded for 20 seconds**, while the Killer becomes **invisible for 20 seconds** |
 | Crowbar | Pries a door and locks it shut (see "Doors and Keys"); using it consumes 1 |
-| Lockpick | A master key that can open doors **1~9** without leaving a trace |
+| Lockpick | A master key that can open **all doors** without leaving a trace |
 | Keys 1~8 | Open the room door with the matching number; randomly issued at the start |
 | Magic Conch | Right-click another player to **privately** learn their role (Killer/Officer/Civilian); consumes 1 |
 | Father's Pocket Watch | While **held down and used**, the action bar shows the remaining time; when you take a fatal hit it is **automatically consumed to save you once** |
@@ -171,13 +151,13 @@ A **stamina system** is enabled in-round (it can be toggled by the admin):
 
 ## 7. Doors, Keys, and Crowbars
 
-There are **10 numbered doors** on the train, each with different rules:
+There are **three kinds of doors** on the train, each with different rules:
 
 | Door | Opening condition |
 |:--:|------|
-| **Doors 1 ~ 8** | Requires the **key with the matching number**, or a **Lockpick** |
-| **Door 9** | **Only a Lockpick** works |
-| **Door 10** | **Requires no item at all** — anyone can open or close it |
+| **Room door** | Requires the **key with the matching number**, or a **Lockpick** |
+| **Train door** | **Only a Lockpick** works |
+| **Carriage door** | **Requires no item at all** — anyone can open or close it |
 
 **General rules:**
 - After opening, a door automatically closes after **3 seconds** (except doors locked shut with a crowbar)
@@ -185,11 +165,11 @@ There are **10 numbered doors** on the train, each with different rules:
 - At the start, each person randomly receives one key; the key is locked in the inventory and **won't drop or be removed**; even if you die, others can't take it
 
 **How to use the crowbar (consumes 1):**
-- On **doors 1 ~ 9**: use it while **standing** (not sneaking) → opens the door and **locks it permanently** (locked for this round, reset after the result). After that, no one can open it with a key.
-- On **door 10**: use it while **sneaking** → closes the door and **locks it for 40 seconds**.
+- On **room doors and train doors**: use it while **standing** (not sneaking) → opens the door and **locks it permanently** (locked for this round, reset after the result). After that, no one can open it with a key.
+- On **carriage doors**: use it while **sneaking** → closes the door and **locks it for 40 seconds**.
 - On a locked door, using a key shows "locked by a crowbar".
 
-> Tip: prying open doors 1~9 is a "one-time sabotage", good for a Killer blocking routes; locking door 10 only lasts 40 seconds, good for temporary rearguard denial.
+> Tip: prying open a room door or train door is a "one-time sabotage", good for a Killer blocking routes; locking a carriage door only lasts 40 seconds, good for temporary rearguard denial.
 
 ---
 
