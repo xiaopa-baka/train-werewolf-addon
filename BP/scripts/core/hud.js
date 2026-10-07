@@ -178,6 +178,28 @@ mc.system.runInterval(() => {
     }
 }, 1);
 
+/**
+ * 立即下发一次两块面板的当前内容（无视"仅变化时发送"的去重与中央大字占用）。
+ * 用于开局等需要马上刷新、避免残留上一局结算文案的时机。
+ */
+export function flushPanels() {
+    for (const player of mc.world.getPlayers()) {
+        if (!player.isValid) continue;
+        const mainText = pickText(panelProviders, player);
+        const subText = pickText(subProviders, player);
+        panelLastSent.set(player.id, textKey(mainText));
+        subLastSent.set(player.id, textKey(subText));
+        try {
+            player.onScreenDisplay.setTitle(buildPayload(PANEL_KEYWORD, mainText), {
+                fadeInDuration: 0,
+                stayDuration: 0,
+                fadeOutDuration: 0,
+                subtitle: buildPayload(SUB_KEYWORD, subText)
+            });
+        } catch (e) { }
+    }
+}
+
 mc.world.afterEvents.playerLeave.subscribe((event) => {
     panelLastSent.delete(event.playerId);
     subLastSent.delete(event.playerId);

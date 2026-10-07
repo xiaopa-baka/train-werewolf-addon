@@ -219,26 +219,36 @@ mc.system.runInterval(() => {
 }, 20);
 
 
-// 局内隐藏 HUD：生命条 / 饥饿条 / 状态效果
-// 用 /hud 指令控制，按玩家持久保存；只在"游戏中"状态位出现/消失导致状态变化时才下发一次
-const HUD_ELEMENTS = ["health", "hunger", "status_effects"];
-const hudHiddenMap = new Map();   // playerId -> 当前是否已对该玩家隐藏
+// 局内隐藏 HUD
+// - 生命条 / 饥饿条 / 状态效果：局内对所有玩家隐藏
+// - 经验条（progress_bar）：局内仅对平民/警员隐藏，杀手保留
+// 用 /hud 指令控制，按玩家持久保存；只在状态签名变化时才下发一次
+const HUD_ELEMENTS_IN_GAME = ["health", "hunger", "status_effects"];
+const HUD_ELEMENT_PROGRESS_BAR = "progress_bar";
+const hudHiddenMap = new Map();   // playerId -> 当前已下发的隐藏状态签名
 
-function applyHudVisibility(player, hide) {
-    for (const element of HUD_ELEMENTS) {
+function applyHudVisibility(player, hideInGame, hideProgressBar) {
+    for (const element of HUD_ELEMENTS_IN_GAME) {
         try {
-            player.runCommand(`hud @s ${hide ? "hide" : "reset"} ${element}`);
+            player.runCommand(`hud @s ${hideInGame ? "hide" : "reset"} ${element}`);
         } catch (e) { }
     }
+    try {
+        player.runCommand(`hud @s ${hideProgressBar ? "hide" : "reset"} ${HUD_ELEMENT_PROGRESS_BAR}`);
+    } catch (e) { }
 }
 
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
-        const shouldHide = isInGame(player);
-        if (hudHiddenMap.get(player.id) === shouldHide) continue;
-        applyHudVisibility(player, shouldHide);
-        hudHiddenMap.set(player.id, shouldHide);
+        const inGame = isInGame(player);
+        const hideInGame = inGame;
+        // 局内平民/警员隐藏经验条（经验条已不再承载任务倒计时）；杀手保留
+        const hideProgressBar = inGame && !isKiller(player);
+        const signature = `${hideInGame ? 1 : 0}${hideProgressBar ? 1 : 0}`;
+        if (hudHiddenMap.get(player.id) === signature) continue;
+        applyHudVisibility(player, hideInGame, hideProgressBar);
+        hudHiddenMap.set(player.id, signature);
     }
 }, 20);
 

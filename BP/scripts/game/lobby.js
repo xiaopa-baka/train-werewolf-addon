@@ -36,6 +36,7 @@ function requestManualStart() {
     const minPlayer = getConfig("minPlayers");
     const inTrainList = allPlayers.filter(p => p.isValid && getPlayerState(p).inTrain);
     if (inTrainList.length >= minPlayer) {
+        // 传入全体玩家：已登车者入局（冒险模式），未登车者由开局流程统一切旁观模式
         startGameNow(allPlayers);
         gameStartTimer = null;
     } else {

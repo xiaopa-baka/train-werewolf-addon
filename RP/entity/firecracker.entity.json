@@ -14,10 +14,7 @@
             },
             "render_controllers": [
                 "controller.render.default"
-            ],
-            "spawn_egg": {
-                "texture": "lw_p1:firecracker"
-            }
+            ]
         }
     }
 }

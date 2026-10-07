@@ -35,15 +35,13 @@ item.lw_p1:mojito=Mojito
 item.lw_p1:martini=Martini
 item.lw_p1:cosmopolitan=Cosmopolitan
 item.lw_p1:champagne=Champagne
+item.lw_p1:firecracker=Firecracker
 
 ## Item groups
 lw_p1:itemGroup.name.keys=Keys
 lw_p1:itemGroup.name.drinks=Drinks
 lw_p1:itemGroup.name.doors=Key Doors
 lw_p1:itemGroup.name.trays=Food Trays
-
-## Spawn eggs
-item.spawn_egg.entity.lw_p1:firecracker.name=Firecracker
 
 ## Blocks
 tile.lw_p1:vending_machine.name=Vending Machine
@@ -306,7 +304,7 @@ lw_p1.ui.mapInfo.saved=§aMap information saved
 lw_p1.ui.unused.title=Reserved Config
 lw_p1.ui.unused.body=To add more tasks, preset game data or states, or change the underlying data, see the project source code at\n§bhttps://github.com/xiaopa-baka/train-werewolf-addon§r\nYou can browse the behavior pack source to learn from it, modify it, or fork it\n\nNotes:\nIf you build on this project, credit the original author and describe your changes. Malicious tampering and redistribution are prohibited!\nSecondary development must not be used commercially. Selling the original or a modified version is prohibited!\nDo not modify or remove anything in the "Other" section, including developer and sponsor information\nIf you run into any issues, feel free to contact the developer\n\n§6Stay tuned for future updates!
 lw_p1.ui.about.title=About this addon
-lw_p1.ui.about.body=§bTrain Werewolf Addon\n§fVersion: 1.0\n§fCompatible: Minecraft Bedrock 1.26.50+\n§fBuilt with: native Script API\n\n§aAbout the developer:\nStudio: LW Realm Studio\nDesign: Xiaopa baka\nAddon author: Xiaopa baka\nStudio group(QQ): 180568043
+lw_p1.ui.about.body=§bTrain Werewolf Addon\n§fVersion: 1.0.1\n§fCompatible: Minecraft Bedrock 1.26.50+\n§fBuilt with: native Script API\n\n§aAbout the developer:\nStudio: LW Realm Studio\nDesign: Xiaopa baka\nAddon author: Xiaopa baka\nStudio group(QQ): 180568043
 lw_p1.ui.sponsor.title=Sponsorship & Recruitment
 lw_p1.ui.sponsor.body=§bThanks for supporting this project!\n\n§f[How to support]\nIf you enjoy this addon and would like to support us:\n• Share this addon on social media\n• Build and publish a gameplay map for it\n\nOur studio is actively recruiting — if you love MC, join us!\n§f[Open roles]\n• Map building\n• Project design\n• Operations & promotion\n• Command design, mod and plugin development\n• Textures and modeling\n• Skin design\n\n\nStudio group: 180568043\n§aEvery MC fan is welcome!\nJoin us and create even better MC adventures together!
 
@@ -391,7 +389,7 @@ lw_p1.task.6.hint1=§aYou are bored, go socialize with someone
 lw_p1.task.6.hint2=§6You feel down and need to socialize
 lw_p1.task.6.hint3=§cYou are deeply depressed, you need to socialize!
 lw_p1.task.panel.time=§f%s s left
-lw_p1.panel.name=§fPlayer: %s
+lw_p1.panel.name=§fPlayer: §e%s§f
 lw_p1.panel.role=§fRole: %s
 lw_p1.panel.gold=§fGold: %s
 lw_p1.panel.time=§fTime left: %s:%s

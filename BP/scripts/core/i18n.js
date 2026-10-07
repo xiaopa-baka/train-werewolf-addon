@@ -23,18 +23,11 @@ export function t(key, ...args) {
 
 /**
  * 物品自身译名。
- * 自定义物品的键为 item.<完整标识符>，原版物品的键为 item.<名称>.name；
- * 刷怪蛋的物品 ID 为 <命名空间>:<实体名>_spawn_egg，译名键遵循原版约定
- * item.spawn_egg.entity.<实体标识符>.name（原版实体不带命名空间）。
+ * 自定义物品的键为 item.<完整标识符>，原版物品的键为 item.<名称>.name。
  * @param {string} id
  * @returns {import("@minecraft/server").RawMessage}
  */
 export function tItem(id) {
-    if (id.endsWith("_spawn_egg")) {
-        const entityId = id.slice(0, -10);
-        const short = entityId.startsWith("minecraft:") ? entityId.slice(10) : entityId;
-        return { translate: `item.spawn_egg.entity.${short}.name` };
-    }
     if (id.startsWith("minecraft:")) return { translate: `item.${id.slice(10)}.name` };
     return { translate: `item.${id}` };
 }

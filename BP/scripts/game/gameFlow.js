@@ -9,7 +9,7 @@ import {
     clearAllPlayerStates, gameSession,
 } from "../core/state.js";
 import { t } from "../core/i18n.js";
-import { showTitle, clearTitle, fadeBlackTransition, markTitleBusy } from "../core/hud.js";
+import { showTitle, clearTitle, fadeBlackTransition, markTitleBusy, flushPanels } from "../core/hud.js";
 import { setGameTime, setGameWeather, clearGameEntities, playTrainWhistle } from "./environment.js";
 import { clearCrowbaredDoors } from "../blocks/keydoor.js";
 
@@ -133,21 +133,26 @@ export function startGameNow(allPlayers) {
             try { player.setDynamicProperty("lw_p1:noteMessage", undefined); } catch (e) { }
         }
 
-        showTitle(t("lw_p1.msg.gameStart"));
-        mc.system.runTimeout(() => {
-            clearTitle();
-        }, 20);
-
         for (const player of allPlayers) {
             if (!player.isValid) continue;
             // 清除上一局残留的职业，保证每局角色重新随机分配
             setRole(player, null);
             if (boardedPlayers.includes(player)) {
                 getPlayerState(player).inGame = true;
+                // 开局统一切到冒险模式（结算判定以冒险模式为存活）
+                try { player.setGameMode(mc.GameMode.Adventure); } catch (e) { }
+            } else {
+                // 未登车玩家不参与本局：直接切旁观模式（可旁观对局，不具备任何局内状态）
+                try { player.setGameMode(mc.GameMode.Spectator); } catch (e) { }
             }
-            // 开局统一切到冒险模式（结算判定以冒险模式为存活）
-            try { player.setGameMode(mc.GameMode.Adventure); } catch (e) { }
         }
+
+        // 开局立即刷新两块面板，清掉上一局残留的结算文案
+        // （此时本局状态已写入，参与者面板直接显示局内信息，旁观者显示空）
+        flushPanels();
+        // 面板与中央大字共用 title 通道，隔 1 tick 再显示"游戏开始"，避免同 tick 互相覆盖
+        mc.system.runTimeout(() => showTitle(t("lw_p1.msg.gameStart")), 1);
+        mc.system.runTimeout(() => clearTitle(), 21);
 
         // 开局转场：所有参与玩家缓慢黑屏，全黑瞬间随机传送，再缓慢恢复
         // 汽笛在开始变黑时响起，声源在车头
