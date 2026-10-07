@@ -123,8 +123,7 @@ function staminaBar(value) {
 
 // 体力条文案（由本模块注册到活动栏调度器）：仅玩家自己看得到（活动栏天然按玩家单独下发）
 export function staminaHudText(player) {
-    if (!staminaEnabled || !isInGame(player) || isGameDead(player)) return undefined;
-    if (isStaminaExempt(player)) return undefined;
+    if (!staminaEnabled || isGameDead(player) || !isInGame(player) || isStaminaExempt(player)) return undefined;
 
     const state = staminaMap.get(player.id);
     if (!state) return undefined;
@@ -153,7 +152,7 @@ mc.system.runInterval(() => {
 
         // 只在"游戏中"生效：体力系统关闭、不在局内、已淘汰（旁观）、
         // 或免体力（创造 / 关闭杀手体力后的杀手）时，清状态并还原可能被压制的饱食度
-        if (!staminaEnabled || !isInGame(player) || isGameDead(player) || isStaminaExempt(player)) {
+        if (!staminaEnabled || isGameDead(player) || !isInGame(player) || isStaminaExempt(player)) {
             staminaMap.delete(player.id);
             restoreFromLock(player);
             continue;
