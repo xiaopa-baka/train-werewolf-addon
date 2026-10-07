@@ -18,7 +18,7 @@
             "sounds": [
                 {
                     "name": "sounds/pistol",
-                    "volume": 32.0
+                    "volume": 1
                 }
             ]
         },
@@ -27,7 +27,7 @@
             "sounds": [
                 {
                     "name": "sounds/firecracker",
-                    "volume": 32.0
+                    "volume": 1
                 }
             ]
         },
@@ -36,7 +36,7 @@
             "sounds": [
                 {
                     "name": "sounds/train_whistle",
-                    "volume": 32.0
+                    "volume": 1
                 }
             ]
         }

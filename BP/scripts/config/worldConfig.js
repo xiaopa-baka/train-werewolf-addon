@@ -51,8 +51,8 @@ export const CONFIG_SCHEMA = {
     // 消费方：tasks.js
     taskFirstDelay: { prop: "lw_p1.cfg.taskFirstDelay", default: 20,  min: 0,   max: 60,   step: 10 },
     // 单个任务限时（秒）：所有玩家（含杀手）共用同一限时；平民/警员超时视为失败，杀手超时视为完成。
-    // 该值同时作为"剩余时间进度条"的满值（按 剩余/时限 的比例变色与提示）。默认 100，范围 100-300（步长 25）。消费方：tasks.js
-    taskLimit:      { prop: "lw_p1.cfg.taskLimit",      default: 100, min: 100, max: 300,  step: 25 },
+    // 该值同时作为"剩余时间进度条"的满值（按 剩余/时限 的比例变色与提示）。默认 200，范围 100-300（步长 25）。消费方：tasks.js
+    taskLimit:      { prop: "lw_p1.cfg.taskLimit",      default: 200, min: 100, max: 300,  step: 25 },
     // 任务完成奖励（金币）：平民/警员每完成一个任务获得的金币。默认 25，范围 10-50（步长 5）。消费方：tasks.js
     taskReward:     { prop: "lw_p1.cfg.taskReward",     default: 25,  min: 10,  max: 50,   step: 5 },
     // 任务总数上限：任务编号范围为 1..taskCount。默认 6。
@@ -175,7 +175,7 @@ export function getEmptyConfig() {
                 price: 100
             },
             {
-                id: "lw_p1:firecracker_spawn_egg",
+                id: "lw_p1:firecracker",
                 displayName: "",
                 price: 75
             },

@@ -57,28 +57,36 @@ function poisonKill(player) {
 
 
 // ===== 音效传播辅助 =====
-// Dimension.playSound 的可闻距离受音效定义影响，实测本项目里手枪、爆竹始终只传约 1 个区块；
-// 而 Player.playSound 是把音效定向发给单个玩家、不做距离剔除，因此手枪/爆竹改用
-// “按半径逐玩家播放”，音量随距离线性衰减，可稳定控制可闻范围。
-// 参数：dimensionId 维度 id；loc 声源坐标；soundId 音效名；range 可闻半径（格）
-function playSoundNearby(dimensionId, loc, soundId, range) {
+// 对范围内每个玩家单独播放：播放点放在该玩家「朝声源方向 1 格」处（有方位感，且距离≈1 必然出声）；
+// 音量按距离线性衰减：volume = 1 - 距离 × falloff，小于 0 记 0（0 即不播放）。
+// 参数：dimensionId 维度 id；loc 声源坐标；soundId 音效名；falloff 每 1 格衰减的音量
+export function playSoundNearby(dimensionId, loc, soundId, falloff) {
+    // 统一去掉命名空间前缀：调用方可能传 "overworld"，而 dimension.id 是 "minecraft:overworld"
+    const shortId = (id) => String(id).split(":").pop();
+    const wantDim = shortId(dimensionId);
+
     for (const p of mc.world.getPlayers()) {
         if (!p.isValid) continue;
-        try {
-            if (p.dimension.id !== dimensionId) continue;
-        } catch (e) { continue; }
+        try { if (shortId(p.dimension.id) !== wantDim) continue; } catch (e) { continue; }
 
-        const dx = p.location.x - loc.x;
-        const dy = p.location.y - loc.y;
-        const dz = p.location.z - loc.z;
+        let dx = loc.x - p.location.x;
+        let dy = loc.y - p.location.y;
+        let dz = loc.z - p.location.z;
         const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (dist > range) continue;
 
-        // 距离越远音量越低，最低保留 0.15 保证仍可听见
-        const volume = Math.max(0.15, 1 - dist / range);
-        // 带 location 播放，声音定位到声源坐标，玩家可据此判断方向
+        const volume = Math.max(0, 1 - dist * falloff);
+        if (volume <= 0) continue;
+
+        if (dist < 1e-4) { dx = 0; dy = 0; dz = 1; }   // 与声源重合，退化为正前方
+        else { dx /= dist; dy /= dist; dz /= dist; }
+
+        // 播放点 = 玩家位置朝声源方向 1 格
+        const sx = p.location.x + dx;
+        const sy = p.location.y + dy;
+        const sz = p.location.z + dz;
+
         try {
-            p.playSound(soundId, { location: loc, volume: volume, pitch: 1 });
+            p.dimension.runCommand(`playsound ${soundId} "${p.name}" ${sx.toFixed(3)} ${sy.toFixed(3)} ${sz.toFixed(3)} ${volume.toFixed(3)} 1`);
         } catch (e) { }
     }
 }
@@ -196,9 +204,6 @@ mc.world.afterEvents.entitySpawn.subscribe((event) => {
     const entity = event.entity;
     if (entity.typeId === "lw_p1:firecracker") {
         entity.setDynamicProperty("lw_p1:spawnTick", mc.system.currentTick);
-        try {
-            entity.runCommand(`particle minecraft:basic_flame_particle ^0.1 ^0.1 ^0.06`);
-        } catch (e) { }
     }
 });
 
@@ -215,19 +220,74 @@ mc.system.runInterval(() => {
 
             const spawnTick = fc.getDynamicProperty("lw_p1:spawnTick");
             if (typeof spawnTick !== "number") continue;
-            const age = mc.system.currentTick - spawnTick;
+            const nowTick = mc.system.currentTick;
 
-            // 每 5 tick 喷一次烟
-            if (age % 5 === 0) {
+            // 弹道：每 tick 推进（带重力），碰到方块即停
+            const vx = fc.getDynamicProperty("lw_p1:vx");
+            const vy = fc.getDynamicProperty("lw_p1:vy");
+            const vz = fc.getDynamicProperty("lw_p1:vz");
+            if (typeof vx === "number" && typeof vy === "number" && typeof vz === "number") {
+                const GRAVITY = 0.05;
+                const newVy = vy - GRAVITY;
+                const loc = fc.location;
+
+                // 位移拆成子步逐点判定，避免漏检嵌进方块
+                const SUB = 0.1;
+                const stepLen = Math.sqrt(vx * vx + newVy * newVy + vz * vz) || 1;
+                const n = Math.min(16, Math.max(1, Math.ceil(stepLen / SUB)));
+                let curX = loc.x, curY = loc.y, curZ = loc.z;
+                let hitBlock = false;
+                for (let i = 0; i < n; i++) {
+                    const nx = curX + vx / n, ny = curY + newVy / n, nz = curZ + vz / n;
+                    let blocked = false;
+                    try {
+                        const blk = dimension.getBlock({ x: nx, y: ny, z: nz });
+                        if (blk && !blk.isAir && !blk.isLiquid) blocked = true;
+                    } catch (e) { }
+                    if (blocked) { hitBlock = true; break; }
+                    curX = nx; curY = ny; curZ = nz;
+                }
+
+                if (hitBlock) {
+                    // 停住并记录落地时刻
+                    fc.teleport({ x: curX, y: curY, z: curZ }, { dimension: fc.dimension });
+                    fc.setDynamicProperty("lw_p1:vx", undefined);
+                    fc.setDynamicProperty("lw_p1:vy", undefined);
+                    fc.setDynamicProperty("lw_p1:vz", undefined);
+                    fc.setDynamicProperty("lw_p1:landTick", nowTick);
+                } else {
+                    fc.setDynamicProperty("lw_p1:vy", newVy);
+                    fc.teleport({ x: curX, y: curY, z: curZ }, { dimension: fc.dimension });
+                }
+            }
+
+            // 未落地：不喷粒子、不倒计时，超时兜底
+            const landTick = fc.getDynamicProperty("lw_p1:landTick");
+            if (typeof landTick !== "number") {
+                if (nowTick - spawnTick >= 1200) { try { fc.remove(); } catch (e) { } }
+                continue;
+            }
+
+            const landedAge = nowTick - landTick;
+
+            // 落地第一帧喷一次火苗
+            if (landedAge === 0) {
+                try {
+                    fc.runCommand(`particle minecraft:basic_flame_particle ^0.1 ^0.1 ^0.06`);
+                } catch (e) { }
+            }
+
+            // 烟：每 5 tick 一次
+            if (landedAge % 5 === 0) {
                 try {
                     fc.runCommand(`particle minecraft:basic_smoke_particle ^0.1 ^0.1 ^0.06`);
                 } catch (e) { }
             }
 
-            // 15 秒后爆炸（300 tick = 15 秒）
-            if (age >= 300) {
+            // 落地 15 秒后爆炸
+            if (landedAge >= 300) {
                 try {
-                    playSoundNearby(fc.dimension.id, fc.location, "firecracker", 64);
+                    playSoundNearby(fc.dimension.id, fc.location, "firecracker", 0.015);
                     fc.runCommand(`particle minecraft:lava_particle ~ ~ ~`);
                     fc.runCommand(`particle minecraft:lava_particle ~ ~ ~`);
                     fc.runCommand(`particle minecraft:lava_particle ~ ~ ~`);
@@ -237,6 +297,80 @@ mc.system.runInterval(() => {
         }
     }
 }, 1);
+
+// 爆竹：右键抛出，带重力飞行，碰到方块停下
+const firecrackerThrowCooldown = new Map();
+const FIRECRACKER_THROW_INTERVAL = 10;
+
+function throwFirecracker(player) {
+    const last = firecrackerThrowCooldown.get(player.id) ?? 0;
+    if (mc.system.currentTick - last < FIRECRACKER_THROW_INTERVAL) return;
+    firecrackerThrowCooldown.set(player.id, mc.system.currentTick);
+
+    const slot = player.selectedSlotIndex;
+    mc.system.run(() => {
+        try {
+            if (!player.isValid) return;
+
+            // 消耗一个爆竹（创造模式不消耗）
+            if (!isCreative(player)) {
+                const c = player.getComponent('inventory').container;
+                const it = c.getItem(slot);
+                if (it && it.typeId === 'lw_p1:firecracker') {
+                    if (it.amount > 1) { it.amount -= 1; c.setItem(slot, it); }
+                    else { c.setItem(slot, undefined); }
+                }
+            }
+
+            const loc = player.location;
+            const spawnLoc = { x: loc.x, y: (loc.y ?? 0) + 1.62, z: loc.z };
+            const view = player.getViewDirection();
+            const len = Math.sqrt(view.x * view.x + view.y * view.y + view.z * view.z) || 1;
+            const speed = 0.5;   // 初速度（格/tick）
+
+            let fc;
+            try {
+                fc = player.dimension.spawnEntity('lw_p1:firecracker', spawnLoc);
+            } catch (e) {
+                return;
+            }
+            fc.setDynamicProperty('lw_p1:spawnTick', mc.system.currentTick);
+            fc.setDynamicProperty('lw_p1:vx', (view.x / len) * speed);
+            fc.setDynamicProperty('lw_p1:vy', (view.y / len) * speed);
+            fc.setDynamicProperty('lw_p1:vz', (view.z / len) * speed);
+
+            // 生成朝向跟随玩家视角
+            try {
+                const rot = player.getRotation();
+                fc.setRotation({ x: rot.x, y: rot.y });
+            } catch (e) { }
+
+            try { player.runCommand('playsound random.bow @a ~ ~ ~ 1 1.5'); } catch (e) { }
+        } catch (e) { }
+    });
+}
+
+// 两种右键触发都拦截
+mc.world.beforeEvents.itemUse.subscribe((event) => {
+    const player = event.source;
+    const item = event.itemStack;
+    if (!player?.isValid || !item) return;
+    if (item.typeId !== 'lw_p1:firecracker') return;
+
+    event.cancel = true;
+    throwFirecracker(player);
+});
+
+mc.world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
+    const player = event.player;
+    const item = event.itemStack;
+    if (!player?.isValid || !item) return;
+    if (item.typeId !== 'lw_p1:firecracker') return;
+
+    event.cancel = true;
+    if (!event.isFirstEvent) return;
+    throwFirecracker(player);
+});
 
 
 // ===== 手枪 =====
@@ -316,7 +450,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
         const cooldownCategory = typeId === "lw_p1:pistol" ? "lw_p1_pistol" : "lw_p1_pistol_mini";
 
         try {
-            playSoundNearby(player.dimension.id, player.location, "pistol", 32);
+            playSoundNearby(player.dimension.id, player.location, "pistol", 0.03);
         } catch (e) { }
 
         spawnBullet(player, typeId);
@@ -724,7 +858,11 @@ mc.world.beforeEvents.itemUse.subscribe((event) => {
                     else { c.setItem(slot, undefined); }
                 }
             };
-            setTaskProgress(player, 200);
+            // 任务2（蹲坑）为 reset 型：未蹲坑时进度每 tick 被清零，
+            // 因此不能只加进度，直接标记完成（后续结算/奖励/清理由 tasks.js 处理）
+            const ps = getPlayerState(player);
+            ps.taskDone = true;
+            ps.taskDoneTick = mc.system.currentTick;
         } catch (e) { }
     });
 });
@@ -1253,8 +1391,8 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
                 try { mc.system.clearRun(active.deathTimeoutId); } catch (e) { }
                 ACTIVE_POISONS.delete(playerId);
                 try {
-                    // 移除已施加的反胃效果
-                    if (player.isValid) player.addEffect("minecraft:nausea", 0, { amplifier: 0, showParticles: false });
+                    // 移除已施加的反胃效果（addEffect 时长 0 无法移除，须用 removeEffect）
+                    if (player.isValid) player.removeEffect("minecraft:nausea");
                 } catch (e) { }
                 try { player.sendMessage(t("lw_p1.prop.royalJelly.cured")); } catch (e) { }
             }

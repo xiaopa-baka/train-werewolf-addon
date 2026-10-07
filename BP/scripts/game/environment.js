@@ -4,6 +4,7 @@
 import * as mc from "@minecraft/server";
 import { getWorldConfig } from "../config/worldConfig.js";
 import { getPlayerState, isInGame } from "../core/state.js";
+import { playSoundNearby } from "../gameplay/props.js";
 
 
 // 世界基础规则
@@ -55,25 +56,20 @@ export function clearGameEntities() {
 }
 
 
-// 火车汽笛：声源固定在车头坐标，音量放大以保证列车范围内都能听到。
+// 火车汽笛：声源固定在车头坐标，范围覆盖整列车。
 // 车头坐标未配置时，退化为对每个玩家直接播放（无方位）。
 export function playTrainWhistle() {
     const latestConfig = getWorldConfig();
     const pos = latestConfig.trainEngineCoordinates ?? latestConfig.trainCoordinates?.start;
     const hasPos = pos && typeof pos.x === "number" && typeof pos.y === "number" && typeof pos.z === "number";
 
-    const overworld = mc.world.getDimension("overworld");
-    if (!overworld) return;
-
     if (hasPos) {
-        try { overworld.playSound("train_whistle", pos, { volume: 1, pitch: 1 }); } catch (e) { }
+        playSoundNearby("overworld", pos, "train_whistle", 0.003);
         return;
     }
 
-    for (const player of mc.world.getPlayers()) {
-        if (!player.isValid) continue;
-        try { player.playSound("train_whistle", { volume: 1, pitch: 1 }); } catch (e) { }
-    }
+    // 无坐标兜底：就地给所有玩家播放
+    try { mc.world.getDimension("overworld")?.runCommand("playsound train_whistle @a"); } catch (e) { }
 }
 
 
