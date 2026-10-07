@@ -165,8 +165,7 @@ function showTaskConfigModal(player) {
     const s1 = getConfigMeta("taskChance");
     const s2 = getConfigMeta("taskFirstDelay");
     const s3 = getConfigMeta("taskLimit");
-    const s4 = getConfigMeta("fakeTaskLimit");
-    const s5 = getConfigMeta("taskReward");
+    const s4 = getConfigMeta("taskReward");
     new ModalFormData()
         .title(t("lw_p1.ui.task.title"))
         .header(t("lw_p1.ui.task.probHeader"))
@@ -175,10 +174,8 @@ function showTaskConfigModal(player) {
         .slider(t("lw_p1.ui.task.startDesc", s2.default), s2.min, s2.max, { valueStep: s2.step, defaultValue: getConfig("taskFirstDelay") })
         .header(t("lw_p1.ui.task.limitHeader"))
         .slider(t("lw_p1.ui.task.limitDesc", s3.default), s3.min, s3.max, { valueStep: s3.step, defaultValue: getConfig("taskLimit") })
-        .header(t("lw_p1.ui.task.fakeHeader"))
-        .slider(t("lw_p1.ui.task.fakeDesc", s4.default), s4.min, s4.max, { valueStep: s4.step, defaultValue: getConfig("fakeTaskLimit") })
         .header(t("lw_p1.ui.task.rewardHeader"))
-        .slider(t("lw_p1.ui.task.rewardDesc", s5.default), s5.min, s5.max, { valueStep: s5.step, defaultValue: getConfig("taskReward") })
+        .slider(t("lw_p1.ui.task.rewardDesc", s4.default), s4.min, s4.max, { valueStep: s4.step, defaultValue: getConfig("taskReward") })
         .show(player).then(res => {
             if (res.canceled) { showGameSettingForm(player); return; }
             try {
@@ -186,8 +183,7 @@ function showTaskConfigModal(player) {
                 setConfig("taskChance", Number(vals[0]));
                 setConfig("taskFirstDelay", Number(vals[1]));
                 setConfig("taskLimit", Number(vals[2]));
-                setConfig("fakeTaskLimit", Number(vals[3]));
-                setConfig("taskReward", Number(vals[4]));
+                setConfig("taskReward", Number(vals[3]));
                 player.sendMessage(t("lw_p1.ui.task.saved"));
             } catch (e) {
                 player.sendMessage(t("lw_p1.ui.saveFail", String(e)));

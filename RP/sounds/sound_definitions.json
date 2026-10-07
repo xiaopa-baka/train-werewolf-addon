@@ -16,13 +16,28 @@
         "pistol": {
             "category": "player",
             "sounds": [
-                "sounds/pistol"
+                {
+                    "name": "sounds/pistol",
+                    "volume": 32.0
+                }
             ]
         },
         "firecracker": {
             "category": "neutral",
             "sounds": [
-                "sounds/firecracker"
+                {
+                    "name": "sounds/firecracker",
+                    "volume": 32.0
+                }
+            ]
+        },
+        "train_whistle": {
+            "category": "neutral",
+            "sounds": [
+                {
+                    "name": "sounds/train_whistle",
+                    "volume": 32.0
+                }
             ]
         }
     }

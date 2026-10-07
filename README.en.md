@@ -45,7 +45,7 @@ After boarding the train, the system randomly assigns you one of three roles:
 
 **Round Flow**: Board → random role assignment → the system assigns timed tasks (overtime means death) → complete tasks to earn coins and buy items from the shop → a winner is decided → return to the platform to prepare for the next round.
 
-For detailed player-facing instructions, see [PLAYER_GUIDE.en.md](./PLAYER_GUIDE.en.md) in this repository.
+For detailed player-facing instructions, see [PLAYER_GUIDE.md](./PLAYER_GUIDE.md) in this repository.
 
 ---
 
@@ -55,7 +55,7 @@ For detailed player-facing instructions, see [PLAYER_GUIDE.en.md](./PLAYER_GUIDE
 - **Task system**: 6 task types (Ventilation / Toilet / Sleep / Eat / Hydrate / Social), with countdown timers — overtime means death
 - **Economy and shops**: coins grow naturally + kill rewards; the **Killer's portable shop** + **vending machines** on the map
 - **Rich item roster**: Dagger, Revolver / Derringer pistols and bullets, baseball-bat frenzy, poison and **plate poisoning**, grenades, blackout device, Magic Conch (reveals a role), Father's Pocket Watch (survive death once), and more
-- **Custom blocks**: 10 numbered **key doors** (key / lockpick / crowbar interactions), **vending machines** (multiblock structures), **plates** (drop random food)
+- **Custom blocks**: **key doors** (key / lockpick / crowbar interactions), **vending machines** (multiblock structures), **plates** (drop random food)
 - **Corpse and name-tag system**: death leaves behind a named corpse, and a note's contents stay on the corpse
 - **Full localization**: built-in Simplified Chinese / English (`zh_CN`, `en_US`)
 - **Visual config panel**: admins right-click with a stick to configure map coordinates, task parameters, shop goods, and more
@@ -72,8 +72,7 @@ For detailed player-facing instructions, see [PLAYER_GUIDE.en.md](./PLAYER_GUIDE
    - **Import**: package `BP/` and `RP/` into `.mcpack` files (or merge them into a `.mcaddon`) and import them in-game;
    - **Development-folder loading**: copy `BP/` and `RP/` into Minecraft's `development_behavior_packs` / `development_resource_packs` folders (see "Local Debug Loading" below).
 3. Enable the behavior pack in world settings (the resource pack is pulled in automatically).
-4. **Be sure to enable** the relevant experimental toggles and **Beta APIs** (this Addon uses ScriptAPI).
-5. Use the dedicated **train map**, or build your own and configure it as described below.
+4. Use the dedicated **train map**, or build your own and configure it as described below.
 
 ### Developers
 
@@ -133,15 +132,9 @@ Same scripts and text, only the script API version differs:
 
 ### 1. Configure the Map and Rules
 
-After entering the game, obtain the config stick:
+After entering the game, obtain the config stick, Hold the stick and **right-click** to open the config panel, then set up in order:
 
-```
-/give @s minecraft:stick
-```
-
-Hold the stick and **right-click** to open the config panel, then set up in order:
-
-1. **Global Game Config**: auto-start, start delay, minimum players, game duration, task parameters, coin growth rate, in-round stamina / jump toggles
+1. **Global Game Config**: auto-start, start delay, minimum players, game duration, task parameters, coin growth rate, in-round stamina / jump toggles, weather toggle
 2. **Map Region Config**: platform, train-head coordinates, train area, ventilation area, toilet spots, random teleport points
 3. **Food & Drink Config**: the list of foods and drinks valid for tasks
 4. **Shop Config**: goods and prices for the Killer shop and vending machines
@@ -158,6 +151,8 @@ Hold the stick and **right-click** to open the config panel, then set up in orde
 | Command | Effect |
 |---|---|
 | `/lw_p1:start` | Start the game manually (requires permission level GameDirectors) |
+| `/lw_p1:end` | Force-end the current round (runs the end flow at any time) |
+| `/lw_p1:clear_corpses` | Remove all corpses and name tags |
 | `/give @s minecraft:stick` | Get the config admin stick |
 | `/give @s lw_p1:keydoor_1` ~ `keydoor_10` | Get key doors |
 | `/give @s lw_p1:key_1` ~ `key_8` | Get room keys |
@@ -187,8 +182,8 @@ demo/
 ├── RP/                         # Resource pack (models / animations / textures / sounds / text)
 ├── package.json                # devDependencies only (type definitions + tsc)
 ├── tsconfig.json               # Type-checking config (noEmit)
-├── 列车狼人杀游玩指南.md        # Player-facing instructions
-└── PLAYER_GUIDE.en.md          # Player-facing instructions (English)
+├── 列车狼人杀游玩指南.md        # Player-facing instructions (Chinese)
+└── PLAYER_GUIDE.md             # Player-facing instructions (English)
 ```
 
 > Scripts are layered by domain, and the entry `BP/scripts/main.js` only does imports, making it easy to locate feature modules.
@@ -238,7 +233,8 @@ All script files carry `// @ts-check` at the top, working with `allowJs + checkJ
 
 ## Documentation
 
-- **Player Guide**: [PLAYER_GUIDE.en.md](./PLAYER_GUIDE.en.md)
+- **Player Guide (English)**: [PLAYER_GUIDE.md](./PLAYER_GUIDE.md)
+- **Player Guide (Chinese)**: [列车狼人杀游玩指南.md](./列车狼人杀游玩指南.md)
 - **Developer Reference**: every script file has a one-line responsibility comment at the top; start reading at `BP/scripts/main.js`
 - **Configuration Guide**: after entering the game, open the config panel with a stick — each option has an explanation
 

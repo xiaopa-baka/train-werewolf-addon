@@ -1,22 +1,23 @@
 // @ts-check
-// gameFlow.js - 开局流程 / 随机传送 / 职业分配 / 对局计时 / 杀手倒计时
+// gameFlow.js - 开局流程 / 随机传送 / 职业分配 / 对局计时
 
 import * as mc from "@minecraft/server";
 import { getWorldConfig, getConfig } from "../config/worldConfig.js";
 import {
-    resetGameClock, addGameTick, getRemainSeconds, setGold,
+    resetGameClock, addGameTick, setGold,
     clearAllTaskProgress, getPlayerState, isInGame, isKiller, isOfficer, setRole,
     clearAllPlayerStates, gameSession,
 } from "../core/state.js";
 import { t } from "../core/i18n.js";
-import { registerActionBarProvider, showTitle, clearTitle, fadeBlackTransition } from "../core/hud.js";
-import { setGameTime, setGameWeather, clearGameEntities } from "./environment.js";
+import { showTitle, clearTitle, fadeBlackTransition, markTitleBusy } from "../core/hud.js";
+import { setGameTime, setGameWeather, clearGameEntities, playTrainWhistle } from "./environment.js";
 import { clearCrowbaredDoors } from "../blocks/keydoor.js";
 
 
 // 开局角色提示
 // 直接用 onScreenDisplay.setTitle 接收 RawMessage，避免 titleraw 命令对 JSON 格式的额外要求
 function showRoleTitle() {
+    markTitleBusy(5 + 50 + 10);
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid || !isInGame(player)) continue;
         const roleKey = isKiller(player) ? "lw_p1.roleTitle.killer"
@@ -35,6 +36,7 @@ function showRoleTitle() {
 
 // 开局目标提示
 function showRoleGoal() {
+    markTitleBusy(5 + 50 + 10);
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid || !isInGame(player)) continue;
         const goalKey = isKiller(player) ? "lw_p1.roleGoal.killer"
@@ -114,6 +116,8 @@ export function startGameNow(allPlayers) {
         gameSession.endTriggered = false;
         gameSession.pendingEndMsg = null;
         gameSession.roleRewardsGiven = false;
+        // 清空上一局结算文案，右侧面板随开局清空（局外常驻展示到此为止）
+        gameSession.lastResultText = null;
         resetGameClock();
         clearAllTaskProgress();
         // 先记录仍在列车上的玩家；clearAllPlayerStates 会清空内存状态（含 inTrain）
@@ -146,8 +150,13 @@ export function startGameNow(allPlayers) {
         }
 
         // 开局转场：所有参与玩家缓慢黑屏，全黑瞬间随机传送，再缓慢恢复
+        // 汽笛在开始变黑时响起，声源在车头
+        playTrainWhistle();
         fadeBlackTransition(allPlayers, { fadeInTime: 2, holdTime: 0.5, fadeOutTime: 2 }, () => {
             teleportPlayersToRandomCoords(allPlayers);
+            // 职业分配与全部道具发放（清背包、初始金币、房间钥匙、便条、杀手商店、警员手枪）
+            // 都放到全黑瞬间执行，避免玩家看见背包变化
+            checkRoleAssign();
         });
         setGameTime("night");
         // 开局天气：开关开启时设为雷暴雨（配置界面可关闭）
@@ -155,8 +164,6 @@ export function startGameNow(allPlayers) {
             setGameWeather("thunder");
         }
 
-        // 立即完成本局职业分配
-        checkRoleAssign();
         // 职业提示推迟到转场（约 4.5 秒）结束后，避免被黑屏遮挡
         mc.system.runTimeout(() => showRoleTitle(), 100);
         mc.system.runTimeout(() => showRoleGoal(), 180);
@@ -289,28 +296,3 @@ mc.system.runInterval(() => {
         addGameTick();
     }
 }, 1);
-
-
-// 杀手活动栏显示剩余游戏时长倒计时（格式 分：秒，注册到活动栏调度器）
-let killerTimeCacheBucket = -1;
-let killerTimeCache = undefined;
-function killerCountdownText() {
-    // 每秒（20 tick）才重算一次，避免逐 tick 反复计算
-    const bucket = Math.floor(mc.system.currentTick / 20);
-    if (bucket === killerTimeCacheBucket) return killerTimeCache;
-    killerTimeCacheBucket = bucket;
-
-    const remainSec = getRemainSeconds();
-
-    const m = Math.floor(remainSec / 60);
-    const s = remainSec % 60;
-    killerTimeCache = t("lw_p1.prop.time.remaining", m, String(s).padStart(2, "0"));
-    return killerTimeCache;
-}
-
-
-// 各功能的注册（weight 越大，轮播中停留的份额越多）
-registerActionBarProvider("lw_p1:killerTime", (player) => {
-    if (!isInGame(player) || !isKiller(player)) return undefined;
-    return killerCountdownText();
-}, { weight: 3 });

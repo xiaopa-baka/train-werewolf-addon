@@ -120,12 +120,15 @@ export function addGold(player, amount) {
  * @property {boolean} sleeping              睡觉中（派生）
  * @property {boolean} socializing           社交中（派生）
  * @property {number}  taskId                当前任务 1..6（0 = 无）
+ * @property {number}  taskLimit             本次任务时限（秒，0 = 未开始计时）
+ * @property {number}  taskRemain            本次任务剩余秒数（内存计时，不再占用经验条）
  * @property {boolean} taskCountdown         倒计时
  * @property {boolean} taskRequestCountdown  请求倒计时
  * @property {boolean} taskHinted            已提示（首次）
  * @property {boolean} taskHinted2           已提示（40秒）
  * @property {boolean} taskHinted3           已提示（20秒）
  * @property {boolean} taskDone              任务完成
+ * @property {number}  taskDoneTick          任务完成时的 tick（用于完成后停留 2 秒再清理）
  * @property {boolean} taskFailed            任务失败
  * @property {boolean} rewardGiven           已发奖励
  * @property {boolean} killRewardGiven       已击杀奖励
@@ -140,8 +143,8 @@ function createDefaultState(inTrain = false) {
         inGame: false, inTrain, role: null, endFlag: false,
         pistolDisabled: false, hurt: false,
         ventilating: false, squatting: false, sleeping: false, socializing: false,
-        taskId: 0, taskCountdown: false, taskRequestCountdown: false, taskHinted: false, taskHinted2: false, taskHinted3: false,
-        taskDone: false, taskFailed: false, rewardGiven: false, killRewardGiven: false
+        taskId: 0, taskLimit: 0, taskRemain: 0, taskCountdown: false, taskRequestCountdown: false, taskHinted: false, taskHinted2: false, taskHinted3: false,
+        taskDone: false, taskDoneTick: 0, taskFailed: false, rewardGiven: false, killRewardGiven: false
     };
 }
 
@@ -187,4 +190,6 @@ mc.system.runInterval(() => {
 
 
 // 跨模块共享的本局运行态（gameFlow 开局流程 与 gameEnd 结算流程 共用）
-export const gameSession = { endTriggered: false, pendingEndMsg: null, roleRewardsGiven: false };
+// lastResultText：上一局结算文案（RawMessage）；局外常驻展示在右侧面板，开局时清空
+// settling：结算/传送进行中（结算清零对局状态后、玩家传送回站台前为 true），期间禁止自动开局
+export const gameSession = { endTriggered: false, pendingEndMsg: null, roleRewardsGiven: false, lastResultText: null, settling: false };

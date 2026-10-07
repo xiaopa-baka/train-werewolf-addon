@@ -1,0 +1,19 @@
+{
+  "namespace": "hud",
+  "root_panel": {
+    "modifications": [
+      {
+        "array_name": "controls",
+        "operation": "insert_front",
+        "value": [
+          {
+            "lw_p1_info_panel@lw_p1.info_panel": {}
+          },
+          {
+            "lw_p1_task_panel@lw_p1.task_panel": {}
+          }
+        ]
+      }
+    ]
+  }
+}

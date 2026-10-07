@@ -1,0 +1,113 @@
+{
+  "namespace": "lw_p1",
+
+  "info_panel": {
+    "type": "image",
+    "texture": "textures/ui/hud_tip_text_background",
+    "alpha": 0.5,
+    "anchor_from": "right_middle",
+    "anchor_to": "right_middle",
+    "offset": [ -4, 0 ],
+    "size": [ "100%c + 12px", "100%c + 8px" ],
+    "layer": 10,
+    "controls": [
+      {
+        "info_label": {
+          "$update_string": "lwInfo:",
+          "type": "label",
+          "text": "#text",
+          "color": [ 1, 1, 1 ],
+          "shadow": true,
+          "controls": [
+            {
+              "info_data_control": {
+                "type": "panel",
+                "size": [ 0, 0 ],
+                "property_bag": {
+                  "#preserved_text": "lwInfo:"
+                },
+                "bindings": [
+                  {
+                    "binding_name": "#hud_title_text_string"
+                  },
+                  {
+                    "binding_name": "#hud_title_text_string",
+                    "binding_name_override": "#preserved_text",
+                    "binding_condition": "visibility_changed"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(not (#hud_title_text_string = #preserved_text) and not ((#hud_title_text_string - $update_string) = #hud_title_text_string))",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            }
+          ],
+          "bindings": [
+            {
+              "binding_type": "view",
+              "source_control_name": "info_data_control",
+              "source_property_name": "(#preserved_text - $update_string)",
+              "target_property_name": "#text"
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  "task_panel": {
+    "type": "panel",
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "offset": [ 4, 4 ],
+    "size": [ "100%c + 12px", "100%c + 8px" ],
+    "layer": 10,
+    "controls": [
+      {
+        "task_label": {
+          "$update_string": "lwTask:",
+          "type": "label",
+          "text": "#text",
+          "color": [ 1, 1, 1 ],
+          "shadow": true,
+          "controls": [
+            {
+              "task_data_control": {
+                "type": "panel",
+                "size": [ 0, 0 ],
+                "property_bag": {
+                  "#preserved_text": "lwTask:"
+                },
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string"
+                  },
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_name_override": "#preserved_text",
+                    "binding_condition": "visibility_changed"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(not (#hud_subtitle_text_string = #preserved_text) and not ((#hud_subtitle_text_string - $update_string) = #hud_subtitle_text_string))",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            }
+          ],
+          "bindings": [
+            {
+              "binding_type": "view",
+              "source_control_name": "task_data_control",
+              "source_property_name": "(#preserved_text - $update_string)",
+              "target_property_name": "#text"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

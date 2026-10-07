@@ -171,9 +171,7 @@ lw_p1.ui.task.probDesc=每秒给未分配任务玩家发布任务的概率。\n�
 lw_p1.ui.task.startHeader=\n任务开始发布时间
 lw_p1.ui.task.startDesc=游戏开始后，首次尝试发布任务的时间。\n默认 %s\n首个任务发布时间（秒）
 lw_p1.ui.task.limitHeader=\n单个任务限时
-lw_p1.ui.task.limitDesc=单个任务必须在该时间内完成，超时视为任务失败。\n默认 %s\n单个任务限时（秒）
-lw_p1.ui.task.fakeHeader=\n杀手虚假任务限时
-lw_p1.ui.task.fakeDesc=杀手虚假任务可选择完成的限时，超过该时间未完成则虚假任务结束。\n默认 %s\n虚假任务限时（秒）
+lw_p1.ui.task.limitDesc=单个任务必须在该时间内完成，平民/警员超时视为失败，杀手超时视为完成。\n默认 %s\n单个任务限时（秒）
 lw_p1.ui.task.rewardHeader=\n任务完成奖励
 lw_p1.ui.task.rewardDesc=平民/警员每完成一个任务获得的金币数。\n默认 %s\n任务完成奖励（金币）
 lw_p1.ui.task.saved=§a任务配置已保存
@@ -347,6 +345,7 @@ lw_p1.msg.notEnoughPlayers=§c人数不足，无法开始游戏（当前 %s / �
 lw_p1.msg.corpsesCleared=§a已清除全部尸体与名牌
 lw_p1.msg.autoStart.title=§e%s
 lw_p1.msg.autoStart.subtitle=§f秒后游戏开始
+lw_p1.msg.autoStart.actionbar=§e%s§f 秒后游戏开始
 
 ## 结算
 lw_p1.end.winner.killer=§c游戏结束，杀手胜利！
@@ -356,6 +355,7 @@ lw_p1.end.reason.killerLeft=杀手退出了游戏
 lw_p1.end.reason.timeUp=时间耗尽，平民存活
 lw_p1.end.reason.civilsDead=平民全部阵亡
 lw_p1.end.message=§6【游戏结束】\n%s\n§f结束原因：%s\n§f杀手：%s\n§f警员：%s\n§f平民：%s
+lw_p1.end.panel=%s\n§f结束原因：%s\n§f杀手：%s\n§f警员：%s\n§f平民：%s
 
 ## 钥匙门
 lw_p1.door.crowbarLocked=§c这扇门被撬开了，无法关闭
@@ -390,6 +390,11 @@ lw_p1.task.5.hint3=§c你快脱水了，再不补水就会渴死！
 lw_p1.task.6.hint1=§a你有点无聊，去找其他人社交吧
 lw_p1.task.6.hint2=§6你有点抑郁了，需要找人社交
 lw_p1.task.6.hint3=§c你现在重度抑郁，你需要社交！
+lw_p1.task.panel.time=§f剩余 %s 秒
+lw_p1.panel.name=§f玩家：%s
+lw_p1.panel.role=§f职业：%s
+lw_p1.panel.gold=§f金币：%s
+lw_p1.panel.time=§f剩余时间：%s:%s
 lw_p1.task.done=§a你感觉好多了
 lw_p1.task.fake.1=§c你可以假装去透气
 lw_p1.task.fake.2=§c你可以假装去上厕所
@@ -397,3 +402,7 @@ lw_p1.task.fake.3=§c你可以假装去睡觉
 lw_p1.task.fake.4=§c你可以假装去吃东西
 lw_p1.task.fake.5=§c你可以假装去喝点什么
 lw_p1.task.fake.6=§c你可以假装去找别人社交
+
+## 告示牌
+lw_p1.sign.start=\n§l§a发车
+lw_p1.sign.end=\n§l§4强制结束对局

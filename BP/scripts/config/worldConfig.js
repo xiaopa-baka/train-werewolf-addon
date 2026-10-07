@@ -50,11 +50,9 @@ export const CONFIG_SCHEMA = {
     // 首次发任务延迟（秒）：开局后先等待这么长时间，才开始尝试发任务。默认 20，范围 0-60（步长 10）
     // 消费方：tasks.js
     taskFirstDelay: { prop: "lw_p1.cfg.taskFirstDelay", default: 20,  min: 0,   max: 60,   step: 10 },
-    // 单个任务限时（秒）：平民/警员必须在此时间内完成，超时视为失败。
-    // 该值同时会被换算成"限时经验等级"用于倒计时显示。默认 100，范围 60-180（步长 10）。消费方：tasks.js
-    taskLimit:      { prop: "lw_p1.cfg.taskLimit",      default: 100, min: 60,  max: 180,  step: 10 },
-    // 杀手虚假任务限时（秒）：杀手假任务的最长存续时间。默认 50，范围 20-60（步长 10）。消费方：tasks.js
-    fakeTaskLimit:  { prop: "lw_p1.cfg.fakeTaskLimit",  default: 50,  min: 20,  max: 60,   step: 10 },
+    // 单个任务限时（秒）：所有玩家（含杀手）共用同一限时；平民/警员超时视为失败，杀手超时视为完成。
+    // 该值同时作为"剩余时间进度条"的满值（按 剩余/时限 的比例变色与提示）。默认 100，范围 100-300（步长 25）。消费方：tasks.js
+    taskLimit:      { prop: "lw_p1.cfg.taskLimit",      default: 100, min: 100, max: 300,  step: 25 },
     // 任务完成奖励（金币）：平民/警员每完成一个任务获得的金币。默认 25，范围 10-50（步长 5）。消费方：tasks.js
     taskReward:     { prop: "lw_p1.cfg.taskReward",     default: 25,  min: 10,  max: 50,   step: 5 },
     // 任务总数上限：任务编号范围为 1..taskCount。默认 6。
@@ -66,10 +64,10 @@ export const CONFIG_SCHEMA = {
     killerGold:     { prop: "lw_p1.cfg.killerGold",     default: 100, min: 0,   max: 500,  step: 50 },
     // 平民初始金币：开局时发放给非杀手（平民/警员）的金币。默认 0，范围 0-500（步长 50）。消费方：gameFlow.js
     civilGold:      { prop: "lw_p1.cfg.civilGold",      default: 0,   min: 0,   max: 500,  step: 50 },
-    // 杀手金币成长：开局后杀手每 10 秒自然增加的金币。默认 15，范围 0-30（步长 5）。消费方：shop.js
-    killerGoldRate: { prop: "lw_p1.cfg.killerGoldRate", default: 15,  min: 0,   max: 30,   step: 5 },
+    // 杀手金币成长：开局后杀手每 10 秒自然增加的金币。默认 5，范围 0-15（步长 1）。消费方：shop.js
+    killerGoldRate: { prop: "lw_p1.cfg.killerGoldRate", default: 5,  min: 0,   max: 15,   step: 1 },
     // 平民金币成长：开局后非杀手每 10 秒自然增加的金币。默认 0，范围 0-10（步长 2）。消费方：shop.js
-    civilGoldRate:  { prop: "lw_p1.cfg.civilGoldRate",  default: 0,   min: 0,   max: 10,   step: 2 },
+    civilGoldRate:  { prop: "lw_p1.cfg.civilGoldRate",  default: 0,   min: 0,   max: 10,   step: 1 },
 
     // ===== 地图相关 =====
     // 房间数量：决定开局发放的钥匙编号范围（1..roomCount）；玩家数超过房间数时循环分配。
@@ -275,7 +273,7 @@ export function getEmptyConfig() {
         weatherEnabled: true,           // 天气：开启后开局设为雷暴雨、结束时恢复晴天。消费方：gameFlow.js / gameEnd.js
         staminaDrainPerSecond: 10,      // 疾跑每秒消耗的体力（范围 2-20，步长 2）
         staminaRegenPerSecond: 4,       // 停止疾跑后每秒恢复的体力（范围 2-20，步长 2）
-        killerStamina: true,            // 杀手体力值：关闭后杀手没有体力值，可以无限疾跑
+        killerStamina: false,            // 杀手体力值：关闭后杀手没有体力值，可以无限疾跑
 
         // 地图信息：显示在指南书首页的地图名与作者。消费方：guideBook.js
         worldInformation: {

@@ -3,10 +3,11 @@
 
 import * as mc from "@minecraft/server";
 import { getWorldConfig, getConfig } from "../config/worldConfig.js";
-import { getPlayerState, isInGame } from "../core/state.js";
+import { getPlayerState, isInGame, gameSession } from "../core/state.js";
 import { t } from "../core/i18n.js";
-import { registerActionBarProvider, showTitle, clearCountdown } from "../core/hud.js";
+import { registerActionBarProvider } from "../core/hud.js";
 import { startGameNow } from "./gameFlow.js";
+import { playTrainWhistle } from "./environment.js";
 
 
 // 手动开局自定义命令
@@ -26,7 +27,11 @@ mc.system.beforeEvents.startup.subscribe((init) => {
 // 手动开局请求：校验最低人数后开局
 function requestManualStart() {
     const allPlayers = Array.from(mc.world.getPlayers());
-    if (allPlayers.some(p => p.isValid && isInGame(p))) return;
+    // 游戏进行中：不执行任何开局逻辑，仅播放汽笛声
+    if (allPlayers.some(p => p.isValid && isInGame(p))) {
+        playTrainWhistle();
+        return;
+    }
 
     const minPlayer = getConfig("minPlayers");
     const inTrainList = allPlayers.filter(p => p.isValid && getPlayerState(p).inTrain);
@@ -34,6 +39,8 @@ function requestManualStart() {
         startGameNow(allPlayers);
         gameStartTimer = null;
     } else {
+        // 人数不足开局失败，但汽笛照常播放
+        playTrainWhistle();
         for (const p of allPlayers) {
             if (!p.isValid) continue;
             try { p.sendMessage(t("lw_p1.msg.notEnoughPlayers", inTrainList.length, minPlayer)); } catch (e) { }
@@ -82,6 +89,13 @@ mc.system.runInterval(() => {
 
     if (hasInGame) return;
 
+    // 结算/传送进行中：此时对局状态已清零但玩家尚未传送回站台，
+    // 若不拦截会立刻重新读秒开局（结算转场期间不能发车）
+    if (gameSession.settling) {
+        gameStartTimer = null;
+        return;
+    }
+
     // 是否启用自动开始
     if (!getConfig("autoStart")) return;
 
@@ -91,7 +105,6 @@ mc.system.runInterval(() => {
 
     if (!allInTrain && gameStartTimer !== null) {
         gameStartTimer = null;
-        clearCountdown();
         return;
     }
 
@@ -104,14 +117,12 @@ mc.system.runInterval(() => {
     try {
         if (gameStartTimer === null) {
             gameStartTimer = getConfig("autoStartDelay");
-            showTitle(t("lw_p1.msg.autoStart.title", gameStartTimer), t("lw_p1.msg.autoStart.subtitle"));
         }
 
         // 每 20 tick（1 秒）递减一次开局倒计时
         if (mc.system.currentTick % 20 === 0) {
             if (gameStartTimer > 0) {
                 gameStartTimer--;
-                showTitle(t("lw_p1.msg.autoStart.title", gameStartTimer), t("lw_p1.msg.autoStart.subtitle"));
             } else if (gameStartTimer === 0) {
                 gameStartTimer = -1;
                 startGameNow(allPlayers);
@@ -122,5 +133,13 @@ mc.system.runInterval(() => {
 }, 1);   // 每 tick 轮询，人数达标后能即时响应
 
 
+// 开局倒计时改走活动栏（独占）：不占用 title/subtitle 通道，右侧面板可同时常驻显示
+function autoStartText() {
+    if (gameStartTimer === null || gameStartTimer <= 0) return undefined;
+    return t("lw_p1.msg.autoStart.actionbar", gameStartTimer);
+}
+
+
 // 各功能的注册（weight 越大，轮播中停留的份额越多）
+registerActionBarProvider("lw_p1:autoStart", () => autoStartText(), { exclusive: true });
 registerActionBarProvider("lw_p1:boarded", () => boardedText(), { weight: 2 });
