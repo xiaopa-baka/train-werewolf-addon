@@ -208,11 +208,18 @@ mc.system.runInterval(() => {
         if (taskId && !ps.taskHinted2 && ratio <= 0.4) {
             ps.taskHinted2 = true;
         }
-        // 剩余 20%：末次提示并施加惩罚效果
-        if (taskId && !ps.taskHinted3 && ratio <= 0.2) {
-            ps.taskHinted3 = true;
-            for (const [effectId, amplifier] of TASK_HINT3_EFFECTS[taskId] ?? []) {
-                try { player.addEffect(effectId, 400, { amplifier, showParticles: true }); } catch (e) { }
+        // 剩余 20%：末次提示 + 惩罚效果
+        if (taskId && ratio <= 0.2) {
+            if (!ps.taskHinted3) ps.taskHinted3 = true;
+            // 惩罚效果每秒以 1 秒时长刷新一次：
+            // - 完成任务后本间隔不再刷新，效果自然在 1 秒内消失，不会残留
+            // - 正在做任务（通风/蹲坑/睡觉/社交）时暂停倒计时，此时也不施加效果
+            const tDef = TASKS[taskId];
+            const doingTask = tDef && tDef.stateField && ps[tDef.stateField];
+            if (!ps.taskDone && !doingTask) {
+                for (const [effectId, amplifier] of TASK_HINT3_EFFECTS[taskId] ?? []) {
+                    try { player.addEffect(effectId, 20, { amplifier, showParticles: true }); } catch (e) { }
+                }
             }
         }
     }
