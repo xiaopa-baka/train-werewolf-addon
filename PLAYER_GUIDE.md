@@ -19,7 +19,7 @@ Train Werewolf is a **multiplayer deduction-versus game**. You and your friends 
 ## 2. How a Round Unfolds
 
 ### ① Board and wait for departure
-Get on the train and stand inside. Once everyone is aboard, the train **departs automatically**; an admin can also order departure manually. Before departure, the action bar shows "players boarded / total players".
+Get on the train and stand inside. Once everyone is aboard, the train **departs automatically**; an admin can also order departure manually. Before departure, the action bar shows "players boarded / total players". On departure, players who are aboard enter **Adventure mode** and join the round; anyone left behind switches to **Spectator mode** and can only watch this round.
 
 > During the waiting phase you get two things: a **Guide Book** (click to view gameplay and map info at any time) and **Teleport to Train Head** (click to return to the train head). After departure the teleport item is taken back, and only the Guide Book remains.
 
@@ -36,11 +36,12 @@ The Killer has an exclusive shop and can buy weapons such as poison, daggers, an
 After the result is settled, everyone is teleported back to the platform, inventories are cleared, starting items are re-issued, and the next round is prepared.
 
 ### In-round HUD explained
-Once a match starts, the vanilla health bar, hunger bar, and status-effect icons are **hidden** (so you can't tell at a glance who is hurt or poisoned). All key information is shown via the **action bar (the line of text above the hotbar)** and the **chat**, for example:
+Once a match starts, the vanilla health bar, hunger bar, and status-effect icons are **hidden** (so you can't tell at a glance who is hurt or poisoned); the **XP bar** is also hidden for Civilians and the Officer, and kept only for the Killer. All key information is shown through:
 
-- Remaining game time (Killer only)
-- Your task and its countdown (the countdown also shows on the XP bar)
-- Stamina bar (only appears when your stamina is not full)
+- The **persistent info panel on the right**: your name, role, and coins; the Killer also sees the remaining game time
+- The **task panel in the top-left**: your task hint + a remaining-time progress bar (the countdown is no longer shown on the XP bar)
+- The **action bar (the line of text above the hotbar)**: the stamina bar (only appears when your stamina is not full), etc.
+- The **chat**: various messages and prompts
 
 ---
 
@@ -57,9 +58,9 @@ Once a match starts, the vanilla health bar, hunger bar, and status-effect icons
 You are the only person on the train who knows what they're doing.
 
 **Your advantages:**
-- You start with **100 coins**, then automatically gain **+15 coins** every 10 seconds
+- You start with **100 coins**, then automatically gain **+5 coins** every 10 seconds (default value)
 - An exclusive shop (occupying hotbar slot 9) where you can buy weapons others can't
-- The action bar shows you the **remaining game time**
+- The right-side info panel shows you the **remaining game time**
 - **For each passenger that dies**: you gain **+100 coins** and the round time is extended by **+60 seconds**
 
 **Your arsenal (see the Item Quick Reference for details):** Dagger, Derringer pistol, Crowbar, Lockpick, Poison, Grenade, Baseball Bat, Blackout Device.
@@ -92,7 +93,7 @@ You are an ordinary passenger on the train, with no weapon and no privileges, bu
 
 ## 4. Task Guide
 
-Tasks are randomly assigned after the game starts; the countdown shows on the **XP bar**, along with a prompt. As time runs low, various negative effects are applied to you — this is the system warning you: **hurry up and do your task!**
+Tasks are randomly assigned after the game starts; the countdown and progress show on the **task panel in the top-left**. As time runs low, various negative effects are applied to you — this is the system warning you: **hurry up and do your task!**
 
 > A Civilian's or Officer's task timing out = instant death. A task the Killer receives is only a disguise — timing out won't kill them.
 
@@ -131,7 +132,7 @@ A **stamina system** is enabled in-round (it can be toggled by the admin):
 | Derringer Pistol | A small gun, **it disappears if it doesn't hit** |
 | Baseball Bat | Held by the Killer it enters about **30 seconds of frenzy** (faster movement), a swing that connects kills instantly; the bat auto-disappears after 30 seconds |
 | Grenade | Throw it, and players within a radius of **3 blocks** die instantly |
-| Poison | Poison a **plate**; someone who takes the poisoned food and eats it gets nauseous after about **5 seconds** and dies of poison in **60 seconds** (Royal Jelly cures it) |
+| Poison | Poison a **plate**; someone who takes the poisoned food and eats it gets nauseous about **5 seconds** later and dies of poison **50 seconds** after eating (Royal Jelly cures it) |
 | Blackout Device | Killer only: all players on the map are **blinded for 20 seconds**, while the Killer becomes **invisible for 20 seconds** |
 | Crowbar | Pries a door and locks it shut (see "Doors and Keys"); using it consumes 1 |
 | Lockpick | A master key that can open **all doors** without leaving a trace |
@@ -144,7 +145,7 @@ A **stamina system** is enabled in-round (it can be toggled by the admin):
 | Cigarette | Smoking one during the Social task completes it directly |
 | Cocktails ×5 | Old Fashioned / Mojito / Martini / Cosmopolitan / Champagne, all valid beverages |
 | Note | Use on air to edit its contents, use on a person to send it; after death the contents stay on your corpse |
-| Firecracker | A spawn egg you can buy in the shop; once released it explodes on a timer |
+| Firecracker | Right-click to throw; flies with gravity and stops on hitting a block; it starts smoking after landing, then explodes 15 seconds after landing with a firecracker sound (audible from far away) |
 | Guide Book | View gameplay and map info at any time |
 
 ---
@@ -176,7 +177,7 @@ There are **three kinds of doors** on the train, each with different rules:
 ## 8. Coins and Shops
 
 ### Where do coins come from?
-- **Killer**: starts at 100, +15 every 10 seconds, and +100 for each passenger death
+- **Killer**: starts at 100, +5 every 10 seconds (default value), and +100 for each passenger death
 - **Civilian / Officer**: +25 for each completed task (starting at 0)
 
 ### Where to buy?

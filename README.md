@@ -246,7 +246,6 @@ npx tsc --noEmit   # 0 error 即通过
 
 - 狮狼传奇_小怕
 - LW.狮狼传奇工作室
-- 尘世之狼
 
 **联系邮箱**：xiaopa1214@163.com
 
