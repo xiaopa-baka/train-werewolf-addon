@@ -171,9 +171,7 @@ lw_p1.ui.task.probDesc=Chance per second to assign a task to a player without on
 lw_p1.ui.task.startHeader=\nFirst task time
 lw_p1.ui.task.startDesc=When the first task assignment is attempted after the game starts.\nDefault %s\nFirst task time (s)
 lw_p1.ui.task.limitHeader=\nTask time limit
-lw_p1.ui.task.limitDesc=A task must be completed within this time, otherwise it fails.\nDefault %s\nTask time limit (s)
-lw_p1.ui.task.fakeHeader=\nKiller fake task limit
-lw_p1.ui.task.fakeDesc=How long a killer may complete a fake task before it disappears.\nDefault %s\nFake task limit (s)
+lw_p1.ui.task.limitDesc=A task must be completed within this time. Civilians/officers fail on timeout, killers are counted as done.\nDefault %s\nTask time limit (s)
 lw_p1.ui.task.rewardHeader=\nTask reward
 lw_p1.ui.task.rewardDesc=Gold earned by civilians/officers for each completed task.\nDefault %s\nTask reward (gold)
 lw_p1.ui.task.saved=§aTask settings saved
@@ -347,6 +345,7 @@ lw_p1.msg.notEnoughPlayers=§cNot enough players to start (current %s / minimum 
 lw_p1.msg.corpsesCleared=§aAll corpses and name tags removed
 lw_p1.msg.autoStart.title=§e%s
 lw_p1.msg.autoStart.subtitle=§funtil the game starts
+lw_p1.msg.autoStart.actionbar=§eGame starts in §e%s§f s
 
 ## Results
 lw_p1.end.winner.killer=§cGame over — the Killer wins!
@@ -356,6 +355,7 @@ lw_p1.end.reason.killerLeft=the Killer left the game
 lw_p1.end.reason.timeUp=time ran out, the passengers survived
 lw_p1.end.reason.civilsDead=all passengers died
 lw_p1.end.message=§6[Game Over]\n%s\n§fReason: %s\n§fKiller: %s\n§fOfficer: %s\n§fPassengers: %s
+lw_p1.end.panel=%s\n§fReason: %s\n§fKiller: %s\n§fOfficer: %s\n§fPassengers: %s
 
 ## Key doors
 lw_p1.door.crowbarLocked=§cThis door was pried open and can no longer be closed
@@ -390,6 +390,11 @@ lw_p1.task.5.hint3=§cYou are dehydrating and will die without water!
 lw_p1.task.6.hint1=§aYou are bored, go socialize with someone
 lw_p1.task.6.hint2=§6You feel down and need to socialize
 lw_p1.task.6.hint3=§cYou are deeply depressed, you need to socialize!
+lw_p1.task.panel.time=§f%s s left
+lw_p1.panel.name=§fPlayer: %s
+lw_p1.panel.role=§fRole: %s
+lw_p1.panel.gold=§fGold: %s
+lw_p1.panel.time=§fTime left: %s:%s
 lw_p1.task.done=§aYou feel much better
 lw_p1.task.fake.1=§cYou could pretend to get some air
 lw_p1.task.fake.2=§cYou could pretend to use the toilet
@@ -397,3 +402,7 @@ lw_p1.task.fake.3=§cYou could pretend to go to sleep
 lw_p1.task.fake.4=§cYou could pretend to go eat something
 lw_p1.task.fake.5=§cYou could pretend to go drink something
 lw_p1.task.fake.6=§cYou could pretend to go socialize
+
+## Signs
+lw_p1.sign.start=\n§l§aSTART
+lw_p1.sign.end=§l§4FORCED\nGAME\nEXIT
