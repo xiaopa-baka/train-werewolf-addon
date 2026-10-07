@@ -55,6 +55,28 @@ export function clearGameEntities() {
 }
 
 
+// 火车汽笛：声源固定在车头坐标，音量放大以保证列车范围内都能听到。
+// 车头坐标未配置时，退化为对每个玩家直接播放（无方位）。
+export function playTrainWhistle() {
+    const latestConfig = getWorldConfig();
+    const pos = latestConfig.trainEngineCoordinates ?? latestConfig.trainCoordinates?.start;
+    const hasPos = pos && typeof pos.x === "number" && typeof pos.y === "number" && typeof pos.z === "number";
+
+    const overworld = mc.world.getDimension("overworld");
+    if (!overworld) return;
+
+    if (hasPos) {
+        try { overworld.playSound("train_whistle", pos, { volume: 1, pitch: 1 }); } catch (e) { }
+        return;
+    }
+
+    for (const player of mc.world.getPlayers()) {
+        if (!player.isValid) continue;
+        try { player.playSound("train_whistle", { volume: 1, pitch: 1 }); } catch (e) { }
+    }
+}
+
+
 // 使用物品 lw_p1:tp_game 传送至车头
 mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.afterEvents.itemUse.subscribe(event => {
