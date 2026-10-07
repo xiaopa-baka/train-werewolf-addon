@@ -56,6 +56,34 @@ function poisonKill(player) {
 }
 
 
+// ===== 音效传播辅助 =====
+// Dimension.playSound 的可闻距离受音效定义影响，实测本项目里手枪、爆竹始终只传约 1 个区块；
+// 而 Player.playSound 是把音效定向发给单个玩家、不做距离剔除，因此手枪/爆竹改用
+// “按半径逐玩家播放”，音量随距离线性衰减，可稳定控制可闻范围。
+// 参数：dimensionId 维度 id；loc 声源坐标；soundId 音效名；range 可闻半径（格）
+function playSoundNearby(dimensionId, loc, soundId, range) {
+    for (const p of mc.world.getPlayers()) {
+        if (!p.isValid) continue;
+        try {
+            if (p.dimension.id !== dimensionId) continue;
+        } catch (e) { continue; }
+
+        const dx = p.location.x - loc.x;
+        const dy = p.location.y - loc.y;
+        const dz = p.location.z - loc.z;
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (dist > range) continue;
+
+        // 距离越远音量越低，最低保留 0.15 保证仍可听见
+        const volume = Math.max(0.15, 1 - dist / range);
+        // 带 location 播放，声音定位到声源坐标，玩家可据此判断方向
+        try {
+            p.playSound(soundId, { location: loc, volume: volume, pitch: 1 });
+        } catch (e) { }
+    }
+}
+
+
 // ===== 匕首 =====
 const chargeStartTick = new Map();
 // 获取玩家前方一定角度、一定范围内最近的其他玩家（同格也算命中）
@@ -199,7 +227,7 @@ mc.system.runInterval(() => {
             // 15 秒后爆炸（300 tick = 15 秒）
             if (age >= 300) {
                 try {
-                    fc.runCommand(`playsound firecracker @a ~ ~ ~ 4`);
+                    playSoundNearby(fc.dimension.id, fc.location, "firecracker", 64);
                     fc.runCommand(`particle minecraft:lava_particle ~ ~ ~`);
                     fc.runCommand(`particle minecraft:lava_particle ~ ~ ~`);
                     fc.runCommand(`particle minecraft:lava_particle ~ ~ ~`);
@@ -288,7 +316,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
         const cooldownCategory = typeId === "lw_p1:pistol" ? "lw_p1_pistol" : "lw_p1_pistol_mini";
 
         try {
-            player.runCommand(`playsound pistol @a ~ ~ ~ 2`);
+            playSoundNearby(player.dimension.id, player.location, "pistol", 32);
         } catch (e) { }
 
         spawnBullet(player, typeId);
@@ -370,95 +398,99 @@ mc.system.runInterval(() => {
             const vx = bullet.getDynamicProperty("lw_p1:vx");
             const vy = bullet.getDynamicProperty("lw_p1:vy");
             const vz = bullet.getDynamicProperty("lw_p1:vz");
+            const shooterId = bullet.getDynamicProperty("lw_p1:shooterId");
+            const weaponType = bullet.getDynamicProperty("lw_p1:weaponType");
+
+            let hit = null;
+            let blockedByBlock = false;
+
             if (typeof vx === "number" && typeof vy === "number" && typeof vz === "number") {
                 const loc = bullet.location;
-                const next = { x: loc.x + vx, y: loc.y + vy, z: loc.z + vz };
+                const stepLen = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1;
+                // 每 tick 位移拆成不超过 0.5 格的子步逐段判定：
+                // 近距离俯射时视线向下，整段射线会先打到地面/墙导致子弹在判定玩家前销毁，
+                // 子步推进并优先判定玩家可避免这种漏判
+                const subCount = Math.max(1, Math.ceil(stepLen / 0.5));
+                const sx = vx / subCount;
+                const sy = vy / subCount;
+                const sz = vz / subCount;
+                const subLen = stepLen / subCount;
 
+                let cur = { x: loc.x, y: loc.y, z: loc.z };
+                let advanced = false;
+
+                for (let i = 0; i < subCount; i++) {
+                    const nx = cur.x + sx, ny = cur.y + sy, nz = cur.z + sz;
+
+                    // 先判玩家：线段（cur→next）到玩家中心的最短距离
+                    for (const p of mc.world.getPlayers()) {
+                        if (!p.isValid) continue;
+                        if (typeof shooterId === "string" && p.id === shooterId) continue;
+                        // 旁观（已淘汰）玩家不阻挡弹道，子弹穿过
+                        let pIsSpec = false;
+                        try { pIsSpec = p.getGameMode() === mc.GameMode.Spectator; } catch (e) { continue; }
+                        if (pIsSpec) continue;
+                        const cx = p.location.x, cy = p.location.y + 0.9, cz = p.location.z;
+
+                        const abx = nx - cur.x, aby = ny - cur.y, abz = nz - cur.z;
+                        const abLen2 = abx * abx + aby * aby + abz * abz;
+                        let d2;
+                        if (abLen2 > 0) {
+                            const tt = Math.max(0, Math.min(1, ((cx - cur.x) * abx + (cy - cur.y) * aby + (cz - cur.z) * abz) / abLen2));
+                            d2 = (cx - (cur.x + tt * abx)) ** 2 + (cy - (cur.y + tt * aby)) ** 2 + (cz - (cur.z + tt * abz)) ** 2;
+                        } else {
+                            d2 = (cx - cur.x) ** 2 + (cy - cur.y) ** 2 + (cz - cur.z) ** 2;
+                        }
+
+                        // 0.81 = 0.9²，命中半径 0.9 格（用平方距离比较，省去开方）
+                        if (d2 <= 0.81) { hit = p; break; }
+                    }
+                    if (hit) break;
+
+                    // 再判方块：该子步内的方块碰撞
+                    try {
+                        const dirLen = subLen || 1;
+                        const dir = { x: sx / dirLen, y: sy / dirLen, z: sz / dirLen };
+                        const ray = dimension.getBlockFromRay(cur, dir, {
+                            maxDistance: subLen,
+                            includeLiquidBlocks: false,
+                            includePassableBlocks: false
+                        });
+                        if (ray) { blockedByBlock = true; break; }
+                    } catch (e) { }
+
+                    cur = { x: nx, y: ny, z: nz };
+                    advanced = true;
+                }
+
+                if (!hit && !blockedByBlock && advanced) {
+                    try {
+                        bullet.teleport(cur, { dimension: bullet.dimension });
+                    } catch (e) { }
+                }
+            }
+
+            // 命中方块销毁（德林杰未命中消失）
+            if (blockedByBlock) {
                 try {
-                    const dirLen = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1;
-                    const dir = { x: vx / dirLen, y: vy / dirLen, z: vz / dirLen };
-                    const ray = dimension.getBlockFromRay(loc, dir, {
-                        maxDistance: dirLen,
-                        includeLiquidBlocks: false,
-                        includePassableBlocks: false
-                    });
-                    if (ray) {
-                        // 命中方块销毁（德林杰未命中消失）
-                        try {
-                            const wp = bullet.getDynamicProperty("lw_p1:weaponType");
-                            const sid = bullet.getDynamicProperty("lw_p1:shooterId");
-                            if (wp === "lw_p1:pistol_mini" && typeof sid === "string") {
-                                const shooter = Array.from(mc.world.getPlayers()).find(p => p.id === sid);
-                                if (shooter && shooter.isValid && !isCreative(shooter)) {
-                                    const container = shooter.getComponent("minecraft:inventory")?.container;
-                                    if (container) {
-                                        for (let i = 0; i < container.size; i++) {
-                                            const item = container.getItem(i);
-                                            if (item?.typeId === "lw_p1:pistol_mini") {
-                                                container.setItem(i, undefined);
-                                                break;
-                                            }
-                                        }
+                    if (weaponType === "lw_p1:pistol_mini" && typeof shooterId === "string") {
+                        const shooter = Array.from(mc.world.getPlayers()).find(p => p.id === shooterId);
+                        if (shooter && shooter.isValid && !isCreative(shooter)) {
+                            const container = shooter.getComponent("minecraft:inventory")?.container;
+                            if (container) {
+                                for (let i = 0; i < container.size; i++) {
+                                    const item = container.getItem(i);
+                                    if (item?.typeId === "lw_p1:pistol_mini") {
+                                        container.setItem(i, undefined);
+                                        break;
                                     }
                                 }
                             }
-                        } catch (e) { }
-                        bullet.remove();
-                        continue;
+                        }
                     }
                 } catch (e) { }
-
-                // 保存上一位置用于射线命中判定
-                bullet.setDynamicProperty("lw_p1:lastX", loc.x);
-                bullet.setDynamicProperty("lw_p1:lastY", loc.y);
-                bullet.setDynamicProperty("lw_p1:lastZ", loc.z);
-
-                try {
-                    bullet.teleport(next, { dimension: bullet.dimension });
-                } catch (e) { }
-            }
-
-            const shooterId = bullet.getDynamicProperty("lw_p1:shooterId");
-            const weaponType = bullet.getDynamicProperty("lw_p1:weaponType");
-            const bLoc = bullet.location;
-            const lastX = bullet.getDynamicProperty("lw_p1:lastX");
-            const lastY = bullet.getDynamicProperty("lw_p1:lastY");
-            const lastZ = bullet.getDynamicProperty("lw_p1:lastZ");
-            const hasLast = typeof lastX === "number" && typeof lastY === "number" && typeof lastZ === "number";
-
-            let hit = null;
-            for (const p of mc.world.getPlayers()) {
-                if (!p.isValid) continue;
-                if (typeof shooterId === "string" && p.id === shooterId) continue;
-                // 旁观（已淘汰）玩家不阻挡弹道，子弹穿过
-                let pIsSpec = false;
-                try { pIsSpec = p.getGameMode() === mc.GameMode.Spectator; } catch (e) { continue; }
-                if (pIsSpec) continue;
-                const cx = p.location.x, cy = p.location.y + 0.9, cz = p.location.z;
-
-                let d2;
-                if (hasLast) {
-                    // 求线段（上一位置→当前位置）到玩家中心的最短距离
-                    const ax = lastX, ay = lastY, az = lastZ;
-                    const bx = bLoc.x, by = bLoc.y, bz = bLoc.z;
-                    const abx = bx - ax, aby = by - ay, abz = bz - az;
-                    const abLen2 = abx * abx + aby * aby + abz * abz;
-                    if (abLen2 > 0) {
-                        const t = Math.max(0, Math.min(1, ((cx - ax) * abx + (cy - ay) * aby + (cz - az) * abz) / abLen2));
-                        d2 = (cx - (ax + t * abx)) ** 2 + (cy - (ay + t * aby)) ** 2 + (cz - (az + t * abz)) ** 2;
-                    } else {
-                        d2 = (cx - ax) ** 2 + (cy - ay) ** 2 + (cz - az) ** 2;
-                    }
-                } else {
-                    // 没有上一位置（第一 tick），用点判定
-                    d2 = (cx - bLoc.x) ** 2 + (cy - bLoc.y) ** 2 + (cz - bLoc.z) ** 2;
-                }
-
-                // 0.81 = 0.9²，命中半径 0.9 格（用平方距离比较，省去开方）
-                if (d2 <= 0.81) {
-                    hit = p;
-                    break;
-                }
+                bullet.remove();
+                continue;
             }
 
             if (hit) {
@@ -909,7 +941,9 @@ function explodeGrenade(grenade) {
     const dim = grenade.dimension;
 
     try {
-        dim.runCommand(`playsound random.explode @a ~ ~ ~ 10 1`);
+        // 用命令的 ~ ~ ~ 会以无实体执行者的世界原点为基准，音效位置错误导致听不到；
+        // 改用 playSound 明确指定爆炸坐标
+        dim.playSound("random.explode", loc, { volume: 10, pitch: 1 });
     } catch (e) { }
 
     try {
