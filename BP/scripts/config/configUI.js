@@ -96,13 +96,19 @@ function showGameSettingForm(player) {
 function showInGameSettingModal(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
+    // 版式与「游戏相关配置」「任务相关配置」完全一致：
+    //   每个分组一个 .header(...)（非首组带前导 \n 作间隔）；
+    //   滑块说明统一为「说明\n默认 %s\n中文标签（单位）」，%s 传**默认值**，当前值走 defaultValue。
     new ModalFormData()
         .title(t("lw_p1.ui.inGame.title"))
+        .header(t("lw_p1.ui.inGame.staminaHeader"))
         .toggle(t("lw_p1.ui.inGame.staminaToggle"), { defaultValue: cfg.staminaEnabled !== false })
-        .slider(t("lw_p1.ui.inGame.drainDesc", cfg.staminaDrainPerSecond ?? 10), 2, 20, { valueStep: 2, defaultValue: cfg.staminaDrainPerSecond ?? 10 })
-        .slider(t("lw_p1.ui.inGame.regenDesc", cfg.staminaRegenPerSecond ?? 4), 2, 20, { valueStep: 2, defaultValue: cfg.staminaRegenPerSecond ?? 4 })
+        .slider(t("lw_p1.ui.inGame.drainDesc", 10), 2, 20, { valueStep: 2, defaultValue: cfg.staminaDrainPerSecond ?? 10 })
+        .slider(t("lw_p1.ui.inGame.regenDesc", 4), 2, 20, { valueStep: 2, defaultValue: cfg.staminaRegenPerSecond ?? 4 })
         .toggle(t("lw_p1.ui.inGame.killerToggle"), { defaultValue: cfg.killerStamina !== false })
+        .header(t("lw_p1.ui.inGame.moveHeader"))
         .toggle(t("lw_p1.ui.inGame.jumpToggle"), { defaultValue: cfg.jumpEnabled !== false })
+        .header(t("lw_p1.ui.inGame.weatherHeader"))
         .toggle(t("lw_p1.ui.inGame.weatherToggle"), { defaultValue: cfg.weatherEnabled !== false })
         .show(player).then(res => {
             if (!player.isValid) return;
