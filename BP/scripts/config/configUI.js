@@ -6,6 +6,7 @@ import {ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server
 import { getWorldConfig, saveWorldConfig, getEmptyConfig, getConfig, setConfig, getConfigMeta, resetConfigDefaults } from "./worldConfig.js";
 import { t, tBlock, tConfigName } from "../core/i18n.js";
 import { itemIdToIconPath } from "../core/itemIcons.js";
+import { getConfigEntries } from "./configExtensions.js";
 
 
 // 将玩家位置转换为方块坐标，并提供一个函数将方块坐标转换为方块中心坐标，方便UI输入输出
@@ -42,25 +43,33 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 function showMainForm(player) {
     if (!player.isValid) return;
 
+    // 菜单项按顺序动态拼装：「可选模块」注册的入口插在「其他」之前。
+    // 没装配这些模块时（getConfigEntries() 为空）按钮的数量与顺序与以前完全一致。
+    /** @type {{label: import("@minecraft/server").RawMessage | string, open: ((player: mc.Player) => void) | null}[]} */
+    const entries = [
+        { label: t("lw_p1.ui.main.game"), open: showGameSettingForm },
+        { label: t("lw_p1.ui.main.map"), open: showMapSettingForm },
+        { label: t("lw_p1.ui.main.food"), open: showFoodDrinkForm },
+        { label: t("lw_p1.ui.main.shop"), open: showShopForm },
+    ];
+    // 可选模块的入口形如 open(player, back)：把 showMainForm 作为 back 传下去，
+    // 这样它保存/取消后也会回到本界面 —— 与内置的「游戏相关配置」等页面行为一致。
+    for (const ext of getConfigEntries(player)) {
+        entries.push({ label: ext.label, open: (p) => ext.open(p, showMainForm) });
+    }
+    entries.push({ label: t("lw_p1.ui.main.other"), open: showOtherMenu });
+    entries.push({ label: t("lw_p1.ui.close"), open: null });
+
     const mainForm = new ActionFormData()
         .title(t("lw_p1.ui.main.title"))
-        .body(t("lw_p1.ui.main.body"))
-        .button(t("lw_p1.ui.main.game"))
-        .button(t("lw_p1.ui.main.map"))
-        .button(t("lw_p1.ui.main.food"))
-        .button(t("lw_p1.ui.main.shop"))
-        .button(t("lw_p1.ui.main.other"))
-        .button(t("lw_p1.ui.close"));
+        .body(t("lw_p1.ui.main.body"));
+    for (const entry of entries) mainForm.button(entry.label);
 
     mainForm.show(player).then(res => {
         if (!player.isValid || res.canceled) return;
-        switch (res.selection) {
-            case 0: showGameSettingForm(player); break;
-            case 1: showMapSettingForm(player); break;
-            case 2: showFoodDrinkForm(player); break;
-            case 3: showShopForm(player); break;
-            case 4: showOtherMenu(player); break;
-        }
+        const entry = entries[res.selection];
+        if (!entry || !entry.open) return;
+        entry.open(player);
     }).catch(() => { });
 }
 
@@ -96,13 +105,19 @@ function showGameSettingForm(player) {
 function showInGameSettingModal(player) {
     if (!player.isValid) return;
     const cfg = getWorldConfig();
+    // 版式与「游戏相关配置」「任务相关配置」完全一致：
+    //   每个分组一个 .header(...)（非首组带前导 \n 作间隔）；
+    //   滑块说明统一为「说明\n默认 %s\n中文标签（单位）」，%s 传**默认值**，当前值走 defaultValue。
     new ModalFormData()
         .title(t("lw_p1.ui.inGame.title"))
+        .header(t("lw_p1.ui.inGame.staminaHeader"))
         .toggle(t("lw_p1.ui.inGame.staminaToggle"), { defaultValue: cfg.staminaEnabled !== false })
-        .slider(t("lw_p1.ui.inGame.drainDesc", cfg.staminaDrainPerSecond ?? 10), 2, 20, { valueStep: 2, defaultValue: cfg.staminaDrainPerSecond ?? 10 })
-        .slider(t("lw_p1.ui.inGame.regenDesc", cfg.staminaRegenPerSecond ?? 4), 2, 20, { valueStep: 2, defaultValue: cfg.staminaRegenPerSecond ?? 4 })
+        .slider(t("lw_p1.ui.inGame.drainDesc", 10), 2, 20, { valueStep: 2, defaultValue: cfg.staminaDrainPerSecond ?? 10 })
+        .slider(t("lw_p1.ui.inGame.regenDesc", 4), 2, 20, { valueStep: 2, defaultValue: cfg.staminaRegenPerSecond ?? 4 })
         .toggle(t("lw_p1.ui.inGame.killerToggle"), { defaultValue: cfg.killerStamina !== false })
+        .header(t("lw_p1.ui.inGame.moveHeader"))
         .toggle(t("lw_p1.ui.inGame.jumpToggle"), { defaultValue: cfg.jumpEnabled !== false })
+        .header(t("lw_p1.ui.inGame.weatherHeader"))
         .toggle(t("lw_p1.ui.inGame.weatherToggle"), { defaultValue: cfg.weatherEnabled !== false })
         .show(player).then(res => {
             if (!player.isValid) return;

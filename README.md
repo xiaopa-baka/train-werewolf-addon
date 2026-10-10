@@ -18,6 +18,7 @@
 - [两条分支：国际版 / 网易版](#两条分支国际版--网易版)
 - [环境要求](#环境要求)
 - [管理员上手](#管理员上手)
+- [可选功能：语音聊天（VoiceCraft）](#可选功能语音聊天voicecraft)
 - [常用命令](#常用命令)
 - [项目结构](#项目结构)
 - [开发指南](#开发指南)
@@ -60,6 +61,7 @@
 - **全量多语言**：内置简体中文 / English（`zh_CN`、`en_US`）
 - **可视化配置面板**：管理员持木棍右键即可配置地图坐标、任务参数、商店商品等
 - **双分支维护**：同一套玩法代码同时支持国际版与网易版（仅脚本 API 版本不同）
+- **可选语音联动**：装配 [VoiceCraft](https://gitlab.avion.team/voicecraft/VoiceCraft) 后自动启用近距离语音（活人 32 格、旁观者互通且与活人彻底隔离）；不装配则**零影响**，且 VoiceCraft 侧一行代码都不用改
 
 ---
 
@@ -138,11 +140,29 @@ npx tsc --noEmit
 2. **地图区域配置**：站台、车头坐标、列车区域、通风区、蹲坑点、随机传送点
 3. **食物 & 饮品配置**：任务合法的食物与饮品列表
 4. **商店配置**：杀手商店与贩卖机的商品与价格
+5. **可选：语音设置**（仅当世界装配了 VoiceCraft 且已连上服务端时，主菜单才会多出这个按钮）：调整活人语音半径，默认 32 格（4–128，步长 4）
 
 ### 2. 开局
 
 - **自动**：全员在列车内且人数达标后自动倒计时发车
 - **手动**：管理员执行 `/lw_p1:start`
+
+---
+
+## 可选功能：语音聊天（VoiceCraft）
+
+本玩法支持接入 [VoiceCraft](https://gitlab.avion.team/voicecraft/VoiceCraft) 近距离语音，并按狼人杀的玩法需求实现了三条规则：
+
+| 场景 | 效果 |
+|---|---|
+| 活人 ↔ 活人 | 半径内互相听得见（默认 **32 格**，管理员可在配置面板的「语音设置」里调） |
+| 旁观者 ↔ 旁观者 | **不受距离限制**，跨维度也能互相听见 |
+| 活人 ↔ 旁观者 | **双向彻底静音**（连音频包都不发） |
+
+- **完全可选**：不装配 VoiceCraft 时本项目**不产生任何行为** —— 不注册定时器、不发送任何数据、不改动任何玩法与状态，配置菜单里也不会出现「语音设置」。
+- **零改动接入**：全部适配只写在本项目脚本里（`BP/scripts/integration/voiceCraft.js`），VoiceCraft 的附加包与其服务端配置**一行都不需要改**，因此不受上游 addon 版本更迭影响。
+- **使用前提**（缺一不可）：① 每名玩家安装 VoiceCraft 客户端 App；② 有人运行 VoiceCraft 服务端且玩家与 MC 世界都能访问到它（公网 IP / UDP 端口映射 / 官方托管）；③ 世界侧装载 VoiceCraft 附加包（`Basic` + 对应传输的 `Core.McWss` 或 `Core.McHttp`）。首次进入需按 VoiceCraft 流程执行 `/voicecraft:vcbind <绑定码>` 绑定一次，此后**重进世界、甚至重启 VoiceCraft 客户端 App 都无需再绑**（绑定记录存在世界的动态属性里；客户端重启后是靠 VoiceCraft 客户端持久保存的 UserGuid 把你认回来；只有执行过 `/lw_p1:voice_forget` 的玩家才需要重新绑）。
+- **仅国际版**：网易版没有 `/connect` 隧道，此功能不适用（见「两条分支」）。
 
 ---
 
@@ -153,11 +173,16 @@ npx tsc --noEmit
 | `/lw_p1:start` | 手动开局（需要权限等级 GameDirectors） |
 | `/lw_p1:end` | 强制结束当前对局（任何时刻执行结束流程） |
 | `/lw_p1:clear_corpses` | 清除所有尸体与名牌 |
+| `/lw_p1:voice_status` | 查看语音联动状态：是否连上、当前声道掩码与语音半径、绑定记录（需 GameDirectors） |
+| `/lw_p1:voice_resync [目标]` | 重发声道与语音半径，并把目标当前的绑定写回世界属性（重进世界会自动恢复绑定）。目标是**玩家选择器**（Tab 有补全）：**省略目标 = 把所有绑定记录写回（含离线玩家）**、`@a`=全部在线玩家、`@s`/`@p`/`@r`/在线玩家名=指定玩家（需 GameDirectors） |
+| `/lw_p1:voice_forget [目标]` | 解除语音绑定：只从世界属性里删掉目标的 id，**不做任何静音**；本会话语音照常，重进世界（或重启客户端 App）都会需要重新 `/vcbind`。目标写法同上，**省略目标 = 清掉所有绑定记录（含离线玩家）**，清自己请写 `@s`（需 GameDirectors） |
 | `/give @s minecraft:stick` | 获取配置管理员木棍 |
 | `/give @s lw_p1:keydoor_1` ~ `keydoor_10` | 获取钥匙门 |
 | `/give @s lw_p1:key_1` ~ `key_8` | 获取房间钥匙 |
 | `/give @s lw_p1:lockpick` | 获取开锁器 |
 | `/give @s lw_p1:guide_book` | 获取指南书 |
+
+> `voice_*` 四条命令只在装配了 VoiceCraft 时才有实际作用；未装配时它们只回报「未检测到 VoiceCraft」，不会报错。
 
 ---
 
@@ -178,15 +203,18 @@ demo/
 │       ├── game/               # lobby / gameFlow / gameEnd / environment / corpse
 │       ├── gameplay/           # tasks / props / shop / inGame / guideBook
 │       ├── blocks/             # keydoor
-│       └── config/             # worldConfig（数据）/ configUI（界面）
+│       ├── config/             # worldConfig（数据）/ configUI（界面）/ configExtensions（可选模块入口）
+│       └── integration/        # 可选功能模块（voiceCraft：VoiceCraft 语音联动）
 ├── RP/                         # 资源包（模型 / 动画 / 贴图 / 音效 / 文案）
 ├── package.json                # 仅 devDependencies（类型定义 + tsc）
 ├── tsconfig.json               # 类型检查配置（noEmit）
 ├── 列车狼人杀游玩指南.md        # 玩家向说明（中文）
-└── PLAYER_GUIDE.md             # 玩家向说明（英文）
+├── PLAYER_GUIDE.md             # 玩家向说明（英文）
+└── VoiceCraft联动调研.md       # 可选语音功能：方案调研 + 实现说明
 ```
 
 > 脚本按领域分层，入口 `BP/scripts/main.js` 只做 import，便于定位功能模块。
+> `config/` 与 `integration/` 之间是**反向注册**：可选模块把自己的配置入口注册到 `configExtensions.js`，配置界面不认识任何具体模块 —— 删掉 `integration/` 也不会影响配置界面与其它功能。
 
 ---
 
@@ -244,7 +272,7 @@ npx tsc --noEmit   # 0 error 即通过
 
 **作者 / 制作**
 
-- 狮狼传奇_小怕
+- 小怕（Xiaopa baka）
 - LW.狮狼传奇工作室
 
 **联系邮箱**：xiaopa1214@163.com

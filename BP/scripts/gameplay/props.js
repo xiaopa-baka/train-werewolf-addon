@@ -1407,7 +1407,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 
         if (player.getGameMode() === mc.GameMode.Creative || player.getGameMode() === mc.GameMode.Spectator) return;
 
-        // 5 秒后反胃 5 秒
+        // 5 秒后开始反胃（持续 50 秒，直到毒发）
         const nauseaTimeoutId = mc.system.runTimeout(() => {
             try {
                 const p = Array.from(mc.world.getPlayers()).find(pp => pp.id === playerId);
@@ -1417,7 +1417,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
             } catch (e) { }
         }, 100);
 
-        // 60 秒后直接中毒死亡
+        // 50 秒后直接中毒死亡（1000 tick）
         const deathTimeoutId = mc.system.runTimeout(() => {
             try {
                 ACTIVE_POISONS.delete(playerId);

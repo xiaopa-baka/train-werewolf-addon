@@ -94,7 +94,7 @@ lw_p1.guide.overview.body=§f一列飞驰的火车，一场暗藏杀机的旅途
 lw_p1.guide.roles.body=· §c§l杀手§r\n§f隐藏在乘客之中，目标是消灭所有乘客，拥有§e杀手商店§f。\n\n· §b§l警员§r\n§f唯一的执法人员，拥有§e左轮手枪§f。\n\n· §a§l平民§r\n§f没有武器，没有特权，是人数最多的群体。\n\n\n
 lw_p1.guide.tasks.body=§f游戏开始后随机发布任务，倒计时在经验条上显示。\n§c超时未完成死亡§f\n\n§b§l任务列表§r\n§e通风任务§f：去车头或车尾透气\n§e睡觉任务§f：躺到床上\n§e进食任务§f：吃下任意食物\n§e补水任务§f：喝任意饮品 - §7香烟直接完成§f\n§e蹲坑任务§f：去厕所蹲下 - §7矿泉水瓶直接完成§f\n§e社交任务§f：靠近其他玩家站一会
 lw_p1.guide.items.body=§c§l杀手商店道具：§r\n§f匕首 · 德林杰手枪 · 撬棍 · 开锁器 · 毒药 · 球棒 · 手雷 · 断电装置\n\n§b§l通用道具§r\n§f便条 · 左轮手枪(警员) · 矿泉水 · 矿泉水瓶 · 神奇的海螺 · 父亲的怀表 · 野生蜂王浆\n\n§e杀手商店§f：杀手自带商店，可购买专属道具\n§e自动贩卖机§f：列车上的自动贩卖机可以购买特殊道具
-lw_p1.guide.note.body=§l便条系统§r\n§f每人开局获得一张便条，绑定背包。\n· 对空白处使用 → 编辑内容\n 对玩家使用 → 发送便条\n· 死亡后内容留在尸体上\n\n\n\n\n§7便条是游戏里唯一的通讯方式！\n
+lw_p1.guide.note.body=§l便条系统§r\n§f每人开局获得一张便条，绑定背包。\n· 对空白处使用 → 编辑内容\n 对玩家使用 → 发送便条\n· 死亡后内容留在尸体上\n\n\n\n\n\n\n
 lw_p1.guide.config.body=使用物品 §e木棍 §f打开配置界面，修改游戏配置\n\n\n\n\n\n\n\n\n\n\n\n\n
 
 ## 商店
@@ -175,12 +175,15 @@ lw_p1.ui.task.rewardDesc=平民/警员每完成一个任务获得的金币数。
 lw_p1.ui.task.saved=§a任务配置已保存
 lw_p1.ui.inGame.button=局内相关配置
 lw_p1.ui.inGame.title=局内相关配置
-lw_p1.ui.inGame.staminaToggle=体力系统：仅局内生效，关闭后疾跑不再消耗体力
-lw_p1.ui.inGame.jumpToggle=允许跳跃：仅局内生效，关闭后玩家无法跳跃
-lw_p1.ui.inGame.weatherToggle=天气：开启后开局设为雷暴雨、结束时恢复晴天
-lw_p1.ui.inGame.drainDesc=疾跑每秒消耗体力\n默认 %s\n体力 / 秒
-lw_p1.ui.inGame.regenDesc=停止疾跑后每秒恢复体力\n默认 %s\n体力 / 秒
-lw_p1.ui.inGame.killerToggle=杀手体力值：关闭后杀手没有体力值，可以无限疾跑
+lw_p1.ui.inGame.staminaHeader=体力
+lw_p1.ui.inGame.staminaToggle=启用体力系统
+lw_p1.ui.inGame.drainDesc=\n疾跑每秒消耗体力\n默认 %s\n体力（秒）
+lw_p1.ui.inGame.regenDesc=\n停止疾跑后每秒恢复体力\n默认 %s\n体力（秒）
+lw_p1.ui.inGame.killerToggle=杀手体力值
+lw_p1.ui.inGame.moveHeader=跳跃
+lw_p1.ui.inGame.jumpToggle=启用跳跃
+lw_p1.ui.inGame.weatherHeader=天气
+lw_p1.ui.inGame.weatherToggle=局内雷暴雨
 lw_p1.ui.inGame.saved=§a局内相关配置已保存
 lw_p1.ui.reset.title=恢复默认配置
 lw_p1.ui.reset.body=§c确定要将所有游戏配置恢复为默认值吗？\n此操作会覆盖当前所有设置！
@@ -304,9 +307,9 @@ lw_p1.ui.mapInfo.saved=§a地图信息已保存
 lw_p1.ui.unused.title=功能预留配置
 lw_p1.ui.unused.body=若您想要增加更多任务、预设游戏数据或状态，修改底层数据，可访问以下网址查看项目源代码\n§bhttps://github.com/xiaopa-baka/train-werewolf-addon§r\n您可以访问项目仓库后查看行为包源代码，进行学习、修改、创建分支二次开发\n\n注意：\n进行二次开发后，请注明原作者和修改内容，禁止恶意篡改后传播！\n二次开发不得用于商业用途，禁止私自售卖原版或修改后的版本！\n二次开发后不得修改或删除整个“其他”板块的内容，包括开发者信息和赞助信息等\n二次开发过程中如有任何问题欢迎联系开发者\n\n§6敬请期待后续版本更新！
 lw_p1.ui.about.title=关于本Addon
-lw_p1.ui.about.body=§b列车狼人杀Addon\n§f版本：正式版 1.0.1\n§f适配：我的世界基岩版 1.26.50+\n§f开发模式：原生Script API\n\n§a开发者简介：\n工作室：LW.狮狼传奇工作室\n项目策划：狮狼传奇_小怕\nAddon作者：狮狼传奇_小怕\n工作室交流群：180568043
+lw_p1.ui.about.body=§b列车狼人杀Addon\n§f版本：正式版 1.0.1\n§f适配：我的世界基岩版 1.26.50+\n§f开发模式：原生Script API\n\n§a开发者简介：\n工作室：LW.狮狼传奇工作室\n项目策划：小怕（Xiaopa baka）\nAddon作者：小怕（Xiaopa baka）
 lw_p1.ui.sponsor.title=赞助 & 团队招募
-lw_p1.ui.sponsor.body=§b欢迎支持本项目开发！\n\n§f【赞助说明】\n如果您喜欢本Addon，愿意支持我们，可以通过以下方式赞助：\n• 在社交媒体上宣传此Addon\n• 为此Addon制作玩法地图并发布\n\n工作室正在积极招新中，欢迎热爱MC的你加入我们！\n§f【招募岗位】\n• 地图建筑\n• 项目策划\n• 运营及宣传\n• 指令设计、模组与插件开发\n• 贴图与建模制作\n• 皮肤设计\n\n\n工作室交流群：180568043\n§a欢迎热爱MC的小伙伴加入！\n加入我们，一起创造更精彩的MC冒险体验！
+lw_p1.ui.sponsor.body=§b欢迎支持本项目开发！\n\n§f【赞助说明】\n如果您喜欢本Addon，愿意支持我们，可以通过以下方式赞助：\n• 在社交媒体上宣传此Addon\n• 为此Addon制作玩法地图并发布\n\n工作室正在积极招新中，欢迎热爱MC的你加入我们！\n§f【招募岗位】\n• 地图建筑\n• 项目策划\n• 运营及宣传\n• 指令设计、模组与插件开发\n• 贴图与建模制作\n• 皮肤设计\n\n\n工作室交流群（QQ）：180568043\n§a欢迎热爱MC的小伙伴加入！\n加入我们，一起创造更精彩的MC冒险体验！
 
 ## 道具交互
 lw_p1.prop.pistol.killerBlocked=§c杀手无法使用这把枪
@@ -404,3 +407,42 @@ lw_p1.task.fake.6=§c你可以假装去找别人社交
 ## 告示牌
 lw_p1.sign.start=\n§l§a发车
 lw_p1.sign.end=\n§l§4强制结束对局
+
+## 语音联动（VoiceCraft，可选功能）
+lw_p1.voice.status.unsupported=§c[语音联动] 当前运行环境不支持 sendScriptEvent，功能不可用
+lw_p1.voice.status.connected=§a[语音联动] VoiceCraft 已连接
+lw_p1.voice.status.idle=§7[语音联动] 未检测到 VoiceCraft（未装附加包 / 客户端未连接）——本模块静默待机
+lw_p1.voice.status.channels=§7活人声道 = %s（%s 格）  旁观声道 = %s（不限距离）
+lw_p1.voice.status.records=§7绑定记录：%s 条  附加包托管中：%s 条  已记绑定码：%s 个
+lw_p1.voice.status.cleared=§7已清除持久绑定记录的玩家（本会话语音照常，重进需重新绑定）：%s 人
+lw_p1.voice.status.clients=§7记住的语音客户端：%s 个（客户端 App 重启后据此自动恢复绑定）
+lw_p1.voice.status.stats=§7自动恢复绑定：尝试 %s 次 / 失败 %s 次  已发包：%s  最后入站报文类型：%s
+lw_p1.voice.status.offline=§8(离线)
+lw_p1.voice.status.channel.living=§a活人
+lw_p1.voice.status.channel.spectator=§b旁观
+lw_p1.voice.status.channel.none=§7未下发
+lw_p1.voice.status.owner.addon=§a附加包托管
+lw_p1.voice.status.owner.local=§e本模块续管
+lw_p1.voice.status.player=§7 - §f%s§7：%s§7 / %s§7（实体 %s）
+lw_p1.voice.status.noEvent=§7（从未收到任何 voicecraft:* 事件）
+lw_p1.voice.status.lastEvent=§7最后事件：%s
+lw_p1.voice.status.lastError=§c最近异常：%s
+lw_p1.voice.cmd.resync.ok=§a[语音联动] 已强制重发声道位与距离参数
+lw_p1.voice.cmd.resync.idle=§7[语音联动] VoiceCraft 未连接，无需重发
+lw_p1.voice.cmd.resync.restored=§a[语音联动] 已把你的当前绑定写回世界属性，重进世界会自动恢复绑定
+lw_p1.voice.cmd.resync.all=§a[语音联动] 已把 %s 条当前绑定写回世界属性，这些玩家重进世界会自动恢复绑定
+lw_p1.voice.cmd.resync.target=§a[语音联动] 已把 %s 的当前绑定写回世界属性，其重进世界会自动恢复绑定
+lw_p1.voice.cmd.resync.none=§7[语音联动] %s 没有可写回的绑定记录（当前没有绑定，或已经在世界属性里）
+lw_p1.voice.cmd.resync.none.all=§7[语音联动] 没有任何可写回的绑定记录（当前没有绑定，或已经都在世界属性里）
+lw_p1.voice.cmd.forget.ok=§a[语音联动] 已清除你的绑定记录（世界属性里不再保存你的 id）：本会话语音照常，重进世界不会自动绑定
+lw_p1.voice.cmd.forget.target=§a[语音联动] 已清除 %s 的绑定记录（世界属性里不再保存其 id）：其本会话语音照常，重进世界不会自动绑定
+lw_p1.voice.cmd.forget.all=§a[语音联动] 已清除全部 %s 条绑定记录（世界属性里不再保存这些玩家）：本会话语音照常，重进世界需要重新绑定
+lw_p1.voice.cmd.forget.none=§7[语音联动] 没有找到可清除的绑定记录（本来就需要重新绑定）
+lw_p1.voice.cmd.forget.hint=§7想恢复「进服自动绑定」：重进世界后用客户端显示的绑定码执行 /vcbind <码>，或由管理员执行 /lw_p1:voice_resync <目标>
+lw_p1.voice.cmd.target.unknown=§c[语音联动] 找不到目标「%s」：目标要写玩家选择器（@s 你自己、@a 全部在线玩家、@p 最近玩家）或在线玩家名，Tab 有补全
+lw_p1.voice.cmd.target.empty=§7[语音联动] 目标选择器没有匹配到任何在线玩家（只有省略目标才会作用于离线玩家）
+lw_p1.voice.ui.entry=§b语音设置
+lw_p1.voice.ui.title=语音设置（VoiceCraft 语音联动）
+lw_p1.voice.ui.rangeHeader=语音传播距离
+lw_p1.voice.ui.rangeDesc=活人之间在此距离内可以互相听到；旁观者之间不受该距离限制。\n默认 %s\n语音半径（格）
+lw_p1.voice.ui.saved=§a[语音联动] 语音半径已设为 %s 格

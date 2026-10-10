@@ -192,7 +192,7 @@ There are **three kinds of doors** on the train, each with different rules:
 
 ---
 
-## 9. Note System (the Only Way to Communicate)
+## 9. Note System (the Built-in Way to Communicate)
 
 Everyone starts with a note, locked in the inventory.
 
@@ -201,7 +201,7 @@ Everyone starts with a note, locked in the inventory.
 - **Right-click another player** → send the note's contents to them
 - If you die, the note's contents **stay on your corpse**, where others can read them
 
-The note is the game's **only text-communication method** — use it to pass intelligence, call for help, and warn others.
+The note is the game's **built-in communication method — it needs no extra setup at all**. Use it to pass intelligence, call for help, and warn others. If the host also deployed the optional voice chat, you can simply talk — see Section 12.
 
 ---
 
@@ -242,7 +242,25 @@ The note is the game's **only text-communication method** — use it to pass int
 
 ---
 
-## 12. FAQ
+## 12. Optional Voice Chat (VoiceCraft)
+
+**There is no voice chat by default.** It is an optional feature the host has to deploy separately, and not having it changes nothing about the game.
+
+To use it, every player who wants to talk needs an extra **VoiceCraft client app** on their PC/phone and has to bind once (run VoiceCraft's own bind command, `/voicecraft:vcbind <binding key>`; the key is shown by the server, and many guides shorten it to `/vcbind`). You only bind once — rejoining the world, and even restarting the VoiceCraft client app, restores it automatically (after a client restart you are matched back by an identifier the client itself keeps). Exception: if an admin ran the voice "forget" command (`/lw_p1:voice_forget`; with no target it clears **every** binding record, offline players included, so admins should write `@s` for themselves), that record is deleted and you have to bind again; the command does **not** disturb voice chat that is already running.)
+
+Rules once it is on:
+
+| Situation | Can you be heard? |
+|---|---|
+| Living player ↔ living player | Yes, but **only within 32 blocks** (the host can change it in "Voice settings", 4–128 blocks) |
+| Spectator (dead) ↔ spectator | Yes, **with no distance limit, even across dimensions** |
+| Living player ↔ spectator | **Completely muted both ways** (the dead cannot call out positions, and the living cannot hear the dead) |
+
+So voice **cannot** let you talk to living players across the whole train, but it does let eliminated players review the round together — and the living hear none of it.
+
+---
+
+## 13. FAQ
 
 **Q: Why can't I drop the items in my inventory?**
 Starting items such as keys, the guide book, and the note are locked and can't be dropped or removed from the inventory, to prevent misclicks.

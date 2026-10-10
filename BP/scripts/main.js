@@ -18,3 +18,4 @@ import "./core/state.js";           // 对局运行期状态与金币访问器
 import "./core/i18n.js";            // 多语言文案工具
 import "./core/itemIcons.js";       // 物品图标映射与贴图路径解析
 import "./config/worldConfig.js";   // 世界配置（读取 / 保存 / 恢复默认）
+import "./integration/voiceCraft.js"; // 可选：VoiceCraft 语音联动（不装 VoiceCraft 时静默待机）

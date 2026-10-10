@@ -73,6 +73,14 @@ export const CONFIG_SCHEMA = {
     // 房间数量：决定开局发放的钥匙编号范围（1..roomCount）；玩家数超过房间数时循环分配。
     // 默认 8，范围 1-8（步长 1）。消费方：gameFlow.js
     roomCount:      { prop: "lw_p1.cfg.roomCount",      default: 8,   min: 1,   max: 8,    step: 1 },
+
+    // ===== 语音相关（可选功能：VoiceCraft 联动） =====
+    // 活人之间的语音可听半径（格）：值越小越"贴脸"，越大越远。旁观者之间**不受**该值限制
+    // （永远不限距离），活人与旁观者之间始终互相静音。
+    // 默认 32，范围 4-128（步长 4）。
+    // 消费方：integration/voiceCraft.js —— 只在世界装配了 VoiceCraft 附加包、
+    // 且已连上服务端时才会把它下发给 VoiceCraft 服务端；未装配时本项不产生任何效果。
+    voiceRange:     { prop: "lw_p1.cfg.voiceRange",     default: 32,  min: 4,   max: 128,  step: 4 },
 };
 
 

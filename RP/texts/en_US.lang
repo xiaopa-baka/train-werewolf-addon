@@ -94,7 +94,7 @@ lw_p1.guide.overview.body=§fA speeding train, a journey hiding murder.\nWill yo
 lw_p1.guide.roles.body=· §c§lKiller§r\n§fHides among the passengers and aims to eliminate them all. Owns the §eKiller Shop§f.\n\n· §b§lOfficer§r\n§fThe only law enforcer, armed with a §eRevolver§f.\n\n· §a§lPassenger§r\n§fNo weapons, no privileges, and the largest group on board.\n\n\n
 lw_p1.guide.tasks.body=§fTasks are given out at random after the game starts. The timer shows on the XP bar.\n§cFailing to finish in time kills you§f\n\n§b§lTask list§r\n§eVentilation§f: go to the train head or tail to get some air\n§eSleep§f: lie down on a bed\n§eEat§f: eat any food\n§eDrink§f: drink anything - §7a Cigarette completes it instantly§f\n§eToilet§f: crouch at the toilet - §7a Mineral Water Bottle completes it instantly§f\n§eSocialize§f: stand near another player for a while
 lw_p1.guide.items.body=§c§lKiller Shop items:§r\n§fDagger · Derringer · Crowbar · Lockpick · Poison · Baseball Bat · Grenade · Power Cutter\n\n§b§lCommon items§r\n§fNote · Revolver (Officer) · Mineral Water · Mineral Water Bottle · Magic Conch · Father's Pocket Watch · Wild Royal Jelly\n\n§eKiller Shop§f: killers carry their own shop with exclusive items\n§eVending Machine§f: buy special items from the vending machines on the train
-lw_p1.guide.note.body=§lNote system§r\n§fEveryone starts with one Note, locked to the inventory.\n· Use on empty space → edit the message\n Use on a player → send the note\n· On death the message stays on your corpse\n\n\n\n\n§7The note is the only way to communicate in this game!\n
+lw_p1.guide.note.body=§lNote system§r\n§fEveryone starts with one Note, locked to the inventory.\n· Use on empty space → edit the message\n Use on a player → send the note\n· On death the message stays on your corpse\n\n\n\n\n\n\n
 lw_p1.guide.config.body=Use a §eStick§f to open the config menu and change game settings\n\n\n\n\n\n\n\n\n\n\n\n\n
 
 ## Shop
@@ -175,12 +175,15 @@ lw_p1.ui.task.rewardDesc=Gold earned by civilians/officers for each completed ta
 lw_p1.ui.task.saved=§aTask settings saved
 lw_p1.ui.inGame.button=In-game settings
 lw_p1.ui.inGame.title=In-game settings
-lw_p1.ui.inGame.staminaToggle=Stamina system (in-game only): disable to stop sprint draining stamina
-lw_p1.ui.inGame.jumpToggle=Allow jumping (in-game only): disable to prevent players from jumping
-lw_p1.ui.inGame.weatherToggle=Weather: thunderstorm on game start, clear when the game ends
-lw_p1.ui.inGame.drainDesc=Stamina drained per second while sprinting.\nDefault %s\nStamina / second
-lw_p1.ui.inGame.regenDesc=Stamina restored per second after you stop sprinting.\nDefault %s\nStamina / second
-lw_p1.ui.inGame.killerToggle=Killer stamina: disable so killers have no stamina and can sprint endlessly
+lw_p1.ui.inGame.staminaHeader=Stamina
+lw_p1.ui.inGame.staminaToggle=Enable stamina system
+lw_p1.ui.inGame.drainDesc=\nStamina drained per second while sprinting.\nDefault %s\nStamina / second
+lw_p1.ui.inGame.regenDesc=\nStamina restored per second after you stop sprinting.\nDefault %s\nStamina / second
+lw_p1.ui.inGame.killerToggle=Killer stamina
+lw_p1.ui.inGame.moveHeader=Jumping
+lw_p1.ui.inGame.jumpToggle=Enable jumping
+lw_p1.ui.inGame.weatherHeader=Weather
+lw_p1.ui.inGame.weatherToggle=In-game thunderstorm
 lw_p1.ui.inGame.saved=§aIn-game settings saved
 lw_p1.ui.reset.title=Restore defaults
 lw_p1.ui.reset.body=§cRestore all game settings to their defaults?\nThis overwrites every current setting!
@@ -304,9 +307,9 @@ lw_p1.ui.mapInfo.saved=§aMap information saved
 lw_p1.ui.unused.title=Reserved Config
 lw_p1.ui.unused.body=To add more tasks, preset game data or states, or change the underlying data, see the project source code at\n§bhttps://github.com/xiaopa-baka/train-werewolf-addon§r\nYou can browse the behavior pack source to learn from it, modify it, or fork it\n\nNotes:\nIf you build on this project, credit the original author and describe your changes. Malicious tampering and redistribution are prohibited!\nSecondary development must not be used commercially. Selling the original or a modified version is prohibited!\nDo not modify or remove anything in the "Other" section, including developer and sponsor information\nIf you run into any issues, feel free to contact the developer\n\n§6Stay tuned for future updates!
 lw_p1.ui.about.title=About this addon
-lw_p1.ui.about.body=§bTrain Werewolf Addon\n§fVersion: 1.0.1\n§fCompatible: Minecraft Bedrock 1.26.50+\n§fBuilt with: native Script API\n\n§aAbout the developer:\nStudio: LW Realm Studio\nDesign: Xiaopa baka\nAddon author: Xiaopa baka\nStudio group(QQ): 180568043
+lw_p1.ui.about.body=§bTrain Werewolf Addon\n§fVersion: 1.0.1\n§fCompatible: Minecraft Bedrock 1.26.50+\n§fBuilt with: native Script API\n\n§aAbout the developer:\nStudio: LW Realm Studio\nDesign: Xiaopa baka\nAddon author: Xiaopa baka
 lw_p1.ui.sponsor.title=Sponsorship & Recruitment
-lw_p1.ui.sponsor.body=§bThanks for supporting this project!\n\n§f[How to support]\nIf you enjoy this addon and would like to support us:\n• Share this addon on social media\n• Build and publish a gameplay map for it\n\nOur studio is actively recruiting — if you love MC, join us!\n§f[Open roles]\n• Map building\n• Project design\n• Operations & promotion\n• Command design, mod and plugin development\n• Textures and modeling\n• Skin design\n\n\nStudio group: 180568043\n§aEvery MC fan is welcome!\nJoin us and create even better MC adventures together!
+lw_p1.ui.sponsor.body=§bThanks for supporting this project!\n\n§f[How to support]\nIf you enjoy this addon and would like to support us:\n• Share this addon on social media\n• Build and publish a gameplay map for it\n\nOur studio is actively recruiting — if you love MC, join us!\n§f[Open roles]\n• Map building\n• Project design\n• Operations & promotion\n• Command design, mod and plugin development\n• Textures and modeling\n• Skin design\n\n\nStudio group(QQ): 180568043\n§aEvery MC fan is welcome!\nJoin us and create even better MC adventures together!
 
 ## Prop interactions
 lw_p1.prop.pistol.killerBlocked=§cKillers cannot use this gun
@@ -404,3 +407,42 @@ lw_p1.task.fake.6=§cYou could pretend to go socialize
 ## Signs
 lw_p1.sign.start=\n§l§aSTART
 lw_p1.sign.end=§l§4FORCED\nGAME\nEXIT
+
+## Voice chat (optional VoiceCraft integration)
+lw_p1.voice.status.unsupported=§c[Voice] sendScriptEvent is unavailable here; feature disabled
+lw_p1.voice.status.connected=§a[Voice] VoiceCraft connected
+lw_p1.voice.status.idle=§7[Voice] VoiceCraft not detected (addon absent / client not connected) — module idle
+lw_p1.voice.status.channels=§7Living channel = %s (%s blocks)  Spectator channel = %s (no range limit)
+lw_p1.voice.status.records=§7Bindings: %s  Hosted by addon: %s  Cached keys: %s
+lw_p1.voice.status.cleared=§7Persisted bindings cleared (voice still works this session; rebind needed on rejoin): %s
+lw_p1.voice.status.clients=§7Remembered voice clients: %s (used to auto-restore bindings after a client app restart)
+lw_p1.voice.status.stats=§7Auto-rebind: %s tried / %s failed  Packets sent: %s  Last inbound packet type: %s
+lw_p1.voice.status.offline=§8(offline)
+lw_p1.voice.status.channel.living=§aLiving
+lw_p1.voice.status.channel.spectator=§bSpectator
+lw_p1.voice.status.channel.none=§7Not sent
+lw_p1.voice.status.owner.addon=§aAddon-hosted
+lw_p1.voice.status.owner.local=§eManaged by this addon
+lw_p1.voice.status.player=§7 - §f%s§7: %s§7 / %s§7 (entity %s)
+lw_p1.voice.status.noEvent=§7(no voicecraft:* event received yet)
+lw_p1.voice.status.lastEvent=§7Last event: %s
+lw_p1.voice.status.lastError=§cLast error: %s
+lw_p1.voice.cmd.resync.ok=§a[Voice] Channel bitmasks and range resent
+lw_p1.voice.cmd.resync.idle=§7[Voice] VoiceCraft is not connected, nothing to resend
+lw_p1.voice.cmd.resync.restored=§a[Voice] Your current binding was written back into the world property; rejoining will restore it
+lw_p1.voice.cmd.resync.all=§a[Voice] Wrote %s current binding(s) back into the world property; those players will restore on rejoin
+lw_p1.voice.cmd.resync.target=§a[Voice] Wrote %s's current binding back into the world property; it will be restored on their rejoin
+lw_p1.voice.cmd.resync.none=§7[Voice] %s has no binding to write back (not bound, or already in the world property)
+lw_p1.voice.cmd.resync.none.all=§7[Voice] Nothing to write back (nobody is bound, or every binding is already in the world property)
+lw_p1.voice.cmd.forget.ok=§a[Voice] Your binding record was cleared (your id is no longer stored): voice keeps working this session, no auto-bind on rejoin
+lw_p1.voice.cmd.forget.target=§a[Voice] Cleared %s's binding record (their id is no longer stored): their voice keeps working this session, no auto-bind on rejoin
+lw_p1.voice.cmd.forget.all=§a[Voice] Cleared all %s binding record(s) (those ids are no longer stored): voice keeps working this session, they must rebind after rejoining
+lw_p1.voice.cmd.forget.none=§7[Voice] No binding record to clear (you already had to rebind)
+lw_p1.voice.cmd.forget.hint=§7To restore auto-binding: rejoin and run /vcbind <key> with the key shown in your client, or an admin runs /lw_p1:voice_resync <target>
+lw_p1.voice.cmd.target.unknown=§c[Voice] No such target "%s": write a player selector (@s you, @a all online players, @p nearest) or an online player name; Tab completes
+lw_p1.voice.cmd.target.empty=§7[Voice] The target selector matched no online player (only an omitted target reaches offline players)
+lw_p1.voice.ui.entry=§bVoice settings
+lw_p1.voice.ui.title=Voice settings (VoiceCraft)
+lw_p1.voice.ui.rangeHeader=Voice range
+lw_p1.voice.ui.rangeDesc=Living players hear each other within this distance; spectators are not limited by it.\nDefault %s\nVoice radius (blocks)
+lw_p1.voice.ui.saved=§a[Voice] Voice radius set to %s blocks
