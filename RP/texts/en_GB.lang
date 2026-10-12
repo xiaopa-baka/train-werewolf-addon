@@ -91,7 +91,7 @@ lw_p1.guide.ch.items=§lItems & Shop
 lw_p1.guide.ch.note=§lNote
 lw_p1.guide.ch.config=§lConfig
 lw_p1.guide.overview.body=§fA speeding train, a journey hiding murder.\nWill you reach the station alive?\n§fTrain Werewolf is a multiplayer deduction game.\n§e5-15 players§f, about §e10 minutes§f per round.\n\n§lRules§r\n§f1. Once everyone boards, the train departs\n2. Roles are assigned at random: §cKiller§f, §bOfficer§f, §aPassenger§f\n3. The Killer eliminates passengers in secret while passengers try to expose them\n\n§lWin conditions§r\n§aPassengers§f: the Killer dies / the train arrives\n§cKiller§f: all passengers die\n\n§7World Name: %s\n§7World Author: %s\n§7Addon Author: Xiaopa baka
-lw_p1.guide.roles.body=· §c§lKiller§r\n§fHides among the passengers and aims to eliminate them all. Owns the §eKiller Shop§f.\n\n· §b§lOfficer§r\n§fThe only law enforcer, armed with a §eRevolver§f.\n\n· §a§lPassenger§r\n§fNo weapons, no privileges, and the largest group on board.\n\n\n
+lw_p1.guide.roles.body=· §c§lKiller§r\n§fHides among the passengers and aims to eliminate them all. Owns the §eKiller Shop§f.\n\n· §b§lOfficer§r\n§fThe only law enforcer, armed with a §eRevolver§f.\n\n· §a§lPassenger§r\n§fNo weapons, no privileges, and the largest group on board.
 lw_p1.guide.tasks.body=§fTasks are given out at random after the game starts. The countdown and progress show on the §etop-left task panel§f.\n§cFailing to finish in time kills you§f (except the Killer)\n\n§b§lTask list§r\n§eVentilation§f: go to the train head or tail to get some air\n§eSleep§f: lie down on a bed\n§eEat§f: eat any food\n§eDrink§f: drink anything\n§eToilet§f: crouch at the toilet - §7a Mineral Water Bottle completes it instantly§f\n§eSocialize§f: stand near another player for a while - §7a Cigarette completes it instantly§f
 lw_p1.guide.items.body=§c§lKiller Shop items:§r\n§fDagger · Derringer · Crowbar · Lockpick · Poison · Baseball Bat · Grenade · Power Cutter\n\n§b§lCommon items§r\n§fNote · Revolver (Officer) · Mineral Water · Mineral Water Bottle · Magic Conch · Father's Pocket Watch · Wild Royal Jelly\n\n§eKiller Shop§f: killers carry their own shop with exclusive items\n§eVending Machine§f: buy special items from the vending machines on the train
 lw_p1.guide.note.body=§lNote system§r\n§fEveryone starts with one Note, locked to the inventory.\n· Use on empty space: edit the message\n Use on a player: send the note\n· On death the message stays on your corpse
@@ -346,7 +346,7 @@ lw_p1.msg.notEnoughPlayers=§cNot enough players to start (current %s / minimum 
 lw_p1.msg.corpsesCleared=§aAll corpses and name tags removed
 lw_p1.msg.autoStart.title=§e%s
 lw_p1.msg.autoStart.subtitle=§funtil the game starts
-lw_p1.msg.autoStart.actionbar=§eGame starts in §e%s§f s
+lw_p1.msg.autoStart.actionbar=§e%s§f s until game start
 
 ## Results
 lw_p1.end.winner.killer=§cGame over — the Killer wins!
@@ -392,9 +392,9 @@ lw_p1.task.6.hint1=§aYou are bored, go socialize with someone
 lw_p1.task.6.hint2=§6You feel down and need to socialize
 lw_p1.task.6.hint3=§cYou are deeply depressed, you need to socialize!
 lw_p1.task.panel.time=§f%s s left
-lw_p1.panel.name=§fPlayer: §e%s§f
+lw_p1.panel.name=§fPlayer: %s
 lw_p1.panel.role=§fRole: %s
-lw_p1.panel.gold=§fGold: %s
+lw_p1.panel.gold=§fGold: §e%s§f
 lw_p1.panel.time=§fTime left: %s:%s
 lw_p1.task.done=§aYou feel much better
 lw_p1.task.fake.1=§cYou could pretend to get some air
@@ -406,7 +406,7 @@ lw_p1.task.fake.6=§cYou could pretend to go socialize
 
 ## Signs
 lw_p1.sign.start=\n§l§aSTART
-lw_p1.sign.end=§l§4FORCED\nGAME\nEXIT
+lw_p1.sign.end=\n§l§4FORCED EXIT
 
 ## Voice chat (optional VoiceCraft integration)
 lw_p1.voice.status.unsupported=§c[Voice] sendScriptEvent is unavailable here; feature disabled
