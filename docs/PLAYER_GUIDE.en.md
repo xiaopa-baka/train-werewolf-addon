@@ -1,4 +1,4 @@
-[简体中文](./列车狼人杀游玩指南.md) ｜ **English**
+[简体中文](./PLAYER_GUIDE.zh_CN.md) ｜ [繁體中文](./PLAYER_GUIDE.zh_TW.md) ｜ [日本語](./PLAYER_GUIDE.ja_JP.md) ｜ **English**
 
 # Train Werewolf — Player Guide
 
@@ -130,12 +130,12 @@ A **stamina system** is enabled in-round (it can be toggled by the admin):
 | Dagger | Charge and release to assassinate a player in front of you |
 | Revolver | The Officer's sidearm, can fire; friendly fire on a Civilian drops the gun and permanently loses it |
 | Derringer Pistol | A small gun, **it disappears if it doesn't hit** |
-| Baseball Bat | Held by the Killer it enters about **30 seconds of frenzy** (faster movement), a swing that connects kills instantly; the bat auto-disappears after 30 seconds |
-| Grenade | Throw it, and players within a radius of **3 blocks** die instantly |
+| Baseball Bat | Merely carried by the Killer (no need to hold it) it enters about **30 seconds of frenzy** (big speed boost, announced to everyone); a swing that connects kills instantly, and the frenzy consumes 1 bat |
+| Grenade | Throw it, and players within a radius of **3 blocks** die instantly (**including the thrower**) |
 | Poison | Poison a **plate**; someone who takes the poisoned food and eats it gets nauseous about **5 seconds** later and dies of poison **50 seconds** after eating (Royal Jelly cures it) |
 | Blackout Device | Killer only: all players on the map are **blinded for 20 seconds**, while the Killer becomes **invisible for 20 seconds** |
 | Crowbar | Pries a door and locks it shut (see "Doors and Keys"); using it consumes 1 |
-| Lockpick | A master key that can open **all doors** without leaving a trace |
+| Lockpick | Opens room and train doors (carriage doors need nothing), and is **never consumed** |
 | Keys 1~8 | Open the room door with the matching number; randomly issued at the start |
 | Magic Conch | Right-click another player to **privately** learn their role (Killer/Officer/Civilian); consumes 1 |
 | Father's Pocket Watch | While **held down and used**, the action bar shows the remaining time; when you take a fatal hit it is **automatically consumed to save you once** |
@@ -145,7 +145,7 @@ A **stamina system** is enabled in-round (it can be toggled by the admin):
 | Cigarette | Smoking one during the Social task completes it directly |
 | Cocktails ×5 | Old Fashioned / Mojito / Martini / Cosmopolitan / Champagne, all valid beverages |
 | Note | Use on air to edit its contents, use on a person to send it; after death the contents stay on your corpse |
-| Firecracker | Right-click to throw; flies with gravity and stops on hitting a block; it starts smoking after landing, then explodes 15 seconds after landing with a firecracker sound (audible from far away) |
+| Firecracker | Right-click to throw; flies with gravity and stops on hitting a block; it starts smoking after landing, then explodes 15 seconds after landing with a firecracker sound (audible from far away), dealing **no damage at all** |
 | Guide Book | View gameplay and map info at any time |
 
 ---
