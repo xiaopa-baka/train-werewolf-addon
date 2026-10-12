@@ -307,7 +307,7 @@ lw_p1.ui.mapInfo.saved=§a地圖資訊已儲存
 lw_p1.ui.unused.title=功能預留設定
 lw_p1.ui.unused.body=若您想要增加更多任務、預設遊戲資料或狀態，修改底層資料，可瀏覽以下網址查看專案原始碼\n§bhttps://github.com/xiaopa-baka/train-werewolf-addon§r\n您可以瀏覽專案倉庫後查看行為包原始碼，進行學習、修改、建立分支二次開發\n\n注意：\n進行二次開發後，請註明原作者和修改內容，禁止惡意竄改後傳播！\n二次開發不得用於商業用途，禁止私自販售原版或修改後的版本！\n二次開發後不得修改或刪除整個「其他」板塊的內容，包括開發者資訊和贊助資訊等\n二次開發過程中如有任何問題歡迎聯絡開發者\n\n§6敬請期待後續版本更新！
 lw_p1.ui.about.title=關於本Addon
-lw_p1.ui.about.body=§b列車狼人殺Addon\n§f版本：正式版 1.0.1\n§f適配：Minecraft 基岩版 1.26.50+\n§f開發模式：原生Script API\n\n§a開發者簡介：\n工作室：LW.狮狼传奇工作室\n專案企劃：小怕（Xiaopa baka）\nAddon作者：小怕（Xiaopa baka）
+lw_p1.ui.about.body=§b列車狼人殺Addon\n§f版本：正式版 1.0.1\n§f適配：Minecraft 基岩版 1.26.50+\n§f開發模式：原生Script API\n\n§a開發者簡介：\n工作室：LW.狮狼传奇工作室（LW Realm Studio）\n專案企劃：小怕（Xiaopa baka）\nAddon作者：小怕（Xiaopa baka）
 lw_p1.ui.sponsor.title=贊助 & 團隊招募
 lw_p1.ui.sponsor.body=§b歡迎支持本專案開發！\n\n§f【贊助說明】\n如果您喜歡本Addon，願意支持我們，可以透過以下方式贊助：\n· 在社群媒體上宣傳此Addon\n· 為此Addon製作玩法地圖並發布\n\n工作室正在積極招新中，歡迎熱愛MC的你加入我們！\n§f【招募職缺】\n· 地圖建築\n· 專案企劃\n· 營運及宣傳\n· 指令設計、模組與外掛開發\n· 材質與建模製作\n· 外觀設計\n\n\n工作室交流群（QQ）：180568043\n§a歡迎熱愛MC的小夥伴加入！\n加入我們，一起創造更精彩的MC冒險體驗！
 

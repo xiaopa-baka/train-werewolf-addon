@@ -307,7 +307,7 @@ lw_p1.ui.mapInfo.saved=§aマップ情報を保存しました
 lw_p1.ui.unused.title=予備機能設定
 lw_p1.ui.unused.body=より多くのタスクやプリセットデータ・状態を追加したい場合、または内部データを変更したい場合は、以下のURLでプロジェクトのソースコードを確認できます\n§bhttps://github.com/xiaopa-baka/train-werewolf-addon§r\nプロジェクトのリポジトリでビヘイビアパックのソースコードを閲覧し、学習・改変・フォークして二次開発できます\n\n注意：\n二次開発の際は原作者と変更内容を明記してください。悪意ある改変のうえでの配布は禁止です！\n二次開発を商業目的で使用することはできません。オリジナル版または改変版の私自販売は禁止です！\n二次開発後も「その他」セクション全体の内容（開発者情報や支援情報など）を変更・削除しないでください\n二次開発中に何か問題があれば、開発者までお気軽にご連絡ください\n\n§6今後のアップデートにご期待ください！
 lw_p1.ui.about.title=このAddonについて
-lw_p1.ui.about.body=§b列車人狼Addon\n§fバージョン：正式版 1.0.1\n§f対応：Minecraft Bedrock Edition 1.26.50+\n§f開発方式：ネイティブScript API\n\n§a開発者紹介：\nスタジオ：LW.狮狼传奇工作室\n企画：Xiaopa baka\nAddon作者：Xiaopa baka
+lw_p1.ui.about.body=§b列車人狼Addon\n§fバージョン：正式版 1.0.1\n§f対応：Minecraft Bedrock Edition 1.26.50+\n§f開発方式：ネイティブScript API\n\n§a開発者紹介：\nスタジオ：LW Realm Studio\n企画：Xiaopa baka\nAddon作者：Xiaopa baka
 lw_p1.ui.sponsor.title=支援 & チーム募集
 lw_p1.ui.sponsor.body=§b本プロジェクトの開発へのご支援をお待ちしています！\n\n§f【支援について】\nこのAddonを気に入り、支援していただける場合は、以下の方法があります：\n· SNSでこのAddonを紹介する\n· このAddonのプレイマップを作成して公開する\n\nスタジオでは現在メンバーを積極募集しています。MCが好きなあなたの参加をお待ちしています！\n§f【募集職種】\n· マップ建築\n· プロジェクト企画\n· 運営・広報\n· コマンド設計、MOD・プラグイン開発\n· テクスチャ・モデリング制作\n· スキン制作\n\n\nスタジオ交流グループ（QQ）：180568043\n§aMCが好きな仲間の参加をお待ちしています！\n一緒に、もっと素晴らしいMCの冒険体験を作りましょう！
 
