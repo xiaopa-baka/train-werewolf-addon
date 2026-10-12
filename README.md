@@ -1,4 +1,4 @@
-**简体中文** ｜ [English](./README.en.md)
+**简体中文** ｜ [繁體中文](./README.zh_TW.md) ｜ [English](./README.en.md)｜ [日本語](./README.ja_JP.md) 
 
 # 列车狼人杀 · Train Werewolf
 
@@ -46,7 +46,7 @@
 
 **一局流程**：登车 → 随机分配身份 → 系统派发限时任务（超时会死）→ 完成任务赚金币、在商店购买道具 → 分出胜负 → 回站台准备下一局。
 
-玩家向的详细说明见仓库内的 [列车狼人杀游玩指南.md](./列车狼人杀游玩指南.md)。
+玩家向的详细说明见仓库内的 [PLAYER_GUIDE.zh_CN.md](./docs/PLAYER_GUIDE.zh_CN.md)。
 
 ---
 
@@ -58,7 +58,7 @@
 - **丰富的道具**：匕首、左轮 / 德林杰手枪与子弹、球棒狂暴、毒药与**餐盘下毒**、手雷、断电装置、神奇的海螺（查身份）、父亲的怀表（免死一次）等
 - **自定义方块**：**钥匙门**（钥匙 / 开锁器 / 撬棍联动）、**贩卖机**（多方块结构）、**餐盘**（随机掉落食物）
 - **尸体与名牌系统**：死亡后留下带名字的尸体，便条内容也会留在尸体上
-- **全量多语言**：内置简体中文 / English（`zh_CN`、`en_US`）
+- **全量多语言**：内置简体中文 / 繁體中文/ English (US) / English (UK) / 日本語（`zh_CN`、`zh_TW`、`en_US`、`en_GB`、`ja_JP`）
 - **可视化配置面板**：管理员持木棍右键即可配置地图坐标、任务参数、商店商品等
 - **双分支维护**：同一套玩法代码同时支持国际版与网易版（仅脚本 API 版本不同）
 - **可选语音联动**：装配 [VoiceCraft](https://gitlab.avion.team/voicecraft/VoiceCraft) 后自动启用近距离语音（活人 32 格、旁观者互通且与活人彻底隔离）；不装配则**零影响**，且 VoiceCraft 侧一行代码都不用改
@@ -170,17 +170,12 @@ npx tsc --noEmit
 
 | 命令 | 效果 |
 |---|---|
-| `/lw_p1:start` | 手动开局（需要权限等级 GameDirectors） |
+| `/lw_p1:start` | 手动开局 |
 | `/lw_p1:end` | 强制结束当前对局（任何时刻执行结束流程） |
 | `/lw_p1:clear_corpses` | 清除所有尸体与名牌 |
-| `/lw_p1:voice_status` | 查看语音联动状态：是否连上、当前声道掩码与语音半径、绑定记录（需 GameDirectors） |
-| `/lw_p1:voice_resync [目标]` | 重发声道与语音半径，并把目标当前的绑定写回世界属性（重进世界会自动恢复绑定）。目标是**玩家选择器**（Tab 有补全）：**省略目标 = 把所有绑定记录写回（含离线玩家）**、`@a`=全部在线玩家、`@s`/`@p`/`@r`/在线玩家名=指定玩家（需 GameDirectors） |
-| `/lw_p1:voice_forget [目标]` | 解除语音绑定：只从世界属性里删掉目标的 id，**不做任何静音**；本会话语音照常，重进世界（或重启客户端 App）都会需要重新 `/vcbind`。目标写法同上，**省略目标 = 清掉所有绑定记录（含离线玩家）**，清自己请写 `@s`（需 GameDirectors） |
-| `/give @s minecraft:stick` | 获取配置管理员木棍 |
-| `/give @s lw_p1:keydoor_1` ~ `keydoor_10` | 获取钥匙门 |
-| `/give @s lw_p1:key_1` ~ `key_8` | 获取房间钥匙 |
-| `/give @s lw_p1:lockpick` | 获取开锁器 |
-| `/give @s lw_p1:guide_book` | 获取指南书 |
+| `/lw_p1:voice_status` | 查看语音联动状态：是否连上、当前声道掩码与语音半径、绑定记录 |
+| `/lw_p1:voice_resync [目标]` | 重发声道与语音半径，并把目标当前的绑定写回世界属性（重进世界会自动恢复绑定）。目标是**玩家选择器**（Tab 有补全）：**省略目标 = 把所有绑定记录写回（含离线玩家）**、`@a`=全部在线玩家、`@s`/`@p`/`@r`/在线玩家名=指定玩家 |
+| `/lw_p1:voice_forget [目标]` | 解除语音绑定：只从世界属性里删掉目标的 id，**不做任何静音**；本会话语音照常，重进世界（或重启客户端 App）都会需要重新 `/vcbind`。目标写法同上，**省略目标 = 清掉所有绑定记录（含离线玩家）**，清自己请写 `@s` |
 
 > `voice_*` 四条命令只在装配了 VoiceCraft 时才有实际作用；未装配时它们只回报「未检测到 VoiceCraft」，不会报错。
 
@@ -208,9 +203,11 @@ demo/
 ├── RP/                         # 资源包（模型 / 动画 / 贴图 / 音效 / 文案）
 ├── package.json                # 仅 devDependencies（类型定义 + tsc）
 ├── tsconfig.json               # 类型检查配置（noEmit）
-├── 列车狼人杀游玩指南.md        # 玩家向说明（中文）
-├── PLAYER_GUIDE.md             # 玩家向说明（英文）
-└── VoiceCraft联动调研.md       # 可选语音功能：方案调研 + 实现说明
+└── docs/                       # 玩家向文档
+│   ├── PLAYER_GUIDE.zh_CN.md   # 玩家指南（简体中文）
+│   ├── PLAYER_GUIDE.zh_TW.md   # 玩家指南（繁體中文）
+│   ├── PLAYER_GUIDE.ja_JP.md   # 玩家指南（日本語）
+│   └── PLAYER_GUIDE.en.md      # Player Guide (English)
 ```
 
 > 脚本按领域分层，入口 `BP/scripts/main.js` 只做 import，便于定位功能模块。
@@ -233,36 +230,14 @@ npx tsc --noEmit   # 0 error 即通过
 - **相对导入必须带 `.js` 扩展名**（如 `import "./config/worldConfig.js"`），否则运行时报 `ERR_MODULE_NOT_FOUND`。
 - 使用 **ScriptAPI 2.x** 写法：`world.afterEvents.worldLoad`、`world.getPlayers()`、`entity.isValid`（属性）、`runCommand` 等，避免旧接口。
 - `beforeEvents` 中不能可靠地修改世界（发物品 / 删实体等），需用 `mc.system.run()` 延后到下一帧执行。
-- 面向玩家的文案一律通过 `core/i18n.js` 的 `t()` 输出，并在 `RP/texts/zh_CN.lang` 与 `en_US.lang` 中补齐对应键（两文件需严格镜像）。
-
-### 新增一个道具
-
-1. 在 `BP/items/` 添加物品 JSON；
-2. 在 `RP/textures/items/` 放贴图，并在 `item_texture.json` 注册；
-3. 在对应系统（通常在 `BP/scripts/gameplay/props.js`）编写事件处理逻辑；
-4. 若要上架，在 `BP/scripts/config/worldConfig.js` 的商店配置中补条目；
-5. 在 `RP/texts/zh_CN.lang` + `en_US.lang` 补译名（`item.lw_p1:<id>`）；
-6. `npx tsc --noEmit` 通过后真机实测。
-
-### 新增一扇门
-
-1. 参照 `BP/blocks/keydoor_1.json` 添加门方块 JSON；
-2. 在 `BP/items/` 添加对应钥匙；
-3. 在 `BP/scripts/blocks/keydoor.js` 的 `DOOR_KEY_MAP` 中登记映射；
-4. 在 RP 中放贴图并注册到 `terrain_texture.json`；
-5. 补语言文件；`npx tsc --noEmit` 通过后实测。
-
-### 提交约定
-
-- 功能 / Bug 修复请同步到 `main` 与 `netease` 两条分支；
-- 提交信息建议使用 `feat: / fix: / chore:` 前缀，说明「为什么改」。
+- 面向玩家的文案一律通过 `core/i18n.js` 的 `t()` 输出，并在 `RP/texts/` 的 5 个语言文件（`zh_CN`、`zh_TW`、`en_US`、`en_GB`、`ja_JP`）中补齐对应键（五个文件需严格镜像：键集合、`%s`、`§` 代码与 `\n` 位置一致）。
 
 ---
 
 ## 文档
 
-- **玩家指南（中文）**：[列车狼人杀游玩指南.md](./列车狼人杀游玩指南.md)
-- **Player Guide (English)**：[PLAYER_GUIDE.md](./PLAYER_GUIDE.md)
+- **玩家指南**：[简体中文](./docs/PLAYER_GUIDE.zh_CN.md) ｜ [繁體中文](./docs/PLAYER_GUIDE.zh_TW.md) ｜ [日本語](./docs/PLAYER_GUIDE.ja_JP.md) ｜ [English](./docs/PLAYER_GUIDE.en.md)
+- **README 语言版本**：[English](./README.en.md) ｜ [繁體中文](./README.zh_TW.md) ｜ [日本語](./README.ja_JP.md)
 - **开发者资料**：每个脚本文件头部都有一行职责注释，阅读入口为 `BP/scripts/main.js`
 - **配置说明**：进入游戏后用木棍打开配置面板，各项均有说明
 
@@ -273,7 +248,7 @@ npx tsc --noEmit   # 0 error 即通过
 **作者 / 制作**
 
 - 小怕（Xiaopa baka）
-- LW.狮狼传奇工作室
+- LW.狮狼传奇工作室（LW Realm Studio）
 
 **联系邮箱**：xiaopa1214@163.com
 

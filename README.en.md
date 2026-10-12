@@ -1,4 +1,4 @@
-[简体中文](./README.md) ｜ **English**
+[简体中文](./README.md) ｜ [繁體中文](./README.zh_TW.md) ｜ **English**｜ [日本語](./README.ja_JP.md) 
 
 # Train Werewolf
 
@@ -46,7 +46,7 @@ After boarding the train, the system randomly assigns you one of three roles:
 
 **Round Flow**: Board → random role assignment → the system assigns timed tasks (overtime means death) → complete tasks to earn coins and buy items from the shop → a winner is decided → return to the platform to prepare for the next round.
 
-For detailed player-facing instructions, see [PLAYER_GUIDE.md](./PLAYER_GUIDE.md) in this repository.
+For detailed player-facing instructions, see [PLAYER_GUIDE.en.md](./docs/PLAYER_GUIDE.en.md) in this repository.
 
 ---
 
@@ -58,7 +58,7 @@ For detailed player-facing instructions, see [PLAYER_GUIDE.md](./PLAYER_GUIDE.md
 - **Rich item roster**: Dagger, Revolver / Derringer pistols and bullets, baseball-bat frenzy, poison and **plate poisoning**, grenades, blackout device, Magic Conch (reveals a role), Father's Pocket Watch (survive death once), and more
 - **Custom blocks**: **key doors** (key / lockpick / crowbar interactions), **vending machines** (multiblock structures), **plates** (drop random food)
 - **Corpse and name-tag system**: death leaves behind a named corpse, and a note's contents stay on the corpse
-- **Full localization**: built-in Simplified Chinese / English (`zh_CN`, `en_US`)
+- **Full localization**: built-in Simplified Chinese / Traditional Chinese / English (US) / English (UK) / Japanese (`zh_CN`, `zh_TW`, `en_US`, `en_GB`, `ja_JP`)
 - **Visual config panel**: admins right-click with a stick to configure map coordinates, task parameters, shop goods, and more
 - **Dual-branch maintenance**: the same gameplay codebase supports both International and NetEase versions (only the script API version differs)
 - **Optional voice integration**: install [VoiceCraft](https://gitlab.avion.team/voicecraft/VoiceCraft) and proximity voice chat turns on automatically (living players at 32 blocks, spectators talking freely among themselves yet fully isolated from the living); without it the addon behaves **exactly as before**, and not a single line of VoiceCraft has to be modified
@@ -170,17 +170,12 @@ This addon can hook into [VoiceCraft](https://gitlab.avion.team/voicecraft/Voice
 
 | Command | Effect |
 |---|---|
-| `/lw_p1:start` | Start the game manually (requires permission level GameDirectors) |
+| `/lw_p1:start` | Start the game manually |
 | `/lw_p1:end` | Force-end the current round (runs the end flow at any time) |
 | `/lw_p1:clear_corpses` | Remove all corpses and name tags |
-| `/lw_p1:voice_status` | Show voice integration status: connection, channel bitmasks, voice radius and binding records (GameDirectors) |
-| `/lw_p1:voice_resync [target]` | Resend channels and voice radius, and write binding records back into the world property (rejoining then auto-restores them). The target is a **player selector** (Tab completes): **omitting it writes back ALL records (offline players included)**, `@a` for everyone online, `@s`/`@p`/`@r`/an online player name for one player (GameDirectors) |
-| `/lw_p1:voice_forget [target]` | Unbind voice: only the target's id is removed from the world property, **nothing is muted**; voice keeps working this session, and rejoining the world (or restarting the client app) needs `/vcbind` again. Same target syntax as above, but **omitting the target clears ALL records (offline players included)** — write `@s` to clear just yourself (GameDirectors) |
-| `/give @s minecraft:stick` | Get the config admin stick |
-| `/give @s lw_p1:keydoor_1` ~ `keydoor_10` | Get key doors |
-| `/give @s lw_p1:key_1` ~ `key_8` | Get room keys |
-| `/give @s lw_p1:lockpick` | Get a lockpick |
-| `/give @s lw_p1:guide_book` | Get the guide book |
+| `/lw_p1:voice_status` | Show voice integration status: connection, channel bitmasks, voice radius and binding records |
+| `/lw_p1:voice_resync [target]` | Resend channels and voice radius, and write binding records back into the world property (rejoining then auto-restores them). The target is a **player selector** (Tab completes): **omitting it writes back ALL records (offline players included)**, `@a` for everyone online, `@s`/`@p`/`@r`/an online player name for one player |
+| `/lw_p1:voice_forget [target]` | Unbind voice: only the target's id is removed from the world property, **nothing is muted**; voice keeps working this session, and rejoining the world (or restarting the client app) needs `/vcbind` again. Same target syntax as above, but **omitting the target clears ALL records (offline players included)** — write `@s` to clear just yourself |
 
 > The four `voice_*` commands only do something when VoiceCraft is installed; otherwise they simply report "VoiceCraft not detected" without erroring.
 
@@ -208,9 +203,11 @@ demo/
 ├── RP/                         # Resource pack (models / animations / textures / sounds / text)
 ├── package.json                # devDependencies only (type definitions + tsc)
 ├── tsconfig.json               # Type-checking config (noEmit)
-├── 列车狼人杀游玩指南.md        # Player-facing instructions (Chinese)
-├── PLAYER_GUIDE.md             # Player-facing instructions (English)
-└── VoiceCraft联动调研.md       # Optional voice feature: research + implementation notes (Chinese)
+└── docs/                       # Player-facing docs
+│   ├── PLAYER_GUIDE.zh_CN.md   # Player guide (Simplified Chinese)
+│   ├── PLAYER_GUIDE.zh_TW.md   # Player guide (Traditional Chinese)
+│   ├── PLAYER_GUIDE.ja_JP.md   # Player guide (Japanese)
+│   └── PLAYER_GUIDE.en.md      # Player guide (English)
 ```
 
 > Scripts are layered by domain, and the entry `BP/scripts/main.js` only does imports, making it easy to locate feature modules.
@@ -233,36 +230,14 @@ All script files carry `// @ts-check` at the top, working with `allowJs + checkJ
 - **Relative imports must include the `.js` extension** (e.g. `import "./config/worldConfig.js"`), otherwise a runtime `ERR_MODULE_NOT_FOUND` occurs.
 - Use **ScriptAPI 2.x** conventions: `world.afterEvents.worldLoad`, `world.getPlayers()`, `entity.isValid` (property), `runCommand`, etc., and avoid the old interfaces.
 - The world cannot be reliably modified inside `beforeEvents` (dispatching items / deleting entities, etc.); defer to the next tick with `mc.system.run()`.
-- All player-facing text must be output through `t()` in `core/i18n.js`, with matching keys completed in `RP/texts/zh_CN.lang` and `en_US.lang` (the two files must mirror each other exactly).
-
-### Adding an Item
-
-1. Add an item JSON under `BP/items/`;
-2. Put a texture in `RP/textures/items/` and register it in `item_texture.json`;
-3. Write the event-handling logic in the corresponding system (usually `BP/scripts/gameplay/props.js`);
-4. If it should be sold, add an entry in the shop config in `BP/scripts/config/worldConfig.js`;
-5. Add localized names in `RP/texts/zh_CN.lang` + `en_US.lang` (`item.lw_p1:<id>`);
-6. Once `npx tsc --noEmit` passes, test on a real device.
-
-### Adding a Door
-
-1. Add a door block JSON modeled on `BP/blocks/keydoor_1.json`;
-2. Add the corresponding key under `BP/items/`;
-3. Register the mapping in `DOOR_KEY_MAP` in `BP/scripts/blocks/keydoor.js`;
-4. Add the texture in RP and register it in `terrain_texture.json`;
-5. Add the language entries; once `npx tsc --noEmit` passes, test on a real device.
-
-### Commit Conventions
-
-- Sync features / bug fixes to both the `main` and `netease` branches;
-- Prefix commit messages with `feat: / fix: / chore:` and explain "why" the change was made.
+- All player-facing text must be output through `t()` in `core/i18n.js`, with matching keys completed in all five language files under `RP/texts/` (`zh_CN`, `zh_TW`, `en_US`, `en_GB`, `ja_JP`); the five files must mirror each other exactly (identical key set, `%s`, `§` codes and `\n` positions).
 
 ---
 
 ## Documentation
 
-- **Player Guide (English)**: [PLAYER_GUIDE.md](./PLAYER_GUIDE.md)
-- **Player Guide (Chinese)**: [列车狼人杀游玩指南.md](./列车狼人杀游玩指南.md)
+- **Player Guide**: [English](./docs/PLAYER_GUIDE.en.md) ｜ [简体中文](./docs/PLAYER_GUIDE.zh_CN.md) ｜ [繁體中文](./docs/PLAYER_GUIDE.zh_TW.md) ｜ [日本語](./docs/PLAYER_GUIDE.ja_JP.md)
+- **README languages**: [简体中文](./README.md) ｜ [繁體中文](./README.zh_TW.md) ｜ [日本語](./README.ja_JP.md)
 - **Developer Reference**: every script file has a one-line responsibility comment at the top; start reading at `BP/scripts/main.js`
 - **Configuration Guide**: after entering the game, open the config panel with a stick — each option has an explanation
 
