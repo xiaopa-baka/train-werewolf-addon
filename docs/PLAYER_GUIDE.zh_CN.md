@@ -1,4 +1,4 @@
-**简体中文** ｜ [繁體中文](./PLAYER_GUIDE.zh_TW.md) ｜ [日本語](./PLAYER_GUIDE.ja_JP.md) ｜ [English](./PLAYER_GUIDE.en.md)
+**简体中文** ｜ [繁體中文](./PLAYER_GUIDE.zh_TW.md) ｜ [English](./PLAYER_GUIDE.en.md) ｜ [日本語](./PLAYER_GUIDE.ja_JP.md)
 
 # 列车狼人杀 — 玩家指南
 

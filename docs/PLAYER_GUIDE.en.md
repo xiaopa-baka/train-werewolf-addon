@@ -1,4 +1,4 @@
-[简体中文](./PLAYER_GUIDE.zh_CN.md) ｜ [繁體中文](./PLAYER_GUIDE.zh_TW.md) ｜ [日本語](./PLAYER_GUIDE.ja_JP.md) ｜ **English**
+[简体中文](./PLAYER_GUIDE.zh_CN.md) ｜ [繁體中文](./PLAYER_GUIDE.zh_TW.md) ｜ **English** ｜ [日本語](./PLAYER_GUIDE.ja_JP.md)
 
 # Train Werewolf — Player Guide
 

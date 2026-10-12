@@ -1,4 +1,4 @@
-[简体中文](./README.md) ｜ **繁體中文** ｜ [English](./README.en.md)｜ [日本語](./README.ja_JP.md) 
+[简体中文](./README.md) ｜ **繁體中文** ｜ [English](./README.en.md) ｜ [日本語](./README.ja_JP.md)
 
 # 列車狼人殺 · Train Werewolf
 

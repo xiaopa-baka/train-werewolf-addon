@@ -1,4 +1,4 @@
-[简体中文](./PLAYER_GUIDE.zh_CN.md) ｜ [繁體中文](./PLAYER_GUIDE.zh_TW.md) ｜ **日本語** ｜ [English](./PLAYER_GUIDE.en.md)
+[简体中文](./PLAYER_GUIDE.zh_CN.md) ｜ [繁體中文](./PLAYER_GUIDE.zh_TW.md) ｜ [English](./PLAYER_GUIDE.en.md) ｜ **日本語**
 
 # 列車人狼 — プレイヤーガイド
 

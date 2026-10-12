@@ -1,4 +1,4 @@
-[简体中文](./README.md) ｜ [繁體中文](./README.zh_TW.md) ｜ **English**｜ [日本語](./README.ja_JP.md) 
+[简体中文](./README.md) ｜ [繁體中文](./README.zh_TW.md) ｜ **English** ｜ [日本語](./README.ja_JP.md)
 
 # Train Werewolf
 
