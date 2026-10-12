@@ -1,0 +1,448 @@
+## ADDON-RP ja_JP.lang
+pack.name=列車人狼-RP
+pack.description=列車マップ用の人狼ゲームAddon\nBy Xiaopa
+
+## アイテム
+item.lw_p1:tp_game=§e先頭車両へテレポート
+item.lw_p1:guide_book=§bガイドブック
+item.lw_p1:killer_store=§aショップを開く
+item.lw_p1:dagger=ダガー
+item.lw_p1:pistol=リボルバー
+item.lw_p1:pistol_mini=デリンジャー
+item.lw_p1:key_1=1番の鍵
+item.lw_p1:key_2=2番の鍵
+item.lw_p1:key_3=3番の鍵
+item.lw_p1:key_4=4番の鍵
+item.lw_p1:key_5=5番の鍵
+item.lw_p1:key_6=6番の鍵
+item.lw_p1:key_7=7番の鍵
+item.lw_p1:key_8=8番の鍵
+item.lw_p1:crowbar=バール
+item.lw_p1:lockpick=ピッキングツール
+item.lw_p1:poison=毒薬
+item.lw_p1:grenade=手榴弾
+item.lw_p1:bat=バット
+item.lw_p1:power_cut=電源切断装置
+item.lw_p1:mineral_water=ミネラルウォーター
+item.lw_p1:mineral_water_bottle=ミネラルウォーターの瓶
+item.lw_p1:cigarette=タバコ
+item.lw_p1:note=メモ
+item.lw_p1:magic_conch=魔法の巻貝
+item.lw_p1:pocke_watch=父の懐中時計
+item.lw_p1:royal_jelly=野生のロイヤルゼリー
+item.lw_p1:old_fashioned=オールドファッション
+item.lw_p1:mojito=モヒート
+item.lw_p1:martini=マティーニ
+item.lw_p1:cosmopolitan=コスモポリタン
+item.lw_p1:champagne=シャンパン
+item.lw_p1:firecracker=爆竹
+
+## アイテムグループ
+lw_p1:itemGroup.name.keys=鍵
+lw_p1:itemGroup.name.drinks=飲み物
+lw_p1:itemGroup.name.doors=鍵付きドア
+lw_p1:itemGroup.name.trays=フードトレイ
+
+## ブロック
+tile.lw_p1:vending_machine.name=自動販売機
+tile.lw_p1:food_tray.name=普通のフードトレイ
+tile.lw_p1:food_tray_wood.name=木製のフードトレイ
+tile.lw_p1:food_tray_ceramic.name=陶器のフードトレイ
+tile.lw_p1:food_tray_glass.name=ガラスのフードトレイ
+tile.lw_p1:keydoor_1.name=1番のドア
+tile.lw_p1:keydoor_2.name=2番のドア
+tile.lw_p1:keydoor_3.name=3番のドア
+tile.lw_p1:keydoor_4.name=4番のドア
+tile.lw_p1:keydoor_5.name=5番のドア
+tile.lw_p1:keydoor_6.name=6番のドア
+tile.lw_p1:keydoor_7.name=7番のドア
+tile.lw_p1:keydoor_8.name=8番のドア
+tile.lw_p1:keydoor_9.name=列車のドア
+tile.lw_p1:keydoor_10.name=客車のドア
+
+## エンティティ
+entity.lw_p1:firecracker.name=爆竹
+entity.lw_p1:pistol.name=リボルバー
+entity.lw_p1:bullet.name=弾丸
+entity.lw_p1:grenade.name=手榴弾
+entity.lw_p1:corpes.name=死体
+entity.lw_p1:player_name.name=プレイヤー名
+
+## 共通
+lw_p1.common.notSet=未設定
+lw_p1.common.unknownPlayer=不明なプレイヤー
+lw_p1.common.none=なし
+lw_p1.common.listSep=、
+
+## 役職
+lw_p1.role.killer=§c殺人者
+lw_p1.role.officer=§b警官
+lw_p1.role.passenger=§a乗客
+
+## ガイドブック
+lw_p1.guide.title=§l§6列車乗客ハンドブック
+lw_p1.guide.indexHint=§7章を選んで読む§r
+lw_p1.guide.prev=← 前のページ
+lw_p1.guide.next=次のページ →
+lw_p1.guide.ch.overview=§lゲーム概要
+lw_p1.guide.ch.roles=§l役職
+lw_p1.guide.ch.tasks=§lタスクシステム
+lw_p1.guide.ch.items=§lアイテムとショップ
+lw_p1.guide.ch.note=§lメモ
+lw_p1.guide.ch.config=§l設定の変更
+lw_p1.guide.overview.body=§f疾走する列車、殺意が潜む旅。\nあなたは生きて駅に着けるか？\n§f列車人狼は多人数推理対戦ゲーム。\n§e5～15人§f、1試合約§e10分§f。\n\n§lルール§r\n§f1. 全員が乗車すると列車が出発\n2. 役職をランダムに配分： §c殺人者§f、§b警官§f、§a乗客§f\n3. 殺人者は密かに乗客を排除し、乗客は殺人者を探し出す\n\n§l勝利条件§r\n§a乗客§f： 殺人者の死亡 / 列車の到着\n§c殺人者§f： 乗客全員の死亡\n\n§7マップ名： %s\n§7マップ作者： %s\n§7Addon作者： Xiaopa baka
+lw_p1.guide.roles.body=· §c§l殺人者§r\n§f乗客に紛れ込み、乗客全員の排除を狙う。§e殺人者ショップ§fを持つ。\n\n· §b§l警官§r\n§f唯一の治安維持者で、§eリボルバー§fを持つ。\n\n· §a§l乗客§r\n§f武器も特権もなく、最も人数の多い集団。
+lw_p1.guide.tasks.body=§fゲーム開始後、タスクがランダムに配布される。カウントダウンと進捗は§e左上のタスクパネル§fに表示。\n§c制限時間内に完了できないと死亡§f（殺人者を除く）\n\n§b§lタスク一覧§r\n§e換気タスク§f： 先頭車両か最後尾で空気を吸う\n§e睡眠タスク§f： ベッドに横になる\n§e食事タスク§f： 好きな食べ物を食べる\n§e水分タスク§f： 好きな飲み物を飲む\n§eトイレタスク§f： トイレでしゃがむ - §7ミネラルウォーターの瓶で即完了§f\n§e交流タスク§f： 他のプレイヤーの近くでしばらく立つ - §7タバコで即完了§f
+lw_p1.guide.items.body=§c§l殺人者ショップのアイテム：§r\n§fダガー · デリンジャー · バール · ピッキングツール · 毒薬 · バット · 手榴弾 · 電源切断装置\n\n§b§l共通アイテム§r\n§fメモ · リボルバー(警官) · ミネラルウォーター · ミネラルウォーターの瓶 · 魔法の巻貝 · 父の懐中時計 · 野生のロイヤルゼリー\n\n§e殺人者ショップ§f： 殺人者専用のショップ。専用アイテムを購入できる\n§e自動販売機§f： 列車内の自動販売機では特殊アイテムを購入できる
+lw_p1.guide.note.body=§lメモシステム§r\n§f全員が開始時にメモを1枚受け取り、インベントリに固定される。\n· 何もない場所に使用： 内容を編集\n プレイヤーに使用： メモを送信\n· 死亡後も内容は死体に残る
+lw_p1.guide.config.body=アイテム §e棒 §fを使用して設定画面を開き、ゲーム設定を変更\n
+
+## ショップ
+lw_p1.shop.title.killer=殺人者ショップ
+lw_p1.shop.title.vending=自動販売機
+lw_p1.shop.gold=現在のゴールド：%s
+lw_p1.shop.button=%s：%s ゴールド
+lw_p1.shop.close=§c閉じる
+lw_p1.shop.busy=§c処理中です。連続してクリックしないでください
+lw_p1.shop.notEnough=§cゴールドが足りません。購入失敗！
+lw_p1.shop.fail=§c購入に失敗しました。もう一度お試しください
+lw_p1.shop.success=§a%s の購入に成功
+lw_p1.shop.invFull=§cインベントリが満杯のため、ゴールドを返金しました
+
+## 設定画面 - 共通
+lw_p1.ui.close=§c閉じる
+lw_p1.ui.back=§c戻る
+lw_p1.ui.cancel=キャンセル
+lw_p1.ui.confirmReset=§cリセットを確定
+lw_p1.ui.confirmClear=§c消去を確定
+lw_p1.ui.resetDefault=§6デフォルト設定に戻す
+lw_p1.ui.resetTitle=デフォルトに戻す
+lw_p1.ui.deleteItem=§cこの項目を削除
+lw_p1.ui.unset=未設定
+lw_p1.ui.coordInvalid=§c座標の入力が不正です。保存に失敗しました
+lw_p1.ui.saveFail=§c保存に失敗: %s
+lw_p1.ui.addItem=アイテムを追加
+lw_p1.ui.addProduct=商品を追加
+lw_p1.ui.edit=%s を編集
+lw_p1.ui.addCurrent=現在位置を追加
+lw_p1.ui.coordX=X座標
+lw_p1.ui.coordY=Y座標
+lw_p1.ui.coordZ=Z座標
+lw_p1.ui.inputInt=整数の座標を入力
+lw_p1.ui.coord.diagStartX=対角線の始点座標\n\n始点X座標
+lw_p1.ui.coord.startY=始点Y座標
+lw_p1.ui.coord.startZ=始点Z座標
+lw_p1.ui.coord.diagEndX=対角線の終点座標\n\n終点X座標
+lw_p1.ui.coord.endY=終点Y座標
+lw_p1.ui.coord.endZ=終点Z座標
+lw_p1.ui.itemId.label=アイテムの完全な識別子を入力してください。例：minecraft:apple
+lw_p1.ui.itemId.labelShort=アイテムの完全な識別子
+lw_p1.ui.itemId.ph=アイテムIDを入力
+lw_p1.ui.itemId.phShort=アイテムID
+
+## 設定画面 - メイン画面
+lw_p1.ui.main.title=メイン設定パネル
+lw_p1.ui.main.body=設定カテゴリを選択してください
+lw_p1.ui.main.game=ゲーム全体設定
+lw_p1.ui.main.map=マップ領域設定
+lw_p1.ui.main.food=食べ物&飲み物設定
+lw_p1.ui.main.shop=ショップ設定
+lw_p1.ui.main.other=その他
+
+## 設定画面 - 全体ゲーム設定
+lw_p1.ui.game.title=ゲーム全体設定
+lw_p1.ui.game.body=ゲーム全体の数値パラメータを調整
+lw_p1.ui.game.settings=ゲーム関連設定
+lw_p1.ui.game.task=タスク関連設定
+lw_p1.ui.game.settingsTitle=ゲーム関連設定
+lw_p1.ui.game.autoHeader=自動開始時間
+lw_p1.ui.game.autoDesc=全プレイヤーが列車内にいると、自動開始のカウントダウンが始まる。\n以下のコマンドで手動開始も可能\n/lw_p1:start\nデフォルト %s\n自動開始時間（秒）
+lw_p1.ui.game.autoToggle=自動開始を有効にする
+lw_p1.ui.game.minHeader=\n最低開始人数
+lw_p1.ui.game.minDesc=列車内のプレイヤーがこの人数に達するとゲームを開始できる。\nデフォルト %s\n最低開始人数（人）
+lw_p1.ui.game.baseHeader=\nゲームの基本時間
+lw_p1.ui.game.baseDesc=1試合の基本時間。乗客が1人死亡するごとに60秒延長される。\nデフォルト %s\nゲーム時間（秒）
+lw_p1.ui.game.saved=§aゲーム設定を保存しました
+lw_p1.ui.task.title=タスク関連設定
+lw_p1.ui.task.probHeader=タスク配布確率
+lw_p1.ui.task.probDesc=タスク未割り当てのプレイヤーに毎秒タスクを出す確率。\nデフォルト %s\n配布確率（パーセント）
+lw_p1.ui.task.startHeader=\nタスク配布の開始時間
+lw_p1.ui.task.startDesc=ゲーム開始後、最初にタスク配布を試みるまでの時間。\nデフォルト %s\n初回タスク配布時間（秒）
+lw_p1.ui.task.limitHeader=\n1タスクの制限時間
+lw_p1.ui.task.limitDesc=1つのタスクはこの時間内に完了する必要がある。乗客/警官は時間切れで失敗、殺人者は完了扱い。\nデフォルト %s\n1タスクの制限時間（秒）
+lw_p1.ui.task.rewardHeader=\nタスク完了報酬
+lw_p1.ui.task.rewardDesc=乗客/警官がタスクを1つ完了するごとに得るゴールド。\nデフォルト %s\nタスク完了報酬（ゴールド）
+lw_p1.ui.task.saved=§aタスク設定を保存しました
+lw_p1.ui.inGame.button=試合内関連設定
+lw_p1.ui.inGame.title=試合内関連設定
+lw_p1.ui.inGame.staminaHeader=スタミナ
+lw_p1.ui.inGame.staminaToggle=スタミナシステムを有効にする
+lw_p1.ui.inGame.drainDesc=\nダッシュ中に毎秒消費するスタミナ\nデフォルト %s\nスタミナ（毎秒）
+lw_p1.ui.inGame.regenDesc=\nダッシュをやめた後、毎秒回復するスタミナ\nデフォルト %s\nスタミナ（毎秒）
+lw_p1.ui.inGame.killerToggle=殺人者のスタミナ値
+lw_p1.ui.inGame.moveHeader=ジャンプ
+lw_p1.ui.inGame.jumpToggle=ジャンプを有効にする
+lw_p1.ui.inGame.weatherHeader=天候
+lw_p1.ui.inGame.weatherToggle=試合中に雷雨
+lw_p1.ui.inGame.saved=§a試合内関連設定を保存しました
+lw_p1.ui.reset.title=デフォルト設定に戻す
+lw_p1.ui.reset.body=§cすべてのゲーム設定をデフォルトに戻しますか？\n現在の設定はすべて上書きされます！
+lw_p1.ui.reset.done=§aすべてのタスク/ゲーム設定をデフォルトに戻しました！
+
+## 設定画面 - マップ領域設定
+lw_p1.ui.map.title=マップ領域設定
+lw_p1.ui.map.body=座標管理
+lw_p1.ui.map.stationEngine=ホーム&先頭車両の座標
+lw_p1.ui.map.trainArea=列車エリアの座標
+lw_p1.ui.map.engineVent=先頭車両の換気エリア座標
+lw_p1.ui.map.tailVent=最後尾の換気エリア座標
+lw_p1.ui.map.toilet=トイレ座標管理
+lw_p1.ui.map.randomTp=ランダムテレポート座標管理
+lw_p1.ui.map.roomCount=部屋数設定
+lw_p1.ui.map.clearAll=§6すべてのマップ座標を消去
+lw_p1.ui.stationEngine.title=ホーム&先頭車両の座標設定
+lw_p1.ui.stationEngine.stationHeader=ホーム座標
+lw_p1.ui.stationEngine.stationX=各試合終了後、プレイヤーはこの座標へテレポートする（開始部屋）\n\nホームX座標
+lw_p1.ui.stationEngine.stationY=ホームY座標
+lw_p1.ui.stationEngine.stationZ=ホームZ座標
+lw_p1.ui.stationEngine.engineHeader=\n先頭車両の座標
+lw_p1.ui.stationEngine.engineX=「先頭車両へテレポート」アイテムのテレポート先座標\n\n先頭車両X座標
+lw_p1.ui.stationEngine.engineY=先頭車両Y座標
+lw_p1.ui.stationEngine.engineZ=先頭車両Z座標
+lw_p1.ui.stationEngine.saved=§aホーム&先頭車両の座標を保存しました
+lw_p1.ui.trainArea.title=列車エリア座標設定
+lw_p1.ui.trainArea.startHeader=列車エリア 始点
+lw_p1.ui.trainArea.endHeader=\n列車エリア 終点
+lw_p1.ui.trainArea.saved=§a列車エリアの座標を保存しました
+lw_p1.ui.engineVent.title=先頭車両の換気エリア座標設定
+lw_p1.ui.engineVent.startHeader=先頭車両の換気エリア 始点
+lw_p1.ui.engineVent.endHeader=\n先頭車両の換気エリア 終点
+lw_p1.ui.engineVent.saved=§a先頭車両の換気エリア座標を保存しました
+lw_p1.ui.tailVent.title=最後尾の換気エリア座標設定
+lw_p1.ui.tailVent.startHeader=最後尾の換気エリア 始点
+lw_p1.ui.tailVent.endHeader=\n最後尾の換気エリア 終点
+lw_p1.ui.tailVent.saved=§a最後尾の換気エリア座標を保存しました
+lw_p1.ui.toilet.title=トイレ座標管理
+lw_p1.ui.toilet.body=プレイヤーが以下の座標でしばらくスニークするとトイレタスクを完了できる。\n座標を最低1つ設定してください
+lw_p1.ui.toilet.added=§aトイレ座標を追加しました
+lw_p1.ui.toilet.deleted=§cトイレ座標を削除しました
+lw_p1.ui.toilet.updated=§aトイレ座標を更新しました
+lw_p1.ui.toilet.edit=トイレ座標 %s を編集
+lw_p1.ui.random.title=ランダムテレポート座標管理
+lw_p1.ui.random.body=ゲーム開始後、プレイヤーは以下の座標へランダムにテレポートする。\n最大プレイヤー数以上の座標を設定してください。
+lw_p1.ui.random.added=§aランダム座標を追加しました
+lw_p1.ui.random.deleted=§cランダムテレポート座標を削除しました
+lw_p1.ui.random.updated=§aランダムテレポート座標を更新しました
+lw_p1.ui.random.edit=ランダムテレポート座標 %s を編集
+lw_p1.ui.room.title=部屋数設定
+lw_p1.ui.room.header=部屋数
+lw_p1.ui.room.desc=ゲーム開始時の鍵の数（1～N）。プレイヤー数が部屋数を超えると循環して割り当てられる。\nデフォルト %s\n部屋数
+lw_p1.ui.room.set=§a部屋数を %s に設定しました
+lw_p1.ui.clear.title=消去の確認
+lw_p1.ui.clear.body=§cすべてのマップ座標を消去しますか？元に戻せません！
+lw_p1.ui.clear.done=§cすべてのマップ座標を消去しました
+
+## 設定画面 - 食べ物&飲み物
+lw_p1.ui.food.title=アイテム設定管理
+lw_p1.ui.food.body=食事/水分タスクの有効アイテムリストを管理
+lw_p1.ui.food.foods=有効な食べ物を設定
+lw_p1.ui.food.drinks=有効な飲み物を設定
+lw_p1.ui.food.trays=フードトレイ設定
+lw_p1.ui.resetFood.body=§c有効な食べ物・飲み物・フードトレイのリストをデフォルトに戻しますか？現在のカスタム項目は上書きされます！
+lw_p1.ui.resetFood.done=§a有効な食べ物/飲み物/フードトレイの設定をデフォルトに戻しました
+lw_p1.ui.foodList.title=有効な食べ物の管理
+lw_p1.ui.foodList.body=食事タスクの有効アイテムリストを管理
+lw_p1.ui.foodList.add=食べ物を追加
+lw_p1.ui.drinkList.title=有効な飲み物の管理
+lw_p1.ui.drinkList.body=水分タスクの有効アイテムリストを管理
+lw_p1.ui.drinkList.add=飲み物を追加
+lw_p1.ui.tray.title=フードトレイ設定
+lw_p1.ui.tray.body=設定するトレイの種類を選択。使用すると設定したアイテムをランダムに獲得できる
+lw_p1.ui.tray.items=%s のアイテム
+lw_p1.ui.tray.itemsBody=使用すると以下のアイテムをランダムに1つ獲得できる
+lw_p1.ui.tray.addTitle=%s のアイテムを追加
+
+## 設定画面 - ショップ
+lw_p1.ui.shop.title=ショップ設定
+lw_p1.ui.shop.body=ショップのアイテムリストと初期ゴールドを管理
+lw_p1.ui.shop.killer=殺人者ショップ設定
+lw_p1.ui.shop.vending=自動販売機設定
+lw_p1.ui.shop.initialCoins=初期ゴールド
+lw_p1.ui.resetShop.body=§c殺人者ショップと自動販売機の商品リストをデフォルトに戻しますか？現在のカスタム項目は上書きされます！
+lw_p1.ui.resetShop.done=§aショップの設定をデフォルトに戻しました
+lw_p1.ui.killerForm.title=殺人者ショップ設定
+lw_p1.ui.killerForm.body=殺人者ショップのアイテムリストを管理
+lw_p1.ui.vendingForm.title=自動販売機設定
+lw_p1.ui.vendingForm.body=自動販売機のアイテムリストを管理
+lw_p1.ui.shopItem.name=商品の表示名
+lw_p1.ui.shopItem.namePh=名前を入力
+lw_p1.ui.shopItem.id=アイテム識別子
+lw_p1.ui.shopItem.idPh=例 minecraft:apple
+lw_p1.ui.shopItem.price=価格
+lw_p1.ui.shopItem.pricePh=正の整数を入力
+lw_p1.ui.initialCoins.title=初期ゴールド設定
+lw_p1.ui.initialCoins.killerHeader=殺人者の初期ゴールド
+lw_p1.ui.initialCoins.killerDesc=ゲーム開始時に殺人者プレイヤーが持つ初期ゴールド。\nデフォルト %s\n殺人者の初期ゴールド
+lw_p1.ui.initialCoins.civilHeader=\n乗客の初期ゴールド
+lw_p1.ui.initialCoins.civilDesc=ゲーム開始時に殺人者以外のプレイヤーが持つ初期ゴールド。\nデフォルト %s\n乗客の初期ゴールド
+lw_p1.ui.initialCoins.killerRateHeader=\n殺人者のゴールド成長
+lw_p1.ui.initialCoins.killerRateDesc=ゲーム開始後、殺人者プレイヤーが10秒ごとに自然獲得するゴールド。\nデフォルト %s\n10秒ごとのゴールド
+lw_p1.ui.initialCoins.civilRateHeader=\n乗客のゴールド成長
+lw_p1.ui.initialCoins.civilRateDesc=ゲーム開始後、殺人者以外のプレイヤーが10秒ごとに自然獲得するゴールド。\nデフォルト %s\n10秒ごとのゴールド
+lw_p1.ui.initialCoins.fail=§c初期ゴールドの保存に失敗: %s
+
+## 設定画面 - その他
+lw_p1.ui.other.title=その他の機能
+lw_p1.ui.other.body=予備機能とこのAddonについての情報
+lw_p1.ui.other.mapInfo=マップ情報を設定
+lw_p1.ui.other.unused=現在利用できない設定をさらに変更
+lw_p1.ui.other.about=このAddonについて
+lw_p1.ui.other.sponsor=支援&メンバー募集
+lw_p1.ui.mapInfo.title=マップ情報設定
+lw_p1.ui.mapInfo.name=マップ名
+lw_p1.ui.mapInfo.namePh=マップ名を入力
+lw_p1.ui.mapInfo.author=マップ作者
+lw_p1.ui.mapInfo.authorPh=作者名を入力
+lw_p1.ui.mapInfo.saved=§aマップ情報を保存しました
+lw_p1.ui.unused.title=予備機能設定
+lw_p1.ui.unused.body=より多くのタスクやプリセットデータ・状態を追加したい場合、または内部データを変更したい場合は、以下のURLでプロジェクトのソースコードを確認できます\n§bhttps://github.com/xiaopa-baka/train-werewolf-addon§r\nプロジェクトのリポジトリでビヘイビアパックのソースコードを閲覧し、学習・改変・フォークして二次開発できます\n\n注意：\n二次開発の際は原作者と変更内容を明記してください。悪意ある改変のうえでの配布は禁止です！\n二次開発を商業目的で使用することはできません。オリジナル版または改変版の私自販売は禁止です！\n二次開発後も「その他」セクション全体の内容（開発者情報や支援情報など）を変更・削除しないでください\n二次開発中に何か問題があれば、開発者までお気軽にご連絡ください\n\n§6今後のアップデートにご期待ください！
+lw_p1.ui.about.title=このAddonについて
+lw_p1.ui.about.body=§b列車人狼Addon\n§fバージョン：正式版 1.0.1\n§f対応：Minecraft Bedrock Edition 1.26.50+\n§f開発方式：ネイティブScript API\n\n§a開発者紹介：\nスタジオ：LW.狮狼传奇工作室\n企画：Xiaopa baka\nAddon作者：Xiaopa baka
+lw_p1.ui.sponsor.title=支援 & チーム募集
+lw_p1.ui.sponsor.body=§b本プロジェクトの開発へのご支援をお待ちしています！\n\n§f【支援について】\nこのAddonを気に入り、支援していただける場合は、以下の方法があります：\n· SNSでこのAddonを紹介する\n· このAddonのプレイマップを作成して公開する\n\nスタジオでは現在メンバーを積極募集しています。MCが好きなあなたの参加をお待ちしています！\n§f【募集職種】\n· マップ建築\n· プロジェクト企画\n· 運営・広報\n· コマンド設計、MOD・プラグイン開発\n· テクスチャ・モデリング制作\n· スキン制作\n\n\nスタジオ交流グループ（QQ）：180568043\n§aMCが好きな仲間の参加をお待ちしています！\n一緒に、もっと素晴らしいMCの冒険体験を作りましょう！
+
+## アイテム操作
+lw_p1.prop.pistol.killerBlocked=§c殺人者はこの銃を使えない
+lw_p1.prop.pistol.lostRight=§cあなたはピストルを使用する資格を失った
+lw_p1.prop.pistol.picked=§aリボルバーを拾った
+lw_p1.prop.invFull=§cインベントリが満杯で拾えない
+lw_p1.prop.mad.start=§c§l%s が狂乱状態になった！
+lw_p1.prop.mad.end=§7%s の狂乱状態が終了した
+lw_p1.prop.conch=§e§l魔法の巻貝 §r§fが告げる： %s の役職は %s
+lw_p1.prop.time.none=§e残り時間 --:--
+lw_p1.prop.time.remaining=§e残り時間 %s:%s
+lw_p1.prop.watch.saved=父の懐中時計が致命的なダメージを1回防いだ
+lw_p1.prop.tray.alreadyPoisoned=§cこのトレイにはすでに毒が盛られている
+lw_p1.prop.tray.poisoned=§a毒を盛ることに成功した
+lw_p1.prop.tray.empty=§cこのトレイは空だ
+lw_p1.prop.royalJelly.cured=§aロイヤルゼリーが毒状態を解除した
+lw_p1.prop.note.title=メモの編集
+lw_p1.prop.note.label=メモの内容を入力
+lw_p1.prop.note.ph=ここに入力...
+lw_p1.prop.note.empty=§cメモにまだ内容がありません。先に編集してください
+lw_p1.prop.note.received=§7%s からのメモ§f: %s
+lw_p1.prop.note.sent=§a%s にメモを送信しました
+lw_p1.prop.note.corpse=§e[メモ] §f%s
+
+## アクションバー HUD
+lw_p1.hud.stamina=§bスタミナ %s §f%s
+lw_p1.hud.stamina.exhausted=§cスタミナ %s §f%s
+
+## ゲームメッセージ
+lw_p1.msg.killer.civilianDeath=§e乗客が死亡。100ゴールドを獲得、カウントダウンが60秒延長
+lw_p1.msg.boarded=乗車済み %s / %s 人
+lw_p1.msg.gameStart=§aゲーム開始！
+lw_p1.msg.notEnoughPlayers=§c人数が足りないためゲームを開始できません（現在 %s / 最低 %s）
+lw_p1.msg.corpsesCleared=§aすべての死体とネームタグを削除しました
+lw_p1.msg.autoStart.title=§e%s
+lw_p1.msg.autoStart.subtitle=§f秒後にゲーム開始
+lw_p1.msg.autoStart.actionbar=§e%s§f 秒後にゲーム開始
+
+## リザルト
+lw_p1.end.winner.killer=§cゲーム終了、殺人者の勝利！
+lw_p1.end.winner.civil=§aゲーム終了、乗客の勝利！
+lw_p1.end.reason.killerDead=殺人者が死亡
+lw_p1.end.reason.killerLeft=殺人者がゲームから退出した
+lw_p1.end.reason.timeUp=時間切れ、乗客は生存
+lw_p1.end.reason.civilsDead=乗客が全員死亡
+lw_p1.end.message=§6【ゲーム終了】\n%s\n§f終了理由：%s\n§f殺人者：%s\n§f警官：%s\n§f乗客：%s
+lw_p1.end.panel=%s\n§f終了理由：%s\n§f殺人者：%s\n§f警官：%s\n§f乗客：%s
+
+## 鍵付きドア
+lw_p1.door.crowbarLocked=§cこのドアはこじ開けられており、閉められない
+lw_p1.door.crowbarCooldown=§cこのドアはバールで詰まっており、しばらくしてから開けられる
+
+## 役職表示（title は短い核心語、subtitle は長文、テキストの画面はみ出しを防ぐ）
+lw_p1.roleWelcome=列車へようこそ
+lw_p1.roleTitle.killer=§c§l殺人者
+lw_p1.roleTitle.officer=§b§l警官
+lw_p1.roleTitle.passenger=§a§l乗客
+lw_p1.roleGoalTitle=あなたの目標
+lw_p1.roleGoal.killer=身分を隠し、全員を始末する
+lw_p1.roleGoal.officer=乗客を守り、殺人者を見つけ出す
+lw_p1.roleGoal.passenger=警官に協力し、安全に降車する
+
+## タスク表示
+lw_p1.task.1.hint1=§a少し息苦しい。換気してきたら？
+lw_p1.task.1.hint2=§6息が苦しくなってきた。換気してきたら？
+lw_p1.task.1.hint3=§cもう窒息しそう。今すぐ換気しなければ！
+lw_p1.task.2.hint1=§aトイレに行きたくなってきた
+lw_p1.task.2.hint2=§6もう我慢できない。急いでトイレへ
+lw_p1.task.2.hint3=§cもう限界、トイレはどこだ？！
+lw_p1.task.3.hint1=§a少し眠くなってきた。寝てきたら？
+lw_p1.task.3.hint2=§6まぶたが重い。寝たほうがいい
+lw_p1.task.3.hint3=§cこれ以上寝なければ死んでしまう！
+lw_p1.task.4.hint1=§a少し腹が減った。何か食べたい
+lw_p1.task.4.hint2=§6今は無性に何か食べたい
+lw_p1.task.4.hint3=§c壁をかじりたいほど空腹。食べなければ餓死する！
+lw_p1.task.5.hint1=§a少し喉が渇いた。何か飲みたい
+lw_p1.task.5.hint2=§6唇が乾ききっている。何か飲みたい
+lw_p1.task.5.hint3=§c脱水症状だ。水分を補給しなければ死ぬ！
+lw_p1.task.6.hint1=§a少し退屈だ。他の人と交流しよう
+lw_p1.task.6.hint2=§6少し落ち込んでいる。誰かと交流しよう
+lw_p1.task.6.hint3=§c重度の抑うつ状態だ。交流が必要！
+lw_p1.task.panel.time=§f残り %s 秒
+lw_p1.panel.name=§fプレイヤー： %s
+lw_p1.panel.role=§f役職： %s
+lw_p1.panel.gold=§fゴールド： §e%s§f
+lw_p1.panel.time=§f残り時間： %s:%s
+lw_p1.task.done=§a気分が良くなった
+lw_p1.task.fake.1=§c換気に行くふりができる
+lw_p1.task.fake.2=§cトイレに行くふりができる
+lw_p1.task.fake.3=§c寝るふりができる
+lw_p1.task.fake.4=§c何か食べるふりができる
+lw_p1.task.fake.5=§c何か飲むふりができる
+lw_p1.task.fake.6=§c他の人と交流するふりができる
+
+## 看板
+lw_p1.sign.start=\n§l§a出発
+lw_p1.sign.end=\n§l§4試合を強制終了
+
+## 音声連携（VoiceCraft、オプション機能）
+lw_p1.voice.status.unsupported=§c[音声連携] この実行環境は sendScriptEvent に対応していないため、機能を利用できません
+lw_p1.voice.status.connected=§a[音声連携] VoiceCraft に接続しました
+lw_p1.voice.status.idle=§7[音声連携] VoiceCraft を検出できません（アドオン未導入 / クライアント未接続）——本モジュールは待機中
+lw_p1.voice.status.channels=§7生存チャンネル = %s（%s ブロック）  スペクテイターチャンネル = %s（距離無制限）
+lw_p1.voice.status.records=§7バインド記録：%s 件  アドオン管理中：%s 件  記録済みバインドコード：%s 個
+lw_p1.voice.status.cleared=§7永続バインド記録を消去したプレイヤー（今回のセッションでは音声はそのまま、再入場時は再バインドが必要）：%s 人
+lw_p1.voice.status.clients=§7記憶している音声クライアント：%s 個（クライアントApp再起動後、これをもとに自動でバインドを復元）
+lw_p1.voice.status.stats=§7自動バインド復元：試行 %s 回 / 失敗 %s 回  送信パケット：%s  最後の受信パケット種別：%s
+lw_p1.voice.status.offline=§8(オフライン)
+lw_p1.voice.status.channel.living=§a生存
+lw_p1.voice.status.channel.spectator=§bスペクテイター
+lw_p1.voice.status.channel.none=§7未送信
+lw_p1.voice.status.owner.addon=§aアドオン管理
+lw_p1.voice.status.owner.local=§e本モジュールが引き続き管理
+lw_p1.voice.status.player=§7 - §f%s§7：%s§7 / %s§7（エンティティ %s）
+lw_p1.voice.status.noEvent=§7（voicecraft:* イベントを一度も受信していない）
+lw_p1.voice.status.lastEvent=§7最後のイベント：%s
+lw_p1.voice.status.lastError=§c直近のエラー：%s
+lw_p1.voice.cmd.resync.ok=§a[音声連携] チャンネルビットマスクと距離パラメータを強制再送信しました
+lw_p1.voice.cmd.resync.idle=§7[音声連携] VoiceCraft が未接続のため、再送信は不要
+lw_p1.voice.cmd.resync.restored=§a[音声連携] 現在のバインドをワールドプロパティに書き戻しました。再入場時に自動で復元されます
+lw_p1.voice.cmd.resync.all=§a[音声連携] %s 件の現在のバインドをワールドプロパティに書き戻しました。これらのプレイヤーは再入場時に自動で復元されます
+lw_p1.voice.cmd.resync.target=§a[音声連携] %s の現在のバインドをワールドプロパティに書き戻しました。再入場時に自動で復元されます
+lw_p1.voice.cmd.resync.none=§7[音声連携] %s に書き戻せるバインド記録がありません（現在バインドされていないか、すでにワールドプロパティにあります）
+lw_p1.voice.cmd.resync.none.all=§7[音声連携] 書き戻せるバインド記録がありません（現在バインドされていないか、すべてワールドプロパティにあります）
+lw_p1.voice.cmd.forget.ok=§a[音声連携] あなたのバインド記録を消去しました（ワールドプロパティにあなたの id は保存されません）：今回のセッションでは音声はそのまま、再入場時は自動バインドされません
+lw_p1.voice.cmd.forget.target=§a[音声連携] %s のバインド記録を消去しました（ワールドプロパティにその id は保存されません）：今回のセッションでは音声はそのまま、再入場時は自動バインドされません
+lw_p1.voice.cmd.forget.all=§a[音声連携] 全 %s 件のバインド記録を消去しました（ワールドプロパティにこれらのプレイヤーは保存されません）：今回のセッションでは音声はそのまま、再入場時は再バインドが必要です
+lw_p1.voice.cmd.forget.none=§7[音声連携] 消去できるバインド記録が見つかりません（そもそも再バインドが必要です）
+lw_p1.voice.cmd.forget.hint=§7「入場時の自動バインド」を復元するには：再入場後、クライアントに表示されたバインドコードで /vcbind <コード> を実行するか、管理者が /lw_p1:voice_resync <対象> を実行してください
+lw_p1.voice.cmd.target.unknown=§c[音声連携] 対象「%s」が見つかりません：対象にはプレイヤーセレクター（@s 自分、@a 全オンラインプレイヤー、@p 最寄りのプレイヤー）またはオンラインプレイヤー名を指定してください。Tab で補完できます
+lw_p1.voice.cmd.target.empty=§7[音声連携] 対象セレクターがオンラインプレイヤーに一致しませんでした（対象を省略した場合のみオフラインプレイヤーに作用します）
+lw_p1.voice.ui.entry=§b音声設定
+lw_p1.voice.ui.title=音声設定（VoiceCraft 音声連携）
+lw_p1.voice.ui.rangeHeader=音声の伝播距離
+lw_p1.voice.ui.rangeDesc=生存者はこの距離内で互いに聞こえる。スペクテイター同士はこの距離の制限を受けない。\nデフォルト %s\n音声半径（ブロック）
+lw_p1.voice.ui.saved=§a[音声連携] 音声半径を %s ブロックに設定しました

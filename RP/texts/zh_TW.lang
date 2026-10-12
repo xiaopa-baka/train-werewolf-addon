@@ -1,0 +1,448 @@
+## ADDON-RP zh_TW.lang
+pack.name=列車狼人殺-RP
+pack.description=為列車地圖製作的狼人殺玩法Addon\nBy Xiaopa
+
+## 物品
+item.lw_p1:tp_game=§e傳送至車頭
+item.lw_p1:guide_book=§b指南書
+item.lw_p1:killer_store=§a開啟商店
+item.lw_p1:dagger=匕首
+item.lw_p1:pistol=左輪手槍
+item.lw_p1:pistol_mini=德林傑手槍
+item.lw_p1:key_1=1號鑰匙
+item.lw_p1:key_2=2號鑰匙
+item.lw_p1:key_3=3號鑰匙
+item.lw_p1:key_4=4號鑰匙
+item.lw_p1:key_5=5號鑰匙
+item.lw_p1:key_6=6號鑰匙
+item.lw_p1:key_7=7號鑰匙
+item.lw_p1:key_8=8號鑰匙
+item.lw_p1:crowbar=撬棍
+item.lw_p1:lockpick=開鎖器
+item.lw_p1:poison=毒藥
+item.lw_p1:grenade=手榴彈
+item.lw_p1:bat=球棒
+item.lw_p1:power_cut=斷電裝置
+item.lw_p1:mineral_water=礦泉水
+item.lw_p1:mineral_water_bottle=礦泉水瓶
+item.lw_p1:cigarette=香菸
+item.lw_p1:note=便條
+item.lw_p1:magic_conch=神奇的海螺
+item.lw_p1:pocke_watch=父親的懷錶
+item.lw_p1:royal_jelly=野生蜂王漿
+item.lw_p1:old_fashioned=老式雞尾酒
+item.lw_p1:mojito=莫希托
+item.lw_p1:martini=馬丁尼
+item.lw_p1:cosmopolitan=柯夢波丹
+item.lw_p1:champagne=香檳
+item.lw_p1:firecracker=爆竹
+
+## 物品組
+lw_p1:itemGroup.name.keys=鑰匙
+lw_p1:itemGroup.name.drinks=飲品
+lw_p1:itemGroup.name.doors=鑰匙門
+lw_p1:itemGroup.name.trays=食物托盤
+
+## 方塊
+tile.lw_p1:vending_machine.name=自動販賣機
+tile.lw_p1:food_tray.name=普通食物托盤
+tile.lw_p1:food_tray_wood.name=木製食物托盤
+tile.lw_p1:food_tray_ceramic.name=陶瓷食物托盤
+tile.lw_p1:food_tray_glass.name=玻璃食物托盤
+tile.lw_p1:keydoor_1.name=1號門
+tile.lw_p1:keydoor_2.name=2號門
+tile.lw_p1:keydoor_3.name=3號門
+tile.lw_p1:keydoor_4.name=4號門
+tile.lw_p1:keydoor_5.name=5號門
+tile.lw_p1:keydoor_6.name=6號門
+tile.lw_p1:keydoor_7.name=7號門
+tile.lw_p1:keydoor_8.name=8號門
+tile.lw_p1:keydoor_9.name=列車門
+tile.lw_p1:keydoor_10.name=車廂門
+
+## 實體
+entity.lw_p1:firecracker.name=爆竹
+entity.lw_p1:pistol.name=左輪手槍
+entity.lw_p1:bullet.name=子彈
+entity.lw_p1:grenade.name=手榴彈
+entity.lw_p1:corpes.name=屍體
+entity.lw_p1:player_name.name=玩家名
+
+## 通用
+lw_p1.common.notSet=未設定
+lw_p1.common.unknownPlayer=未知玩家
+lw_p1.common.none=無
+lw_p1.common.listSep=、
+
+## 身份
+lw_p1.role.killer=§c殺手
+lw_p1.role.officer=§b警員
+lw_p1.role.passenger=§a平民
+
+## 指南書
+lw_p1.guide.title=§l§6列車乘客手冊
+lw_p1.guide.indexHint=§7選擇章節閱讀§r
+lw_p1.guide.prev=← 上一頁
+lw_p1.guide.next=下一頁 →
+lw_p1.guide.ch.overview=§l遊戲概述
+lw_p1.guide.ch.roles=§l身份
+lw_p1.guide.ch.tasks=§l任務系統
+lw_p1.guide.ch.items=§l道具與商店
+lw_p1.guide.ch.note=§l便條
+lw_p1.guide.ch.config=§l修改設定
+lw_p1.guide.overview.body=§f一列飛馳的火車，一場暗藏殺機的旅途。\n你能否活著到站？\n§f列車狼人殺是一款多人推理對抗遊戲。\n§e5-15 人§f，一局約 §e10 分鐘§f。\n\n§l規則§r\n§f1. 所有人登車後，列車出發\n2. 隨機分配身份： §c殺手§f、§b警員§f、§a平民§f\n3. 殺手暗中消滅乘客，乘客努力找出殺手\n\n§l獲勝條件§r\n§a乘客§f： 殺手死亡 / 列車到站\n§c殺手§f： 所有乘客死亡\n\n§7地圖名稱： %s\n§7地圖作者： %s\n§7Addon作者： 小怕（Xiaopa baka）
+lw_p1.guide.roles.body=· §c§l殺手§r\n§f隱藏在乘客之中，目標是消滅所有乘客，擁有§e殺手商店§f。\n\n· §b§l警員§r\n§f唯一的執法人員，擁有§e左輪手槍§f。\n\n· §a§l平民§r\n§f沒有武器，沒有特權，是人數最多的群體。
+lw_p1.guide.tasks.body=§f遊戲開始後隨機發布任務，倒數計時與進度顯示在§e左上角任務面板§f。\n§c逾時未完成死亡§f（殺手除外）\n\n§b§l任務列表§r\n§e通風任務§f： 去車頭或車尾透氣\n§e睡覺任務§f： 躺到床上\n§e進食任務§f： 吃下任意食物\n§e補水任務§f： 喝任意飲品\n§e蹲坑任務§f： 去廁所蹲下 - §7礦泉水瓶直接完成§f\n§e社交任務§f： 靠近其他玩家站一會兒 - §7香菸直接完成§f
+lw_p1.guide.items.body=§c§l殺手商店道具：§r\n§f匕首 · 德林傑手槍 · 撬棍 · 開鎖器 · 毒藥 · 球棒 · 手榴彈 · 斷電裝置\n\n§b§l通用道具§r\n§f便條 · 左輪手槍(警員) · 礦泉水 · 礦泉水瓶 · 神奇的海螺 · 父親的懷錶 · 野生蜂王漿\n\n§e殺手商店§f： 殺手自帶商店，可購買專屬道具\n§e自動販賣機§f： 列車上的自動販賣機可以購買特殊道具
+lw_p1.guide.note.body=§l便條系統§r\n§f每人開局獲得一張便條，綁定背包。\n· 對空白處使用： 編輯內容\n 對玩家使用： 發送便條\n· 死亡後內容留在屍體上
+lw_p1.guide.config.body=使用物品 §e木棍 §f開啟設定介面，修改遊戲設定\n
+
+## 商店
+lw_p1.shop.title.killer=殺手商店
+lw_p1.shop.title.vending=販賣機
+lw_p1.shop.gold=目前金幣：%s
+lw_p1.shop.button=%s：%s 金幣
+lw_p1.shop.close=§c關閉
+lw_p1.shop.busy=§c處理中，請勿重複點擊
+lw_p1.shop.notEnough=§c金幣不足，購買失敗！
+lw_p1.shop.fail=§c購買失敗，請重試
+lw_p1.shop.success=§a成功購買 %s
+lw_p1.shop.invFull=§c物品欄已滿，金幣已退還
+
+## 設定介面 - 通用
+lw_p1.ui.close=§c關閉
+lw_p1.ui.back=§c返回
+lw_p1.ui.cancel=取消
+lw_p1.ui.confirmReset=§c確認恢復
+lw_p1.ui.confirmClear=§c確認清空
+lw_p1.ui.resetDefault=§6恢復預設設定
+lw_p1.ui.resetTitle=恢復預設
+lw_p1.ui.deleteItem=§c刪除此項
+lw_p1.ui.unset=未設定
+lw_p1.ui.coordInvalid=§c座標輸入不合法，儲存失敗
+lw_p1.ui.saveFail=§c儲存失敗: %s
+lw_p1.ui.addItem=新增物品
+lw_p1.ui.addProduct=新增商品
+lw_p1.ui.edit=編輯 %s
+lw_p1.ui.addCurrent=新增目前位置
+lw_p1.ui.coordX=X座標
+lw_p1.ui.coordY=Y座標
+lw_p1.ui.coordZ=Z座標
+lw_p1.ui.inputInt=輸入整數座標
+lw_p1.ui.coord.diagStartX=對角線起點座標\n\n起點X座標
+lw_p1.ui.coord.startY=起點Y座標
+lw_p1.ui.coord.startZ=起點Z座標
+lw_p1.ui.coord.diagEndX=對角線終點座標\n\n終點X座標
+lw_p1.ui.coord.endY=終點Y座標
+lw_p1.ui.coord.endZ=終點Z座標
+lw_p1.ui.itemId.label=請輸入物品完整識別碼，範例：minecraft:apple
+lw_p1.ui.itemId.labelShort=物品完整識別碼
+lw_p1.ui.itemId.ph=請輸入物品ID
+lw_p1.ui.itemId.phShort=物品ID
+
+## 設定介面 - 主介面
+lw_p1.ui.main.title=主設定面板
+lw_p1.ui.main.body=請選擇設定分類
+lw_p1.ui.main.game=全域遊戲設定
+lw_p1.ui.main.map=地圖區域設定
+lw_p1.ui.main.food=食物&飲品設定
+lw_p1.ui.main.shop=商店設定
+lw_p1.ui.main.other=其他
+
+## 設定介面 - 全域遊戲設定
+lw_p1.ui.game.title=全域遊戲設定
+lw_p1.ui.game.body=調整遊戲全域數值參數
+lw_p1.ui.game.settings=遊戲相關設定
+lw_p1.ui.game.task=任務相關設定
+lw_p1.ui.game.settingsTitle=遊戲相關設定
+lw_p1.ui.game.autoHeader=自動開始時間
+lw_p1.ui.game.autoDesc=當所有玩家都位於列車時，遊戲自動開始倒數計時。\n也可透過以下指令手動開始遊戲\n/lw_p1:start\n預設 %s\n自動開始時間（秒）
+lw_p1.ui.game.autoToggle=啟用自動開始遊戲
+lw_p1.ui.game.minHeader=\n最低開局人數
+lw_p1.ui.game.minDesc=當列車內玩家人數達到此值時，遊戲可以開始。\n預設 %s\n最低開局人數（人）
+lw_p1.ui.game.baseHeader=\n遊戲基礎時長
+lw_p1.ui.game.baseDesc=單局遊戲的基礎時長，每死亡一位平民時長加60秒。\n預設 %s\n遊戲時長（秒）
+lw_p1.ui.game.saved=§a遊戲設定已儲存
+lw_p1.ui.task.title=任務相關設定
+lw_p1.ui.task.probHeader=任務分配機率
+lw_p1.ui.task.probDesc=每秒對未分配任務玩家發布任務的機率。\n預設 %s\n分配機率（百分比）
+lw_p1.ui.task.startHeader=\n任務開始發布時間
+lw_p1.ui.task.startDesc=遊戲開始後，首次嘗試發布任務的時間。\n預設 %s\n首個任務發布時間（秒）
+lw_p1.ui.task.limitHeader=\n單個任務限時
+lw_p1.ui.task.limitDesc=單個任務必須在該時間內完成，平民/警員逾時視為失敗，殺手逾時視為完成。\n預設 %s\n單個任務限時（秒）
+lw_p1.ui.task.rewardHeader=\n任務完成獎勵
+lw_p1.ui.task.rewardDesc=平民/警員每完成一個任務獲得的金幣數。\n預設 %s\n任務完成獎勵（金幣）
+lw_p1.ui.task.saved=§a任務設定已儲存
+lw_p1.ui.inGame.button=局內相關設定
+lw_p1.ui.inGame.title=局內相關設定
+lw_p1.ui.inGame.staminaHeader=體力
+lw_p1.ui.inGame.staminaToggle=啟用體力系統
+lw_p1.ui.inGame.drainDesc=\n疾跑每秒消耗體力\n預設 %s\n體力（秒）
+lw_p1.ui.inGame.regenDesc=\n停止疾跑後每秒恢復體力\n預設 %s\n體力（秒）
+lw_p1.ui.inGame.killerToggle=殺手體力值
+lw_p1.ui.inGame.moveHeader=跳躍
+lw_p1.ui.inGame.jumpToggle=啟用跳躍
+lw_p1.ui.inGame.weatherHeader=天氣
+lw_p1.ui.inGame.weatherToggle=局內雷暴雨
+lw_p1.ui.inGame.saved=§a局內相關設定已儲存
+lw_p1.ui.reset.title=恢復預設設定
+lw_p1.ui.reset.body=§c確定要將所有遊戲設定恢復為預設值嗎？\n此操作會覆蓋目前所有設定！
+lw_p1.ui.reset.done=§a已成功將所有任務/遊戲設定恢復為預設值！
+
+## 設定介面 - 地圖區域設定
+lw_p1.ui.map.title=地圖區域設定
+lw_p1.ui.map.body=座標管理
+lw_p1.ui.map.stationEngine=月台&車頭座標
+lw_p1.ui.map.trainArea=列車區域座標
+lw_p1.ui.map.engineVent=車頭透氣區座標
+lw_p1.ui.map.tailVent=車尾透氣區座標
+lw_p1.ui.map.toilet=蹲坑座標管理
+lw_p1.ui.map.randomTp=隨機傳送座標管理
+lw_p1.ui.map.roomCount=房間數設定
+lw_p1.ui.map.clearAll=§6清空所有地圖座標
+lw_p1.ui.stationEngine.title=月台&車頭座標設定
+lw_p1.ui.stationEngine.stationHeader=月台座標
+lw_p1.ui.stationEngine.stationX=每局結束後玩家傳送至該座標（開始屋）\n\n月台X座標
+lw_p1.ui.stationEngine.stationY=月台Y座標
+lw_p1.ui.stationEngine.stationZ=月台Z座標
+lw_p1.ui.stationEngine.engineHeader=\n車頭座標
+lw_p1.ui.stationEngine.engineX=使用「傳送至車頭」物品後傳送的座標\n\n車頭X座標
+lw_p1.ui.stationEngine.engineY=車頭Y座標
+lw_p1.ui.stationEngine.engineZ=車頭Z座標
+lw_p1.ui.stationEngine.saved=§a月台&車頭座標已儲存
+lw_p1.ui.trainArea.title=列車區域座標設定
+lw_p1.ui.trainArea.startHeader=列車區域 起點
+lw_p1.ui.trainArea.endHeader=\n列車區域 終點
+lw_p1.ui.trainArea.saved=§a列車區域座標已儲存
+lw_p1.ui.engineVent.title=車頭透氣區座標設定
+lw_p1.ui.engineVent.startHeader=車頭透氣區 起點
+lw_p1.ui.engineVent.endHeader=\n車頭透氣區 終點
+lw_p1.ui.engineVent.saved=§a車頭透氣區座標已儲存
+lw_p1.ui.tailVent.title=車尾透氣區座標設定
+lw_p1.ui.tailVent.startHeader=車尾透氣區 起點
+lw_p1.ui.tailVent.endHeader=\n車尾透氣區 終點
+lw_p1.ui.tailVent.saved=§a車尾透氣區座標已儲存
+lw_p1.ui.toilet.title=蹲坑座標管理
+lw_p1.ui.toilet.body=玩家在以下座標位置潛行一段時間可完成蹲坑任務。\n至少設定一個座標
+lw_p1.ui.toilet.added=§a蹲坑座標已新增
+lw_p1.ui.toilet.deleted=§c已刪除蹲坑座標
+lw_p1.ui.toilet.updated=§a蹲坑座標已更新
+lw_p1.ui.toilet.edit=編輯 蹲坑座標 %s
+lw_p1.ui.random.title=隨機傳送座標管理
+lw_p1.ui.random.body=開局後玩家將隨機傳送到以下座標。\n至少設定與最大玩家人數相同數量的座標。
+lw_p1.ui.random.added=§a隨機座標已新增
+lw_p1.ui.random.deleted=§c已刪除隨機傳送座標
+lw_p1.ui.random.updated=§a隨機傳送座標已更新
+lw_p1.ui.random.edit=編輯 隨機傳送座標 %s
+lw_p1.ui.room.title=房間數設定
+lw_p1.ui.room.header=房間數量
+lw_p1.ui.room.desc=遊戲開始時，鑰匙數量（1-N），若玩家人數超過房間數則循環分配。\n預設 %s\n房間數量
+lw_p1.ui.room.set=§a房間數已設為 %s
+lw_p1.ui.clear.title=確認清空
+lw_p1.ui.clear.body=§c確定清空所有地圖座標？無法復原！
+lw_p1.ui.clear.done=§c所有地圖座標已清空
+
+## 設定介面 - 食物&飲品
+lw_p1.ui.food.title=物品設定管理
+lw_p1.ui.food.body=管理進食/補水任務的合法物品清單
+lw_p1.ui.food.foods=設定合法食物
+lw_p1.ui.food.drinks=設定合法飲品
+lw_p1.ui.food.trays=食物托盤設定
+lw_p1.ui.resetFood.body=§c確定恢復合法食物、飲品和食物托盤的預設清單嗎？目前的自訂項目將被覆蓋！
+lw_p1.ui.resetFood.done=§a已恢復合法食物/飲品/食物托盤的預設設定
+lw_p1.ui.foodList.title=合法食物管理
+lw_p1.ui.foodList.body=管理進食任務的合法物品清單
+lw_p1.ui.foodList.add=新增食物
+lw_p1.ui.drinkList.title=合法飲品管理
+lw_p1.ui.drinkList.body=管理補水任務的合法物品清單
+lw_p1.ui.drinkList.add=新增飲品
+lw_p1.ui.tray.title=食物托盤設定
+lw_p1.ui.tray.body=選擇要設定的托盤類型，互動後可隨機獲得設定中的物品
+lw_p1.ui.tray.items=%s 物品
+lw_p1.ui.tray.itemsBody=互動後可隨機獲得以下物品之一
+lw_p1.ui.tray.addTitle=新增 %s 物品
+
+## 設定介面 - 商店
+lw_p1.ui.shop.title=商店設定
+lw_p1.ui.shop.body=管理商店物品清單與初始金幣
+lw_p1.ui.shop.killer=殺手商店設定
+lw_p1.ui.shop.vending=販賣機設定
+lw_p1.ui.shop.initialCoins=初始金幣
+lw_p1.ui.resetShop.body=§c確定恢復殺手商店和販賣機的預設商品清單嗎？目前的自訂項目將被覆蓋！
+lw_p1.ui.resetShop.done=§a已恢復商店的預設設定
+lw_p1.ui.killerForm.title=殺手商店設定
+lw_p1.ui.killerForm.body=管理殺手商店物品清單
+lw_p1.ui.vendingForm.title=販賣機設定
+lw_p1.ui.vendingForm.body=管理販賣機物品清單
+lw_p1.ui.shopItem.name=商品顯示名稱
+lw_p1.ui.shopItem.namePh=請輸入名稱
+lw_p1.ui.shopItem.id=物品識別碼
+lw_p1.ui.shopItem.idPh=如 minecraft:apple
+lw_p1.ui.shopItem.price=價格
+lw_p1.ui.shopItem.pricePh=請輸入正整數
+lw_p1.ui.initialCoins.title=初始金幣設定
+lw_p1.ui.initialCoins.killerHeader=殺手初始金幣
+lw_p1.ui.initialCoins.killerDesc=遊戲開始後，殺手玩家持有的初始金幣數。\n預設 %s\n殺手初始金幣
+lw_p1.ui.initialCoins.civilHeader=\n平民初始金幣
+lw_p1.ui.initialCoins.civilDesc=遊戲開始後，非殺手玩家持有的初始金幣數。\n預設 %s\n平民初始金幣
+lw_p1.ui.initialCoins.killerRateHeader=\n殺手金幣成長
+lw_p1.ui.initialCoins.killerRateDesc=遊戲開始後，殺手玩家每 10 秒自然獲得的金幣數。\n預設 %s\n每10秒金幣
+lw_p1.ui.initialCoins.civilRateHeader=\n平民金幣成長
+lw_p1.ui.initialCoins.civilRateDesc=遊戲開始後，非殺手玩家每 10 秒自然獲得的金幣數。\n預設 %s\n每10秒金幣
+lw_p1.ui.initialCoins.fail=§c初始金幣儲存失敗: %s
+
+## 設定介面 - 其他
+lw_p1.ui.other.title=其他功能
+lw_p1.ui.other.body=一些預留功能和關於資訊
+lw_p1.ui.other.mapInfo=設定地圖資訊
+lw_p1.ui.other.unused=修改更多目前不可用設定
+lw_p1.ui.other.about=關於本Addon
+lw_p1.ui.other.sponsor=贊助&加入我們
+lw_p1.ui.mapInfo.title=地圖資訊設定
+lw_p1.ui.mapInfo.name=地圖名稱
+lw_p1.ui.mapInfo.namePh=請輸入地圖名稱
+lw_p1.ui.mapInfo.author=地圖作者
+lw_p1.ui.mapInfo.authorPh=請輸入作者名稱
+lw_p1.ui.mapInfo.saved=§a地圖資訊已儲存
+lw_p1.ui.unused.title=功能預留設定
+lw_p1.ui.unused.body=若您想要增加更多任務、預設遊戲資料或狀態，修改底層資料，可瀏覽以下網址查看專案原始碼\n§bhttps://github.com/xiaopa-baka/train-werewolf-addon§r\n您可以瀏覽專案倉庫後查看行為包原始碼，進行學習、修改、建立分支二次開發\n\n注意：\n進行二次開發後，請註明原作者和修改內容，禁止惡意竄改後傳播！\n二次開發不得用於商業用途，禁止私自販售原版或修改後的版本！\n二次開發後不得修改或刪除整個「其他」板塊的內容，包括開發者資訊和贊助資訊等\n二次開發過程中如有任何問題歡迎聯絡開發者\n\n§6敬請期待後續版本更新！
+lw_p1.ui.about.title=關於本Addon
+lw_p1.ui.about.body=§b列車狼人殺Addon\n§f版本：正式版 1.0.1\n§f適配：Minecraft 基岩版 1.26.50+\n§f開發模式：原生Script API\n\n§a開發者簡介：\n工作室：LW.狮狼传奇工作室\n專案企劃：小怕（Xiaopa baka）\nAddon作者：小怕（Xiaopa baka）
+lw_p1.ui.sponsor.title=贊助 & 團隊招募
+lw_p1.ui.sponsor.body=§b歡迎支持本專案開發！\n\n§f【贊助說明】\n如果您喜歡本Addon，願意支持我們，可以透過以下方式贊助：\n· 在社群媒體上宣傳此Addon\n· 為此Addon製作玩法地圖並發布\n\n工作室正在積極招新中，歡迎熱愛MC的你加入我們！\n§f【招募職缺】\n· 地圖建築\n· 專案企劃\n· 營運及宣傳\n· 指令設計、模組與外掛開發\n· 材質與建模製作\n· 外觀設計\n\n\n工作室交流群（QQ）：180568043\n§a歡迎熱愛MC的小夥伴加入！\n加入我們，一起創造更精彩的MC冒險體驗！
+
+## 道具互動
+lw_p1.prop.pistol.killerBlocked=§c殺手無法使用這把槍
+lw_p1.prop.pistol.lostRight=§c你已失去使用手槍的資格
+lw_p1.prop.pistol.picked=§a你撿起了左輪手槍
+lw_p1.prop.invFull=§c背包已滿，無法拾取
+lw_p1.prop.mad.start=§c§l%s 進入了瘋狂狀態！
+lw_p1.prop.mad.end=§7%s 的瘋狂狀態已結束
+lw_p1.prop.conch=§e§l神奇的海螺 §r§f告訴你： %s 的身份是 %s
+lw_p1.prop.time.none=§e剩餘時間 --:--
+lw_p1.prop.time.remaining=§e剩餘時間 %s:%s
+lw_p1.prop.watch.saved=父親的懷錶 幫你免除了一次致命傷害
+lw_p1.prop.tray.alreadyPoisoned=§c這個托盤已經被下毒了
+lw_p1.prop.tray.poisoned=§a下毒成功
+lw_p1.prop.tray.empty=§c這個托盤是空的
+lw_p1.prop.royalJelly.cured=§a蜂王漿解除了你的中毒狀態
+lw_p1.prop.note.title=便條編輯
+lw_p1.prop.note.label=輸入便條內容
+lw_p1.prop.note.ph=在這裡輸入...
+lw_p1.prop.note.empty=§c便條上還沒有內容，請先編輯
+lw_p1.prop.note.received=§7%s 的便條§f: %s
+lw_p1.prop.note.sent=§a已向 %s 發送便條
+lw_p1.prop.note.corpse=§e[便條] §f%s
+
+## 動作欄 HUD
+lw_p1.hud.stamina=§b體力 %s §f%s
+lw_p1.hud.stamina.exhausted=§c體力 %s §f%s
+
+## 遊戲訊息
+lw_p1.msg.killer.civilianDeath=§e有平民死亡，獲得 100 金幣，倒數計時延長 60 秒
+lw_p1.msg.boarded=已登車 %s / %s 人
+lw_p1.msg.gameStart=§a遊戲開始！
+lw_p1.msg.notEnoughPlayers=§c人數不足，無法開始遊戲（目前 %s / 最低 %s）
+lw_p1.msg.corpsesCleared=§a已清除全部屍體與名牌
+lw_p1.msg.autoStart.title=§e%s
+lw_p1.msg.autoStart.subtitle=§f秒後遊戲開始
+lw_p1.msg.autoStart.actionbar=§e%s§f 秒後遊戲開始
+
+## 結算
+lw_p1.end.winner.killer=§c遊戲結束，殺手勝利！
+lw_p1.end.winner.civil=§a遊戲結束，平民勝利！
+lw_p1.end.reason.killerDead=殺手死亡
+lw_p1.end.reason.killerLeft=殺手退出了遊戲
+lw_p1.end.reason.timeUp=時間耗盡，平民存活
+lw_p1.end.reason.civilsDead=平民全部陣亡
+lw_p1.end.message=§6【遊戲結束】\n%s\n§f結束原因：%s\n§f殺手：%s\n§f警員：%s\n§f平民：%s
+lw_p1.end.panel=%s\n§f結束原因：%s\n§f殺手：%s\n§f警員：%s\n§f平民：%s
+
+## 鑰匙門
+lw_p1.door.crowbarLocked=§c這扇門被撬開了，無法關閉
+lw_p1.door.crowbarCooldown=§c這扇門被撬棍卡住了，稍後才能打開
+
+## 身份提示（title 放短核心詞，subtitle 放長句，避免文字溢出畫面）
+lw_p1.roleWelcome=歡迎登車
+lw_p1.roleTitle.killer=§c§l殺手
+lw_p1.roleTitle.officer=§b§l警員
+lw_p1.roleTitle.passenger=§a§l乘客
+lw_p1.roleGoalTitle=你的目標
+lw_p1.roleGoal.killer=隱藏身份，解決所有人
+lw_p1.roleGoal.officer=保護乘客，找出殺手
+lw_p1.roleGoal.passenger=配合警員，安全下車
+
+## 任務提示
+lw_p1.task.1.hint1=§a你感覺有點悶，去透透氣吧
+lw_p1.task.1.hint2=§6你有點喘不過氣，去透透氣吧
+lw_p1.task.1.hint3=§c你快悶死了，現在必須馬上去透氣！
+lw_p1.task.2.hint1=§a你想去上個廁所
+lw_p1.task.2.hint2=§6你有點憋不住了，快去上個廁所
+lw_p1.task.2.hint3=§c你就要憋死了，廁所在哪裡？！
+lw_p1.task.3.hint1=§a你有點睏了，去睡個覺吧
+lw_p1.task.3.hint2=§6你的眼皮在打架，睡個覺吧
+lw_p1.task.3.hint3=§c你確信再不睡覺就要猝死了！
+lw_p1.task.4.hint1=§a你有點餓，想吃東西
+lw_p1.task.4.hint2=§6你現在特別想吃點什麼東西
+lw_p1.task.4.hint3=§c你餓得想啃牆，再不吃東西絕對會餓死！
+lw_p1.task.5.hint1=§a你有點口渴，想喝點什麼
+lw_p1.task.5.hint2=§6你嘴唇乾裂，特別想喝點什麼
+lw_p1.task.5.hint3=§c你快脫水了，再不補水就會渴死！
+lw_p1.task.6.hint1=§a你有點無聊，去找其他人社交吧
+lw_p1.task.6.hint2=§6你有點抑鬱了，需要找人社交
+lw_p1.task.6.hint3=§c你現在重度抑鬱，你需要社交！
+lw_p1.task.panel.time=§f剩餘 %s 秒
+lw_p1.panel.name=§f玩家： %s
+lw_p1.panel.role=§f職業： %s
+lw_p1.panel.gold=§f金幣： §e%s§f
+lw_p1.panel.time=§f剩餘時間： %s:%s
+lw_p1.task.done=§a你感覺好多了
+lw_p1.task.fake.1=§c你可以假裝去透氣
+lw_p1.task.fake.2=§c你可以假裝去上廁所
+lw_p1.task.fake.3=§c你可以假裝去睡覺
+lw_p1.task.fake.4=§c你可以假裝去吃東西
+lw_p1.task.fake.5=§c你可以假裝去喝點什麼
+lw_p1.task.fake.6=§c你可以假裝去找別人社交
+
+## 告示牌
+lw_p1.sign.start=\n§l§a發車
+lw_p1.sign.end=\n§l§4強制結束對局
+
+## 語音連動（VoiceCraft，可選功能）
+lw_p1.voice.status.unsupported=§c[語音連動] 目前執行環境不支援 sendScriptEvent，功能無法使用
+lw_p1.voice.status.connected=§a[語音連動] VoiceCraft 已連線
+lw_p1.voice.status.idle=§7[語音連動] 未偵測到 VoiceCraft（未安裝附加包 / 用戶端未連線）——本模組靜默待機
+lw_p1.voice.status.channels=§7活人聲道 = %s（%s 格）  旁觀聲道 = %s（不限距離）
+lw_p1.voice.status.records=§7綁定記錄：%s 筆  附加包託管中：%s 筆  已記綁定碼：%s 個
+lw_p1.voice.status.cleared=§7已清除持久綁定記錄的玩家（本場次語音照常，重進需重新綁定）：%s 人
+lw_p1.voice.status.clients=§7記住的語音用戶端：%s 個（用戶端 App 重新啟動後據此自動恢復綁定）
+lw_p1.voice.status.stats=§7自動恢復綁定：嘗試 %s 次 / 失敗 %s 次  已傳送封包：%s  最後入站封包類型：%s
+lw_p1.voice.status.offline=§8(離線)
+lw_p1.voice.status.channel.living=§a活人
+lw_p1.voice.status.channel.spectator=§b旁觀
+lw_p1.voice.status.channel.none=§7未下發
+lw_p1.voice.status.owner.addon=§a附加包託管
+lw_p1.voice.status.owner.local=§e本模組續管
+lw_p1.voice.status.player=§7 - §f%s§7：%s§7 / %s§7（實體 %s）
+lw_p1.voice.status.noEvent=§7（從未收到任何 voicecraft:* 事件）
+lw_p1.voice.status.lastEvent=§7最後事件：%s
+lw_p1.voice.status.lastError=§c最近異常：%s
+lw_p1.voice.cmd.resync.ok=§a[語音連動] 已強制重新傳送聲道位與距離參數
+lw_p1.voice.cmd.resync.idle=§7[語音連動] VoiceCraft 未連線，無需重新傳送
+lw_p1.voice.cmd.resync.restored=§a[語音連動] 已將你目前的綁定寫回世界屬性，重新進入世界會自動恢復綁定
+lw_p1.voice.cmd.resync.all=§a[語音連動] 已將 %s 筆目前綁定寫回世界屬性，這些玩家重新進入世界會自動恢復綁定
+lw_p1.voice.cmd.resync.target=§a[語音連動] 已將 %s 的目前綁定寫回世界屬性，其重新進入世界會自動恢復綁定
+lw_p1.voice.cmd.resync.none=§7[語音連動] %s 沒有可寫回的綁定記錄（目前沒有綁定，或已經在世界屬性裡）
+lw_p1.voice.cmd.resync.none.all=§7[語音連動] 沒有任何可寫回的綁定記錄（目前沒有綁定，或已經都在世界屬性裡）
+lw_p1.voice.cmd.forget.ok=§a[語音連動] 已清除你的綁定記錄（世界屬性裡不再儲存你的 id）：本場次語音照常，重新進入世界不會自動綁定
+lw_p1.voice.cmd.forget.target=§a[語音連動] 已清除 %s 的綁定記錄（世界屬性裡不再儲存其 id）：其本場次語音照常，重新進入世界不會自動綁定
+lw_p1.voice.cmd.forget.all=§a[語音連動] 已清除全部 %s 筆綁定記錄（世界屬性裡不再儲存這些玩家）：本場次語音照常，重新進入世界需要重新綁定
+lw_p1.voice.cmd.forget.none=§7[語音連動] 沒有找到可清除的綁定記錄（本來就需要重新綁定）
+lw_p1.voice.cmd.forget.hint=§7想恢復「進服自動綁定」：重新進入世界後用用戶端顯示的綁定碼執行 /vcbind <碼>，或由管理員執行 /lw_p1:voice_resync <目標>
+lw_p1.voice.cmd.target.unknown=§c[語音連動] 找不到目標「%s」：目標要寫玩家選擇器（@s 你自己、@a 全部線上玩家、@p 最近玩家）或線上玩家名，Tab 有補全
+lw_p1.voice.cmd.target.empty=§7[語音連動] 目標選擇器沒有符合任何線上玩家（只有省略目標才會作用於離線玩家）
+lw_p1.voice.ui.entry=§b語音設定
+lw_p1.voice.ui.title=語音設定（VoiceCraft 語音連動）
+lw_p1.voice.ui.rangeHeader=語音傳播距離
+lw_p1.voice.ui.rangeDesc=活人之間在此距離內可以互相聽到；旁觀者之間不受該距離限制。\n預設 %s\n語音半徑（格）
+lw_p1.voice.ui.saved=§a[語音連動] 語音半徑已設為 %s 格
