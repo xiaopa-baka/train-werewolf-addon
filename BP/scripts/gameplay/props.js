@@ -4,9 +4,8 @@
 import * as mc from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { getWorldConfig } from "../config/worldConfig.js";
-import { getRemainSeconds, setTaskProgress, getPlayerState, isInGame, isKiller, isOfficer } from "../core/state.js";
+import { setTaskProgress, getPlayerState, isInGame, isKiller, isOfficer } from "../core/state.js";
 import { t } from "../core/i18n.js";
-import { registerActionBarProvider } from "../core/hud.js";
 
 
 // 判断玩家是否为创造模式
@@ -1155,50 +1154,47 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
 
 
 // ===== 父亲的怀表 =====
-const watchCharging = new Set();
+// 背包内持有怀表时，右面板第四行常驻显示本局剩余时间（与杀手同一位置、同一格式，见 tasks.js 的 getInfoPanelText）。
+// 怀表在抵挡致命伤害时被消耗，一旦离开背包该行随即不再显示。
+// 与抵挡伤害的判定口径保持一致：只看主背包容器，不含副手。
 
-function watchRemainText() {
-    try {
-        const remain = getRemainSeconds();
-        const m = Math.floor(remain / 60), s = remain % 60;
-        return t("lw_p1.prop.time.remaining", m, String(s).padStart(2, "0"));
-    } catch (e) {
-        return t("lw_p1.prop.time.none");
+/** @type {Map<string, {tick: number, owned: boolean}>} playerId -> 最近一次背包检查结果 */
+const watchOwnedCache = new Map();
+const WATCH_CACHE_TICKS = 10;   // 检查结果复用时长（0.5 秒），避免每 tick 全背包扫描
+const WATCH_CACHE_MAX = 32;     // 超过该条目数时清理陈旧记录，避免离线玩家残留
+
+// 背包内是否存在怀表（结果缓存；被消耗时由下方结算处立即失效）
+export function hasPocketWatch(player) {
+    if (!player?.isValid) return false;
+
+    const now = mc.system.currentTick;
+    const cached = watchOwnedCache.get(player.id);
+    if (cached && now - cached.tick < WATCH_CACHE_TICKS) return cached.owned;
+
+    if (watchOwnedCache.size > WATCH_CACHE_MAX) {
+        for (const [id, entry] of watchOwnedCache) {
+            if (now - entry.tick >= WATCH_CACHE_TICKS * 10) watchOwnedCache.delete(id);
+        }
     }
+
+    let owned = false;
+    try {
+        const container = player.getComponent("minecraft:inventory")?.container;
+        if (container) {
+            for (let i = 0; i < container.size; i++) {
+                const item = container.getItem(i);
+                if (item && item.typeId === "lw_p1:pocke_watch") {
+                    owned = true;
+                    break;
+                }
+            }
+        }
+    } catch (e) { owned = false; }
+
+    watchOwnedCache.set(player.id, { tick: now, owned });
+    return owned;
 }
 
-function endWatchCharge(player) {
-    if (!player?.isValid) return;
-    watchCharging.delete(player.id);
-}
-
-mc.world.afterEvents.worldLoad.subscribe(() => {
-    // 开始蓄力
-    mc.world.afterEvents.itemStartUse.subscribe((event) => {
-        const player = event.source;
-        if (!player?.isValid) return;
-        const stack = event.itemStack;
-        if (!stack || stack.typeId !== "lw_p1:pocke_watch") return;
-        watchCharging.add(player.id);
-    });
-    // 结束蓄力
-    const stop = (event) => {
-        const player = event.source;
-        if (!player?.isValid) return;
-        const stack = event.itemStack;
-        if (!stack || stack.typeId !== "lw_p1:pocke_watch") return;
-        endWatchCharge(player);
-    };
-    mc.world.afterEvents.itemReleaseUse.subscribe(stop);
-    mc.world.afterEvents.itemCompleteUse.subscribe(stop);
-    mc.world.afterEvents.itemStopUse.subscribe(stop);
-});
-
-// 蓄力期间活动栏显示剩余时间（由本模块注册到活动栏调度器）
-export function watchHudText(player) {
-    if (!watchCharging.has(player.id)) return undefined;
-    return watchRemainText();
-}
 // 抵挡一次伤害
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
@@ -1234,6 +1230,7 @@ mc.system.runInterval(() => {
                     container.setItem(foundSlot, undefined);
                 }
             } catch (e) { }
+            watchOwnedCache.delete(player.id);   // 怀表已被消耗，立即让右面板的剩余时间行消失
             player.sendMessage(t("lw_p1.prop.watch.saved"))
             getPlayerState(player).hurt = false;
         } else {
@@ -1407,7 +1404,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
 
         if (player.getGameMode() === mc.GameMode.Creative || player.getGameMode() === mc.GameMode.Spectator) return;
 
-        // 5 秒后反胃 5 秒
+        // 5 秒后开始反胃（1000 tick 时长），50 秒后毒发身亡
         const nauseaTimeoutId = mc.system.runTimeout(() => {
             try {
                 const p = Array.from(mc.world.getPlayers()).find(pp => pp.id === playerId);
@@ -1417,7 +1414,7 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
             } catch (e) { }
         }, 100);
 
-        // 60 秒后直接中毒死亡
+        // 50 秒后直接中毒死亡（1000 tick）
         const deathTimeoutId = mc.system.runTimeout(() => {
             try {
                 ACTIVE_POISONS.delete(playerId);
@@ -1540,5 +1537,3 @@ mc.world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
 });
 
 
-// 各功能的注册（weight 越大，轮播中停留的份额越多）
-registerActionBarProvider("lw_p1:watch", (player) => watchHudText(player), { weight: 4 });
