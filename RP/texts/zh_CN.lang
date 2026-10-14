@@ -19,6 +19,7 @@ item.lw_p1:key_7=7号钥匙
 item.lw_p1:key_8=8号钥匙
 item.lw_p1:crowbar=撬棍
 item.lw_p1:lockpick=开锁器
+item.lw_p1:firecracker=爆竹
 item.lw_p1:poison=毒药
 item.lw_p1:grenade=手雷
 item.lw_p1:bat=球棍
@@ -35,7 +36,6 @@ item.lw_p1:mojito=莫吉托
 item.lw_p1:martini=马提尼
 item.lw_p1:cosmopolitan=大都会鸡尾酒
 item.lw_p1:champagne=香槟
-item.lw_p1:firecracker=爆竹
 
 ## 物品组
 lw_p1:itemGroup.name.keys=钥匙
@@ -407,6 +407,16 @@ lw_p1.task.fake.6=§c你可以假装去找别人社交
 ## 告示牌
 lw_p1.sign.start=\n§l§a发车
 lw_p1.sign.end=\n§l§4强制结束对局
+lw_p1.sign.toilet=厕所\n<---\n--->
+lw_p1.sign.bathroom=\n浴室
+lw_p1.sign.room_1=\n1号房
+lw_p1.sign.room_2=\n2号房
+lw_p1.sign.room_3=\n3号房
+lw_p1.sign.room_4=\n4号房
+lw_p1.sign.room_5=\n5号房
+lw_p1.sign.room_6=\n6号房
+lw_p1.sign.room_7=\n7号房
+lw_p1.sign.room_8=\n8号房
 
 ## 语音联动（VoiceCraft，可选功能）
 lw_p1.voice.status.unsupported=§c[语音联动] 当前运行环境不支持 sendScriptEvent，功能不可用

@@ -19,6 +19,7 @@ item.lw_p1:key_7=7番の鍵
 item.lw_p1:key_8=8番の鍵
 item.lw_p1:crowbar=バール
 item.lw_p1:lockpick=ピッキングツール
+item.lw_p1:firecracker=爆竹
 item.lw_p1:poison=毒薬
 item.lw_p1:grenade=手榴弾
 item.lw_p1:bat=バット
@@ -35,7 +36,6 @@ item.lw_p1:mojito=モヒート
 item.lw_p1:martini=マティーニ
 item.lw_p1:cosmopolitan=コスモポリタン
 item.lw_p1:champagne=シャンパン
-item.lw_p1:firecracker=爆竹
 
 ## アイテムグループ
 lw_p1:itemGroup.name.keys=鍵
@@ -407,6 +407,16 @@ lw_p1.task.fake.6=§c他の人と交流するふりができる
 ## 看板
 lw_p1.sign.start=\n§l§a出発
 lw_p1.sign.end=\n§l§4試合を強制終了
+lw_p1.sign.toilet=トイレ\n<---\n--->
+lw_p1.sign.bathroom=\n浴室
+lw_p1.sign.room_1=\n1番の部屋
+lw_p1.sign.room_2=\n2番の部屋
+lw_p1.sign.room_3=\n3番の部屋
+lw_p1.sign.room_4=\n4番の部屋
+lw_p1.sign.room_5=\n5番の部屋
+lw_p1.sign.room_6=\n6番の部屋
+lw_p1.sign.room_7=\n7番の部屋
+lw_p1.sign.room_8=\n8番の部屋
 
 ## 音声連携（VoiceCraft、オプション機能）
 lw_p1.voice.status.unsupported=§c[音声連携] この実行環境は sendScriptEvent に対応していないため、機能を利用できません

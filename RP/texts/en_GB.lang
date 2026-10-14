@@ -19,6 +19,7 @@ item.lw_p1:key_7=Key 7
 item.lw_p1:key_8=Key 8
 item.lw_p1:crowbar=Crowbar
 item.lw_p1:lockpick=Lockpick
+item.lw_p1:firecracker=Firecracker
 item.lw_p1:poison=Poison
 item.lw_p1:grenade=Grenade
 item.lw_p1:bat=Baseball Bat
@@ -35,7 +36,6 @@ item.lw_p1:mojito=Mojito
 item.lw_p1:martini=Martini
 item.lw_p1:cosmopolitan=Cosmopolitan
 item.lw_p1:champagne=Champagne
-item.lw_p1:firecracker=Firecracker
 
 ## Item groups
 lw_p1:itemGroup.name.keys=Keys
@@ -407,6 +407,16 @@ lw_p1.task.fake.6=§cYou could pretend to go socialize
 ## Signs
 lw_p1.sign.start=\n§l§aSTART
 lw_p1.sign.end=\n§l§4FORCED EXIT
+lw_p1.sign.toilet=Toilet\n<---\n--->
+lw_p1.sign.bathroom=\nBathroom
+lw_p1.sign.room_1=\nRoom 1
+lw_p1.sign.room_2=\nRoom 2
+lw_p1.sign.room_3=\nRoom 3
+lw_p1.sign.room_4=\nRoom 4
+lw_p1.sign.room_5=\nRoom 5
+lw_p1.sign.room_6=\nRoom 6
+lw_p1.sign.room_7=\nRoom 7
+lw_p1.sign.room_8=\nRoom 8
 
 ## Voice chat (optional VoiceCraft integration)
 lw_p1.voice.status.unsupported=§c[Voice] sendScriptEvent is unavailable here; feature disabled

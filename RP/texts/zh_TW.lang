@@ -19,6 +19,7 @@ item.lw_p1:key_7=7號鑰匙
 item.lw_p1:key_8=8號鑰匙
 item.lw_p1:crowbar=撬棍
 item.lw_p1:lockpick=開鎖器
+item.lw_p1:firecracker=爆竹
 item.lw_p1:poison=毒藥
 item.lw_p1:grenade=手榴彈
 item.lw_p1:bat=球棒
@@ -35,7 +36,6 @@ item.lw_p1:mojito=莫希托
 item.lw_p1:martini=馬丁尼
 item.lw_p1:cosmopolitan=柯夢波丹
 item.lw_p1:champagne=香檳
-item.lw_p1:firecracker=爆竹
 
 ## 物品組
 lw_p1:itemGroup.name.keys=鑰匙
@@ -407,6 +407,16 @@ lw_p1.task.fake.6=§c你可以假裝去找別人社交
 ## 告示牌
 lw_p1.sign.start=\n§l§a發車
 lw_p1.sign.end=\n§l§4強制結束對局
+lw_p1.sign.toilet=廁所\n<---\n--->
+lw_p1.sign.bathroom=\n浴室
+lw_p1.sign.room_1=\n1號房
+lw_p1.sign.room_2=\n2號房
+lw_p1.sign.room_3=\n3號房
+lw_p1.sign.room_4=\n4號房
+lw_p1.sign.room_5=\n5號房
+lw_p1.sign.room_6=\n6號房
+lw_p1.sign.room_7=\n7號房
+lw_p1.sign.room_8=\n8號房
 
 ## 語音連動（VoiceCraft，可選功能）
 lw_p1.voice.status.unsupported=§c[語音連動] 目前執行環境不支援 sendScriptEvent，功能無法使用
