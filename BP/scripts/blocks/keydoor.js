@@ -3,6 +3,7 @@
 
 import * as mc from "@minecraft/server";
 import { t } from "../core/i18n.js";
+import { isInGame } from "../core/state.js";
 
 
 const DOOR_IDS = new Set(
@@ -22,8 +23,21 @@ const DOOR_KEY_MAP = {
 };
 
 
+// 是否处于"非游戏阶段"：场上没有任何局内玩家（大厅候车 / 结算转场 / 自由活动）
+// 以全局阶段为准而非单个玩家状态，避免对局中途加入的玩家绕过道具限制。
+// 读取异常时按"非游戏阶段"处理（宁可大厅能开门，也不要因异常把门锁死）。
+function isNonGamePhase() {
+    try {
+        return !mc.world.getPlayers().some(p => p.isValid && isInGame(p));
+    } catch (e) {
+        return true;
+    }
+}
+
 // 判断玩家当前手持物品是否允许打开该门
-function canOpenDoor(doorId, hand) {
+// freeAccess = 非游戏阶段：不检查手持物品，徒手即可开关任何门
+function canOpenDoor(doorId, hand, freeAccess = false) {
+    if (freeAccess) return true;
     // 九号门，只能用开锁器
     if (doorId === "lw_p1:keydoor_9") {
         return hand === "lw_p1:lockpick";
@@ -205,8 +219,12 @@ function handleKeydoorInteract(player, block) {
 
     const hand = getHandTypeId(player);
 
-    // 撬棍交互
-    if (hand === "lw_p1:crowbar") {
+    // 非游戏阶段：所有门不设道具限制，徒手即可开关
+    // （自动关门逻辑与局内道具交互均保持原样；局外不使用撬棍等道具效果）
+    const freeAccess = isNonGamePhase();
+
+    // 撬棍交互（局内玩法：局外不消耗撬棍、也不会锁死大厅的门）
+    if (!freeAccess && hand === "lw_p1:crowbar") {
         const isDoor10 = block.typeId === "lw_p1:keydoor_10";
         // 10号门 需要潜行
         if (isDoor10 && !player.isSneaking) return;
@@ -244,7 +262,7 @@ function handleKeydoorInteract(player, block) {
         return;
     }
 
-    if (!canOpenDoor(block.typeId, hand)) {
+    if (!canOpenDoor(block.typeId, hand, freeAccess)) {
         return;
     }
 
@@ -256,9 +274,9 @@ function handleKeydoorInteract(player, block) {
     }
     lastInteractTick.set(doorKey(block), now);
 
-    // 被撬棍锁定的门拒绝钥匙开关
+    // 被撬棍锁定的门拒绝钥匙开关（局外不适用：锁定是局内玩法机制）
     const doorKeyStr = doorKey(block);
-    const barExpiry = CROWBARED_DOORS.get(doorKeyStr);
+    const barExpiry = freeAccess ? undefined : CROWBARED_DOORS.get(doorKeyStr);
     if (barExpiry !== undefined) {
         if (barExpiry === "permanent") {
             try { player.sendMessage(t("lw_p1.door.crowbarLocked")); } catch (e) { }
