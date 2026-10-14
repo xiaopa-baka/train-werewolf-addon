@@ -1250,9 +1250,11 @@ export function isVoiceCraftActive() {
  * 「说明\n默认 %s\n中文标签（单位）」（%s 传默认值，当前值走 defaultValue），
  * 保存/取消后都经 `back` 回到上级界面。
  * @param {import("@minecraft/server").Player} player
- * @param {(player: import("@minecraft/server").Player) => void} [back] 返回上级界面
+ * @param {(player: import("@minecraft/server").Player) => void} [back] 保存后返回上级界面
+ * @param {(opener: (player: import("@minecraft/server").Player) => void) => void} [remember]
+ *        表单被直接关闭（X / Esc）时登记「重新打开本界面」的函数，供潜行使用木棍时回到这里
  */
-function showVoiceCraftForm(player, back) {
+function showVoiceCraftForm(player, back, remember) {
     if (!player?.isValid) return;
     const meta = getConfigMeta(VOICE_RANGE_KEY);
     const min = meta && Number.isFinite(meta.min) ? meta.min : 4;
@@ -1267,7 +1269,11 @@ function showVoiceCraftForm(player, back) {
         .slider(t("lw_p1.voice.ui.rangeDesc", preset), min, max, { valueStep: step, defaultValue: current })
         .show(player).then(res => {
             if (!player.isValid) return;
-            if (res.canceled) { if (typeof back === "function") back(player); return; }
+            // 直接关闭（X / Esc）：只登记「上次直接关闭的界面」，不跳回上一级
+            if (res.canceled) {
+                if (typeof remember === "function") remember((p) => showVoiceCraftForm(p, back, remember));
+                return;
+            }
             try {
                 const values = res.formValues.filter(v => v !== null && v !== undefined);
                 const value = Number(values[0]);
@@ -1356,7 +1362,7 @@ mc.system.beforeEvents.startup.subscribe((init) => {
     try {
         init.customCommandRegistry.registerCommand({
             name: "lw_p1:voice_resync",
-            description: "Resend voice bitmasks/range and write binding(s) back (no arg = ALL records incl. offline, @a = everyone online, <player>)",
+            description: "Resend voice bitmasks/range and write binding(s) back (no arg = ALL records incl. offline)",
             permissionLevel: mc.CommandPermissionLevel.GameDirectors,
             optionalParameters: TARGET_PARAMETER,
         }, (origin, target) => {
@@ -1408,7 +1414,7 @@ mc.system.beforeEvents.startup.subscribe((init) => {
     try {
         init.customCommandRegistry.registerCommand({
             name: "lw_p1:voice_forget",
-            description: "Clear voice binding(s) (no arg = ALL records incl. offline, @a = everyone online, <player>); rejoin needs /vcbind again",
+            description: "Clear voice binding(s) (no arg = ALL records incl. offline); rejoin needs /vcbind again",
             permissionLevel: mc.CommandPermissionLevel.GameDirectors,
             optionalParameters: TARGET_PARAMETER,
         }, (origin, target) => {

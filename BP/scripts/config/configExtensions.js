@@ -17,9 +17,11 @@
  * @typedef {object} ConfigExtension
  * @property {string} id 唯一标识（重复注册以先到者为准）
  * @property {import("@minecraft/server").RawMessage | string} label 菜单按钮上的文字
- * @property {(player: import("@minecraft/server").Player, back?: (player: import("@minecraft/server").Player) => void) => void} open
- *           点击后打开的表单。第二个参数 `back` 由配置界面传入，用于把玩家送回主界面
- *           （与内置页「游戏相关配置」保存/取消后返回上级的行为一致）；忽略它也没问题。
+ * @property {(player: import("@minecraft/server").Player, back?: (player: import("@minecraft/server").Player) => void, remember?: (opener: (player: import("@minecraft/server").Player) => void) => void) => void} open
+ *           点击后打开的表单。
+ *           · `back`：保存后要回的上一级界面（与内置页「游戏相关配置」保存后返回上级的行为一致）；忽略它也没问题。
+ *           · `remember`：表单被**直接关闭**（右上角 X / Esc）时调用，把「重新打开本界面」的函数登记下来，
+ *             这样玩家潜行使用木棍就能回到这里；忽略它只影响这一条便利功能，不影响其它行为。
  * @property {() => boolean} [isVisible] 返回假时本次**不显示**该按钮（缺省 = 显示）
  */
 
