@@ -10,6 +10,7 @@ import {
 } from "../core/state.js";
 import { t } from "../core/i18n.js";
 import { registerPanelProvider, registerSubPanelProvider } from "../core/hud.js";
+import { hasPocketWatch } from "./props.js";
 
 
 // ===== 任务定义表 =====
@@ -17,61 +18,17 @@ import { registerPanelProvider, registerSubPanelProvider } from "../core/hud.js"
 //         "accumulate" 累计不清零（任务3/6）
 //         "event"      由进食/饮用事件直接加分，不参与逐 tick 累计（任务4/5）
 //   stateField 该状态为真时每 tick +1
-//   threshold 完成所需进度（tick 数：200 = 10 秒，100 = 5 秒，300 = 15 秒）
-//   steps     进度条档位：取 <= 当前进度的最大档
+//   threshold 完成所需进度（逐 tick 任务为 tick 数：200 = 10 秒，100 = 5 秒，300 = 15 秒；事件型任务为 1 次）
 const TASKS = {
-    1: {
-        mode: "reset", stateField: "ventilating", threshold: 200,
-        steps: [
-            { at: 1, bar: "§c▓▓▓▓▓" },
-            { at: 40, bar: "§c▓▓▓▓" },
-            { at: 80, bar: "§6▓▓▓" },
-            { at: 120, bar: "§6▓▓" },
-            { at: 160, bar: "§a▓" },
-        ],
-    },
-    2: {
-        mode: "reset", stateField: "squatting", threshold: 200,
-        steps: [
-            { at: 1, bar: "§c▓▓▓▓▓" },
-            { at: 40, bar: "§c▓▓▓▓" },
-            { at: 80, bar: "§6▓▓▓" },
-            { at: 120, bar: "§6▓▓" },
-            { at: 160, bar: "§a▓" },
-        ],
-    },
-    3: {
-        mode: "accumulate", stateField: "sleeping", threshold: 100,
-        steps: [
-            { at: 1, bar: "§c▓▓▓▓▓" },
-            { at: 20, bar: "§c▓▓▓▓" },
-            { at: 40, bar: "§6▓▓▓" },
-            { at: 60, bar: "§6▓▓" },
-            { at: 80, bar: "§a▓" },
-        ],
-    },
-    4: {
-        mode: "event", threshold: 1,
-        steps: [{ at: 1, bar: "§a▓" }],
-    },
-    5: {
-        mode: "event", threshold: 1,
-        steps: [{ at: 1, bar: "§a▓" }],
-    },
-    6: {
-        mode: "accumulate", stateField: "socializing", threshold: 300,
-        steps: [
-            { at: 1, bar: "§c▓▓▓▓▓▓" },
-            { at: 50, bar: "§c▓▓▓▓▓" },
-            { at: 100, bar: "§6▓▓▓▓" },
-            { at: 150, bar: "§6▓▓▓" },
-            { at: 200, bar: "§6▓▓" },
-            { at: 250, bar: "§a▓" },
-        ],
-    },
+    1: { mode: "reset", stateField: "ventilating", threshold: 200 },
+    2: { mode: "reset", stateField: "squatting", threshold: 200 },
+    3: { mode: "accumulate", stateField: "sleeping", threshold: 100 },
+    4: { mode: "event", threshold: 1 },
+    5: { mode: "event", threshold: 1 },
+    6: { mode: "accumulate", stateField: "socializing", threshold: 300 },
 };
 
-// 提示（下）的惩罚效果：经验等级（=剩余秒数）降到 20 时施加，持续 20 秒
+// 末次提示（剩余 20%）的惩罚效果：每秒以 1 秒时长刷新一次，随提示档位结束自然消失
 const TASK_HINT3_EFFECTS = {
     1: [["minecraft:nausea", 0], ["minecraft:poison", 0]],
     2: [["minecraft:speed", 2], ["minecraft:poison", 0]],
@@ -80,10 +37,6 @@ const TASK_HINT3_EFFECTS = {
     5: [["minecraft:weakness", 0], ["minecraft:slowness", 2]],
     6: [["minecraft:invisibility", 0], ["minecraft:blindness", 0]],
 };
-
-// 需要逐 tick 累计进度的任务
-const RUNNING_TASK_IDS = [1, 2, 3, 6];
-
 
 // 玩家当前持有的任务编号（1..任务数），无任务则返回 0
 function getTaskId(player) {
@@ -140,7 +93,7 @@ mc.system.runInterval(() => {
 }, 20);
 
 
-// 请求倒计时 → 写入本次任务时限（内存计时，不再占用经验条）→ 每秒扣 1 秒
+// 请求倒计时 → 写入本次任务时限（内存计时）→ 每秒扣 1 秒
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
@@ -177,8 +130,8 @@ mc.system.runInterval(() => {
 }, 20);
 
 
-// 任务提示：按 剩余时间/任务时限 的比例分档（0.6 / 0.4 / 0.2），不再依赖固定剩余秒数
-// 提示文本本身改到右侧面板常驻显示（见文件末尾的面板文案），此处只维护档位标记与惩罚效果
+// 任务提示：按 剩余时间/任务时限 的比例分档（0.6 / 0.4 / 0.2）
+// 提示文本由左上角任务面板常驻显示（见文件末尾的面板文案），此处只维护档位标记与惩罚效果
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
         if (!player.isValid) continue;
@@ -263,7 +216,7 @@ mc.system.runInterval(() => {
 }, 1);
 
 
-// 任务完成：清状态位、重置进度与经验、发金币奖励
+// 任务完成：清状态位、重置任务进度、发金币奖励
 // 完成后先停留 2 秒（40 tick）让左上角第三行显示绿色 ✓，再清理状态
 mc.system.runInterval(() => {
     for (const player of mc.world.getPlayers()) {
@@ -586,9 +539,6 @@ mc.world.afterEvents.playerLeave.subscribe((event) => {
 });
 
 
-// 任务进度条已移至左上角面板第三行，不再占用活动栏
-
-
 // ===== 右侧信息面板 / 左上角任务面板 =====
 // 右面板走 title 通道（关键字 lwInfo:）：局内显示 4 行玩家信息，局外显示上一局结算。
 // 左面板走 subtitle 通道（关键字 lwTask:）：局内显示任务提示 + 倒计时进度条 + 任务进度条，局外隐藏。
@@ -611,7 +561,7 @@ function roleText(player) {
     return t("lw_p1.role.passenger");
 }
 
-// 右面板：局内 4 行（名字 / 职业 / 金币 / 剩余游戏时长仅杀手）；局外 = 上一局结算
+// 右面板：局内 4 行（名字 / 职业 / 金币 / 剩余游戏时长）；第四行仅杀手或背包内有怀表者可见；局外 = 上一局结算
 function getInfoPanelText(player) {
     if (!isInGame(player)) return gameSession.lastResultText ?? undefined;
 
@@ -621,8 +571,9 @@ function getInfoPanelText(player) {
         t("lw_p1.panel.gold", getGold(player))
     ];
 
-    // 第四行：剩余游戏时长（仅杀手），格式 分:秒，与实际对局剩余时间一致
-    if (isKiller(player)) {
+    // 第四行：剩余游戏时长，格式 分:秒，与实际对局剩余时间一致
+    // 杀手常驻显示；非杀手只要背包内有怀表就同样显示，怀表被消耗离开背包后随即隐藏
+    if (isKiller(player) || hasPocketWatch(player)) {
         const remainSec = getRemainSeconds();
         const m = Math.floor(remainSec / 60);
         const s = String(remainSec % 60).padStart(2, "0");

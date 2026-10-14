@@ -38,7 +38,7 @@ After the result is settled, everyone is teleported back to the platform, invent
 ### In-round HUD explained
 Once a match starts, the vanilla health bar, hunger bar, and status-effect icons are **hidden** (so you can't tell at a glance who is hurt or poisoned); the **XP bar** is also hidden for Civilians and the Officer, and kept only for the Killer. All key information is shown through:
 
-- The **persistent info panel on the right**: your name, role, and coins; the Killer also sees the remaining game time
+- The **persistent info panel on the right**: your name, role, and coins; the Killer also sees the remaining game time (so does anyone carrying a Pocket Watch)
 - The **task panel in the top-left**: your task hint + a remaining-time progress bar (the countdown is no longer shown on the XP bar)
 - The **action bar (the line of text above the hotbar)**: the stamina bar (only appears when your stamina is not full), etc.
 - The **chat**: various messages and prompts
@@ -138,7 +138,7 @@ A **stamina system** is enabled in-round (it can be toggled by the admin):
 | Lockpick | Opens room and train doors (carriage doors need nothing), and is **never consumed** |
 | Keys 1~8 | Open the room door with the matching number; randomly issued at the start |
 | Magic Conch | Right-click another player to **privately** learn their role (Killer/Officer/Civilian); consumes 1 |
-| Father's Pocket Watch | While **held down and used**, the action bar shows the remaining time; when you take a fatal hit it is **automatically consumed to save you once** |
+| Father's Pocket Watch | While **carried in your inventory**, the info panel on the right permanently shows the remaining game time; when you take a fatal hit it is **automatically consumed to save you once** |
 | Wild Royal Jelly | Drink it to **cure poisoning** |
 | Mineral Water | Drinking it leaves a **Water Bottle** in your inventory |
 | Water Bottle | Using it during the Toilet task completes it directly |
