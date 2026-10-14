@@ -1,6 +1,13 @@
 交接文档.md
 项目策划书.md
 跨项目协作经验汇总.md
+VoiceCraft联动调研.md
+
+docs/架构分析与重构方案.md
+docs/重构操作手册.md
+docs/角色系统设计.md
+docs/多玩法模式支持方案.md
+
 热更新.bat
 热更新_网易.bat
 node_modules/
