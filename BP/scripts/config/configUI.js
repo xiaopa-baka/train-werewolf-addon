@@ -8,6 +8,48 @@ import { t, tBlock, tConfigName } from "../core/i18n.js";
 import { itemIdToIconPath } from "../core/itemIcons.js";
 
 
+// ===== 界面跳转记忆 =====
+// 「直接关闭」（点右上角 X 或按 Esc）某个配置界面时，不再跳回上一级界面，而是直接关闭，
+// 并把这个界面记下来：手持木棍**潜行**使用即可重新打开它（没有记录则打开主界面）。
+// 手持木棍**不潜行**使用 = 直接打开主界面。
+/** @type {Map<string, (player: mc.Player) => void>} 玩家 id -> 重新打开「上次直接关闭的界面」的函数 */
+const lastClosedForms = new Map();
+
+/**
+ * 记录玩家刚直接关闭的界面。
+ * @param {mc.Player} player
+ * @param {(player: mc.Player) => void} opener 重新打开该界面的函数
+ */
+function rememberClosedForm(player, opener) {
+    if (!player?.isValid || typeof opener !== "function") return;
+    lastClosedForms.set(player.id, opener);
+}
+
+/**
+ * 统一处理表单的「直接关闭」：记录本界面并结束本次交互（不跳回上一级）。
+ * @param {mc.Player} player
+ * @param {{canceled: boolean}} res 表单回调结果
+ * @param {(player: mc.Player) => void} opener 本界面的重新打开函数
+ * @returns {boolean} 返回真表示已按「直接关闭」处理，调用方应立即 return
+ */
+function handleDirectClose(player, res, opener) {
+    if (!res || !res.canceled) return false;
+    rememberClosedForm(player, opener);
+    return true;
+}
+
+/**
+ * 取玩家上一次直接关闭的界面（没有则返回 null）。
+ * @param {mc.Player} player
+ * @returns {((player: mc.Player) => void) | null}
+ */
+function getLastClosedForm(player) {
+    if (!player?.isValid) return null;
+    const opener = lastClosedForms.get(player.id);
+    return typeof opener === "function" ? opener : null;
+}
+
+
 // 将玩家位置转换为方块坐标，并提供一个函数将方块坐标转换为方块中心坐标，方便UI输入输出
 function getPlayerBlockIntPos(player) {
     return {
@@ -32,8 +74,23 @@ mc.world.afterEvents.worldLoad.subscribe(() => {
     mc.world.afterEvents.itemUse.subscribe(event => {
         const player = event.source;
         if (player && player.isValid && event.itemStack?.typeId === "minecraft:stick") {
+            // 潜行使用 = 回到上次直接关闭的界面（没有记录则主界面）；不潜行使用 = 主界面
+            const lastClosed = player.isSneaking ? getLastClosedForm(player) : null;
+            if (lastClosed) { lastClosed(player); return; }
             showMainForm(player);
         }
+    });
+
+    // 木棍是配置界面的入口道具，不允许用它破坏方块
+    mc.world.beforeEvents.playerBreakBlock.subscribe(event => {
+        if (event.itemStack?.typeId === "minecraft:stick") {
+            event.cancel = true;
+        }
+    });
+
+    // 玩家离开时清掉他的界面记忆，避免玩家 id 复用或内存堆积
+    mc.world.afterEvents.playerLeave.subscribe(event => {
+        lastClosedForms.delete(event.playerId);
     });
 });
 
@@ -80,7 +137,7 @@ function showGameSettingForm(player) {
 
     gameForm.show(player).then(res => {
         if (!player.isValid) return;
-        if (res.canceled) { showMainForm(player); return; }
+        if (handleDirectClose(player, res, showGameSettingForm)) return;
         switch (res.selection) {
             case 0: mc.system.run(() => showGameConfigModal(player)); break;
             case 1: mc.system.run(() => showTaskConfigModal(player)); break;
@@ -112,7 +169,7 @@ function showInGameSettingModal(player) {
         .toggle(t("lw_p1.ui.inGame.weatherToggle"), { defaultValue: cfg.weatherEnabled !== false })
         .show(player).then(res => {
             if (!player.isValid) return;
-            if (res.canceled) { showGameSettingForm(player); return; }
+            if (handleDirectClose(player, res, showInGameSettingModal)) return;
             try {
                 const vals = res.formValues.filter(v => v !== null && v !== undefined);
                 const latest = getWorldConfig();
@@ -149,7 +206,7 @@ function showGameConfigModal(player) {
         .header(t("lw_p1.ui.game.baseHeader"))
         .slider(t("lw_p1.ui.game.baseDesc", s3.default), s3.min, s3.max, { valueStep: s3.step, defaultValue: getConfig("baseDuration") })
         .show(player).then(res => {
-            if (res.canceled) { showGameSettingForm(player); return; }
+            if (handleDirectClose(player, res, showGameConfigModal)) return;
             try {
                 const vals = res.formValues.filter(v => v !== null && v !== undefined);
                 setConfig("autoStartDelay", Number(vals[0]));
@@ -183,7 +240,7 @@ function showTaskConfigModal(player) {
         .header(t("lw_p1.ui.task.rewardHeader"))
         .slider(t("lw_p1.ui.task.rewardDesc", s4.default), s4.min, s4.max, { valueStep: s4.step, defaultValue: getConfig("taskReward") })
         .show(player).then(res => {
-            if (res.canceled) { showGameSettingForm(player); return; }
+            if (handleDirectClose(player, res, showTaskConfigModal)) return;
             try {
                 const vals = res.formValues.filter(v => v !== null && v !== undefined);
                 setConfig("taskChance", Number(vals[0]));
@@ -209,6 +266,8 @@ function resetAllScoresToDefault(player) {
         .button1(t("lw_p1.ui.cancel"))
         .button2(t("lw_p1.ui.confirmReset"))
         .show(player).then(res => {
+            if (!player.isValid) return;
+            if (handleDirectClose(player, res, resetAllScoresToDefault)) return;
             if (res.selection === 1) {
                 // 全部可调参数恢复预设值
                 resetConfigDefaults();
@@ -250,7 +309,7 @@ function showMapSettingForm(player) {
 
     mapForm.show(player).then(res => {
         if (!player.isValid) return;
-        if (res.canceled) { showMainForm(player); return; }
+        if (handleDirectClose(player, res, showMapSettingForm)) return;
         switch (res.selection) {
             case 0: mc.system.run(() => showStationEngineCoordModal(player)); break;
             case 1: mc.system.run(() => showTrainAreaCoordModal(player)); break;
@@ -304,7 +363,7 @@ function showStationEngineCoordModal(player) {
         .textField(t("lw_p1.ui.stationEngine.engineZ"), "", { defaultValue: String(engine.z) })
         .show(player).then(res => {
             if (!player.isValid) return;
-            if (res.canceled) { showMapSettingForm(player); return; }
+            if (handleDirectClose(player, res, showStationEngineCoordModal)) return;
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             const sx = parseInt(String(vals[0]));
             const sy = parseInt(String(vals[1]));
@@ -353,7 +412,7 @@ function showTrainAreaCoordModal(player) {
         .textField(t("lw_p1.ui.coord.endZ"), "", { defaultValue: String(end.z) })
         .show(player).then(res => {
             if (!player.isValid) return;
-            if (res.canceled) { showMapSettingForm(player); return; }
+            if (handleDirectClose(player, res, showTrainAreaCoordModal)) return;
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             const sx = parseInt(String(vals[0]));
             const sy = parseInt(String(vals[1]));
@@ -405,7 +464,7 @@ function showEngineVentCoordModal(player) {
         .textField(t("lw_p1.ui.coord.endZ"), "", { defaultValue: String(end.z) })
         .show(player).then(res => {
             if (!player.isValid) return;
-            if (res.canceled) { showMapSettingForm(player); return; }
+            if (handleDirectClose(player, res, showEngineVentCoordModal)) return;
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             const sx = parseInt(String(vals[0]));
             const sy = parseInt(String(vals[1]));
@@ -456,7 +515,7 @@ function showTailVentCoordModal(player) {
         .textField(t("lw_p1.ui.coord.endZ"), "", { defaultValue: String(end.z) })
         .show(player).then(res => {
             if (!player.isValid) return;
-            if (res.canceled) { showMapSettingForm(player); return; }
+            if (handleDirectClose(player, res, showTailVentCoordModal)) return;
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             const sx = parseInt(String(vals[0]));
             const sy = parseInt(String(vals[1]));
@@ -496,7 +555,8 @@ function showToiletList(player) {
     });
 
     form.button(t("lw_p1.ui.back")).show(player).then(res => {
-        if (!player.isValid || res.canceled) { showMapSettingForm(player); return; }
+        if (!player.isValid) return;
+        if (handleDirectClose(player, res, showToiletList)) return;
         if (res.selection === 0) {
             const intPos = getPlayerBlockIntPos(player);
             cfg.toiletCoordinates.push(intPosToCenter(intPos.x, intPos.y, intPos.z));
@@ -532,7 +592,7 @@ function editToiletCoordinate(player, index) {
         .toggle(t("lw_p1.ui.deleteItem"), { defaultValue: false })
         .show(player).then(res => {
             if (!player.isValid) { showToiletList(player); return; }
-            if (res.canceled) { showToiletList(player); return; }
+            if (handleDirectClose(player, res, (p) => editToiletCoordinate(p, index))) return;
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             if (vals[3] === true) {
                 cfg.toiletCoordinates.splice(index, 1);
@@ -574,7 +634,8 @@ function showRandomList(player) {
     });
 
     form.button(t("lw_p1.ui.back")).show(player).then(res => {
-        if (!player.isValid || res.canceled) { showMapSettingForm(player); return; }
+        if (!player.isValid) return;
+        if (handleDirectClose(player, res, showRandomList)) return;
         if (res.selection === 0) {
             const intPos = getPlayerBlockIntPos(player);
             cfg.randomCoordinates.push(intPosToCenter(intPos.x, intPos.y, intPos.z));
@@ -610,7 +671,7 @@ function editRandomCoordinate(player, index) {
         .toggle(t("lw_p1.ui.deleteItem"), { defaultValue: false })
         .show(player).then(res => {
             if (!player.isValid) { showRandomList(player); return; }
-            if (res.canceled) { showRandomList(player); return; }
+            if (handleDirectClose(player, res, (p) => editRandomCoordinate(p, index))) return;
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             if (vals[3] === true) {
                 cfg.randomCoordinates.splice(index, 1);
@@ -644,7 +705,7 @@ function showRoomCountModal(player) {
         .header(t("lw_p1.ui.room.header"))
         .slider(t("lw_p1.ui.room.desc", s.default), s.min, s.max, { valueStep: s.step, defaultValue: getConfig("roomCount") })
         .show(player).then(res => {
-            if (res.canceled) { showMapSettingForm(player); return; }
+            if (handleDirectClose(player, res, showRoomCountModal)) return;
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             const n = Number(vals[0]);
             if (Number.isFinite(n) && n >= s.min && n <= s.max) {
@@ -665,6 +726,8 @@ function confirmClearAllCoord(player) {
         .button1(t("lw_p1.ui.cancel"))
         .button2(t("lw_p1.ui.confirmClear"))
         .show(player).then(res => {
+            if (!player.isValid) return;
+            if (handleDirectClose(player, res, confirmClearAllCoord)) return;
             if (res.selection === 1) {
                 saveWorldConfig(getEmptyConfig());
                 player.sendMessage(t("lw_p1.ui.clear.done"));
@@ -691,7 +754,7 @@ function showFoodDrinkForm(player) {
 
     form.show(player).then(res => {
         if (!player.isValid) return;
-        if (res.canceled) { showMainForm(player); return; }
+        if (handleDirectClose(player, res, showFoodDrinkForm)) return;
         switch (res.selection) {
             case 0: showFoodListForm(player); break;
             case 1: showDrinkListForm(player); break;
@@ -713,6 +776,7 @@ function confirmResetFoodDrink(player) {
         .button2(t("lw_p1.ui.confirmReset"))
         .show(player).then(res => {
             if (!player.isValid) return;
+            if (handleDirectClose(player, res, confirmResetFoodDrink)) return;
             if (res.selection === 1) {
                 const config = getWorldConfig();
                 const defaults = getEmptyConfig();
@@ -745,7 +809,7 @@ function showFoodListForm(player) {
     form.button(t("lw_p1.ui.back"));
 
     form.show(player).then(res => {
-        if (res.canceled) return showFoodDrinkForm(player);
+        if (handleDirectClose(player, res, showFoodListForm)) return;
         const idx = res.selection;
 
         if (idx === config.allowedFoods.length) {
@@ -774,7 +838,7 @@ function showDrinkListForm(player) {
     form.button(t("lw_p1.ui.back"));
 
     form.show(player).then(res => {
-        if (res.canceled) return showFoodDrinkForm(player);
+        if (handleDirectClose(player, res, showDrinkListForm)) return;
         const idx = res.selection;
 
         if (idx === config.allowedDrinks.length) {
@@ -794,6 +858,8 @@ function showEditModal(player, type, index) {
     const config = getWorldConfig();
     const list = type === "food" ? config.allowedFoods : config.allowedDrinks;
     const oldValue = list[index];
+    // 记录可能已过期（条目已被删除）：退回列表，避免编辑到错误的条目
+    if (oldValue === undefined) { (type === "food" ? showFoodListForm : showDrinkListForm)(player); return; }
     const form = new ModalFormData();
         form.title(t("lw_p1.ui.edit", oldValue));
         form.textField(t("lw_p1.ui.itemId.label"), t("lw_p1.ui.itemId.ph"), { defaultValue: String(oldValue) });
@@ -801,7 +867,7 @@ function showEditModal(player, type, index) {
 
     form.show(player).then(res => {
         const backList = () => type === "food" ? showFoodListForm(player) : showDrinkListForm(player);
-        if (res.canceled) return backList();
+        if (handleDirectClose(player, res, (p) => showEditModal(p, type, index))) return;
 
         const vals = res.formValues.filter(v => v !== null && v !== undefined);
         if (vals[1] === true) {
@@ -830,7 +896,7 @@ function showAddModal(player, type) {
 
     form.show(player).then(res => {
         const backList = () => type === "food" ? showFoodListForm(player) : showDrinkListForm(player);
-        if (res.canceled) return backList();
+        if (handleDirectClose(player, res, (p) => showAddModal(p, type))) return;
 
         const newValue = String(res.formValues[0]).trim();
         if (newValue) {
@@ -865,7 +931,7 @@ function showFoodTrayMenu(player) {
 
     form.show(player).then(res => {
         if (!player.isValid) return;
-        if (res.canceled) { showFoodDrinkForm(player); return; }
+        if (handleDirectClose(player, res, showFoodTrayMenu)) return;
         if (res.selection < FOOD_TRAY_IDS.length) {
             showFoodTrayItemList(player, FOOD_TRAY_IDS[res.selection]);
         } else {
@@ -896,7 +962,7 @@ function showFoodTrayItemList(player, trayId) {
 
     form.show(player).then(res => {
         if (!player.isValid) return;
-        if (res.canceled) { showFoodTrayMenu(player); return; }
+        if (handleDirectClose(player, res, (p) => showFoodTrayItemList(p, trayId))) return;
         if (res.selection === items.length) {
             showFoodTrayAddModal(player, trayId);
         } else if (res.selection === items.length + 1) {
@@ -915,7 +981,7 @@ function showFoodTrayAddModal(player, trayId) {
         .title(t("lw_p1.ui.tray.addTitle", tBlock(trayId)))
         .textField(t("lw_p1.ui.itemId.label"), t("lw_p1.ui.itemId.phShort"), { defaultValue: "" })
         .show(player).then(res => {
-            if (res.canceled) { showFoodTrayItemList(player, trayId); return; }
+            if (handleDirectClose(player, res, (p) => showFoodTrayAddModal(p, trayId))) return;
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             const newValue = String(vals[0]).trim();
             if (newValue) {
@@ -932,13 +998,16 @@ function showFoodTrayAddModal(player, trayId) {
 function showFoodTrayEditModal(player, trayId, index) {
     if (!player.isValid) return;
     const config = getWorldConfig();
-    const oldValue = config.foodTrayItems[trayId][index];
+    const trayItems = config.foodTrayItems[trayId];
+    const oldValue = trayItems ? trayItems[index] : undefined;
+    // 记录可能已过期（条目已被删除）：退回列表
+    if (oldValue === undefined) { showFoodTrayItemList(player, trayId); return; }
     new ModalFormData()
         .title(t("lw_p1.ui.edit", oldValue))
         .textField(t("lw_p1.ui.itemId.labelShort"), t("lw_p1.ui.itemId.phShort"), { defaultValue: String(oldValue) })
         .toggle(t("lw_p1.ui.deleteItem"), { defaultValue: false })
         .show(player).then(res => {
-            if (res.canceled) { showFoodTrayItemList(player, trayId); return; }
+            if (handleDirectClose(player, res, (p) => showFoodTrayEditModal(p, trayId, index))) return;
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             if (vals[1] === true) {
                 config.foodTrayItems[trayId].splice(index, 1);
@@ -970,7 +1039,7 @@ function showShopForm(player) {
 
     form.show(player).then(res => {
         if (!player.isValid) return;
-        if (res.canceled) { showMainForm(player); return; }
+        if (handleDirectClose(player, res, showShopForm)) return;
         switch (res.selection) {
             case 0: showkillerStoreForm(player); break;
             case 1: showVendingMachineForm(player); break;
@@ -992,6 +1061,7 @@ function confirmResetShop(player) {
         .button2(t("lw_p1.ui.confirmReset"))
         .show(player).then(res => {
             if (!player.isValid) return;
+            if (handleDirectClose(player, res, confirmResetShop)) return;
             if (res.selection === 1) {
                 const config = getWorldConfig();
                 const defaults = getEmptyConfig();
@@ -1024,7 +1094,7 @@ function showkillerStoreForm(player) {
 
     form.show(player).then(res => {
         if (!player.isValid) return;
-        if (res.canceled) { showShopForm(player); return; }
+        if (handleDirectClose(player, res, showkillerStoreForm)) return;
 
         const idx = res.selection;
         if (idx === items.length) {
@@ -1057,7 +1127,7 @@ function showVendingMachineForm(player) {
 
     form.show(player).then(res => {
         if (!player.isValid) return;
-        if (res.canceled) { showShopForm(player); return; }
+        if (handleDirectClose(player, res, showVendingMachineForm)) return;
 
         const idx = res.selection;
         if (idx === items.length) {
@@ -1076,6 +1146,8 @@ function showEditShopItemModal(player, shopType, index) {
     const config = getWorldConfig();
     const list = shopType === "killer" ? config.killerStoreItems : config.vendingMachineItems;
     const item = list[index];
+    // 记录可能已过期（商品已被删除）：退回列表，避免读到不存在的商品
+    if (!item) { (shopType === "killer" ? showkillerStoreForm : showVendingMachineForm)(player); return; }
     const form = new ModalFormData();
     const backForm = () => shopType === "killer" ? showkillerStoreForm(player) : showVendingMachineForm(player);
 
@@ -1086,7 +1158,7 @@ function showEditShopItemModal(player, shopType, index) {
     form.toggle(t("lw_p1.ui.deleteItem"), { defaultValue: false });
 
     form.show(player).then(res => {
-        if (res.canceled) return backForm();
+        if (handleDirectClose(player, res, (p) => showEditShopItemModal(p, shopType, index))) return;
         const vals = res.formValues.filter(v => v !== null && v !== undefined);
         if (vals[3] === true) {
             list.splice(index, 1);
@@ -1121,7 +1193,7 @@ function showAddShopItemModal(player, shopType) {
     form.textField(t("lw_p1.ui.shopItem.price"), t("lw_p1.ui.shopItem.pricePh"), { defaultValue: "" });
 
     form.show(player).then(res => {
-        if (res.canceled) return backForm();
+        if (handleDirectClose(player, res, (p) => showAddShopItemModal(p, shopType))) return;
         const vals = res.formValues.filter(v => v !== null && v !== undefined);
         const [name, id, priceStr] = vals;
         const price = parseInt(String(priceStr));
@@ -1157,7 +1229,7 @@ function showInitialCoinsForm(player) {
         .header(t("lw_p1.ui.initialCoins.civilRateHeader"))
         .slider(t("lw_p1.ui.initialCoins.civilRateDesc", s4.default), s4.min, s4.max, { valueStep: s4.step, defaultValue: getConfig("civilGoldRate") })
         .show(player).then(res => {
-            if (res.canceled) { showShopForm(player); return; }
+            if (handleDirectClose(player, res, showInitialCoinsForm)) return;
             try {
                 const vals = res.formValues.filter(v => v !== null && v !== undefined);
                 setConfig("killerGold", Number(vals[0]));
@@ -1186,7 +1258,7 @@ function showOtherMenu(player) {
         .button(t("lw_p1.ui.back"));
     otherForm.show(player).then(res => {
         if (!player.isValid) return;
-        if (res.canceled) { showMainForm(player); return; }
+        if (handleDirectClose(player, res, showOtherMenu)) return;
         switch (res.selection) {
             case 0: mc.system.run(() => showMapInfoForm(player)); break;
             case 1: showUnusedConfigUI(player); break;
@@ -1209,7 +1281,7 @@ function showMapInfoForm(player) {
         .textField(t("lw_p1.ui.mapInfo.author"), t("lw_p1.ui.mapInfo.authorPh"), { defaultValue: String(wi.mapAuthor ?? "") })
         .show(player).then(res => {
             if (!player.isValid) return;
-            if (res.canceled) { showOtherMenu(player); return; }
+            if (handleDirectClose(player, res, showMapInfoForm)) return;
             const vals = res.formValues.filter(v => v !== null && v !== undefined);
             cfg.worldInformation = {
                 mapName: String(vals[0] ?? "").trim(),
@@ -1226,7 +1298,11 @@ function showMapInfoForm(player) {
 function showUnusedConfigUI(player) {
     if (!player.isValid) return;
     new ActionFormData().title(t("lw_p1.ui.unused.title")).body(t("lw_p1.ui.unused.body")).button(t("lw_p1.ui.back"))
-        .show(player).then(r => r.selection === 0 && showOtherMenu(player));
+        .show(player).then(res => {
+            if (!player.isValid) return;
+            if (handleDirectClose(player, res, showUnusedConfigUI)) return;
+            if (res.selection === 0) showOtherMenu(player);
+        });
 }
 
 
@@ -1234,7 +1310,11 @@ function showUnusedConfigUI(player) {
 function showDeveloperAboutUI(player) {
     if (!player.isValid) return;
     new ActionFormData().title(t("lw_p1.ui.about.title")).body(t("lw_p1.ui.about.body")).button(t("lw_p1.ui.back"))
-        .show(player).then(r => r.selection === 0 && showOtherMenu(player));
+        .show(player).then(res => {
+            if (!player.isValid) return;
+            if (handleDirectClose(player, res, showDeveloperAboutUI)) return;
+            if (res.selection === 0) showOtherMenu(player);
+        });
 }
 
 
@@ -1242,5 +1322,9 @@ function showDeveloperAboutUI(player) {
 function showSponsorJoinUI(player) {
     if (!player.isValid) return;
     new ActionFormData().title(t("lw_p1.ui.sponsor.title")).body(t("lw_p1.ui.sponsor.body")).button(t("lw_p1.ui.back"))
-        .show(player).then(r => r.selection === 0 && showOtherMenu(player));
+        .show(player).then(res => {
+            if (!player.isValid) return;
+            if (handleDirectClose(player, res, showSponsorJoinUI)) return;
+            if (res.selection === 0) showOtherMenu(player);
+        });
 }
