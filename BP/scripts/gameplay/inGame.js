@@ -66,7 +66,7 @@ function restoreFromLock(player) {
 }
 
 
-// 进入力竭：记录当前饱食度并压到 6
+// 进入力竭：记录当前饱食度并压到 EXHAUST_HUNGER
 function enterExhausted(player, state) {
     const hunger = getHunger(player);
     if (!hunger) return;
@@ -243,7 +243,7 @@ mc.system.runInterval(() => {
         if (!player.isValid) continue;
         const inGame = isInGame(player);
         const hideInGame = inGame;
-        // 局内平民/警员隐藏经验条（经验条已不再承载任务倒计时）；杀手保留
+        // 局内平民/警员隐藏经验条；杀手保留
         const hideProgressBar = inGame && !isKiller(player);
         const signature = `${hideInGame ? 1 : 0}${hideProgressBar ? 1 : 0}`;
         if (hudHiddenMap.get(player.id) === signature) continue;

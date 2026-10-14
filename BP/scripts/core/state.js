@@ -121,12 +121,12 @@ export function addGold(player, amount) {
  * @property {boolean} socializing           社交中（派生）
  * @property {number}  taskId                当前任务 1..6（0 = 无）
  * @property {number}  taskLimit             本次任务时限（秒，0 = 未开始计时）
- * @property {number}  taskRemain            本次任务剩余秒数（内存计时，不再占用经验条）
+ * @property {number}  taskRemain            本次任务剩余秒数（内存计时）
  * @property {boolean} taskCountdown         倒计时
  * @property {boolean} taskRequestCountdown  请求倒计时
  * @property {boolean} taskHinted            已提示（首次）
- * @property {boolean} taskHinted2           已提示（40秒）
- * @property {boolean} taskHinted3           已提示（20秒）
+ * @property {boolean} taskHinted2           已提示（剩余 40% 时限）
+ * @property {boolean} taskHinted3           已提示（剩余 20% 时限）
  * @property {boolean} taskDone              任务完成
  * @property {number}  taskDoneTick          任务完成时的 tick（用于完成后停留 2 秒再清理）
  * @property {boolean} taskFailed            任务失败

@@ -70,9 +70,9 @@ export function forceEndGame() {
 }
 
 // 结算判定
-// 规则1：游戏中只存在杀手一个冒险模式，杀手胜利
-// 规则2：杀手的游戏模式不是冒险模式，平民胜利
-// 规则3：任务栏时间归零，平民胜利
+// 规则1：杀手全部出局（死亡 / 退出 / 离线），平民胜利
+// 规则2：仍有杀手存活且平民全部出局，杀手胜利
+// 规则3：剩余游戏时长归零，平民胜利
 mc.system.runInterval(() => {
     try {
         if (gameSession.endTriggered) return;

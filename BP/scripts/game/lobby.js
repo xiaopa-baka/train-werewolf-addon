@@ -80,7 +80,7 @@ function boardedText() {
 
 
 // 非游戏阶段，人数达标且全在列车内 开启开局倒计时
-// 倒计时结束后将玩家随机传送至出生坐标，将时间设为午夜
+// 倒计时结束后将玩家随机传送至地图配置的随机传送点，将时间设为午夜
 let gameStartTimer = null;
 
 mc.system.runInterval(() => {

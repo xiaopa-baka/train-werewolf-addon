@@ -1,5 +1,5 @@
 // @ts-check
-// hud.js - 活动栏轮播调度器 + 右侧常驻面板 + 标题显示工具
+// hud.js - 活动栏轮播调度器 + 左右常驻面板 + 标题/转场工具
 
 import * as mc from "@minecraft/server";
 
@@ -9,7 +9,7 @@ console.log("\n©\nXiaopa baka\nLW Realm Studio");
 
 // ===== 活动栏轮播调度器 =====
 // 多个功能都要占用活动栏时统一分配：各功能提供文案，按权重轮播；
-// 无适用文案时清空；任务进度条等外部独占时让位。
+// 无适用文案时清空；开局倒计时等独占来源显示时让位。
 
 const ACTION_BAR_ROTATE_TICKS = 40;   // 每隔多少 tick 切换一次文案（40 tick = 2 秒）
 const actionBarProviders = new Map();
