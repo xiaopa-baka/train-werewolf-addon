@@ -331,7 +331,7 @@ function handleKeydoorInteract(player, block) {
     }
 }
 
-// 只有手持对应钥匙才能切换开/关
+// 切换门开/关（局内需手持对应钥匙或开锁器；非游戏阶段徒手即可）
 mc.world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
     const player = event.player;
     const block = event.block;
@@ -448,7 +448,7 @@ function openDoorWithAutoClose(block) {
 }
 
 
-// 供 gameEnd.js 在游戏结束时调用，清除所有撬棍锁定并关闭被撬开的门
+// 供 gameEnd.js / gameFlow.js 在开局与结束时调用，清除所有撬棍锁定并关闭被撬开的门
 export function clearCrowbaredDoors() {
     const dim = mc.world.getDimension("overworld");
     for (const [key, expiry] of CROWBARED_DOORS) {
