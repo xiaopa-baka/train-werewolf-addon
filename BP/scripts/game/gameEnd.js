@@ -152,11 +152,10 @@ mc.system.runInterval(() => {
     resetGameClock();
     clearAllTaskProgress();
 
-    // 清空经验、金币、背包与效果并补发物品（游戏模式改到黑屏阶段再切换，避免被看到瞬间变身）
+    // 清空金币、背包与效果并补发物品（游戏模式改到黑屏阶段再切换，避免被看到瞬间变身）
     for (const player of allPlayers) {
         if (!player.isValid) continue;
         try { setGold(player, 0); } catch (e) { }
-        try { player.addLevels(-1000); } catch (e) { }
         try { player.runCommand("clear @s"); } catch (e) { }
         try { player.runCommand("effect @s clear"); } catch (e) { }
         try { player.runCommand(`give @s lw_p1:guide_book 1 0 {"minecraft:item_lock":{"mode":"lock_in_inventory"}}`); } catch (e) { }
