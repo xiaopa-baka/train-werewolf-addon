@@ -13,6 +13,7 @@ import "./gameplay/props.js";       // 道具系统
 import "./gameplay/shop.js";        // 商店系统（含贩卖机多方块逻辑）
 import "./gameplay/inGame.js";      // 局内系统（体力 + 跳跃）
 import "./gameplay/guideBook.js";   // 指南书
+import "./gameplay/containerLock.js"; // 局内禁止与可存储物品的容器交互
 import "./blocks/keydoor.js";       // 钥匙门逻辑
 import "./core/state.js";           // 对局运行期状态与金币访问器
 import "./core/i18n.js";            // 多语言文案工具
