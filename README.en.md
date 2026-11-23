@@ -23,6 +23,7 @@ A multiplayer deduction-versus survival Addon for **Minecraft Bedrock Edition**.
 - [Project Structure](#project-structure)
 - [Development Guide](#development-guide)
 - [Documentation](#documentation)
+- [Inspiration](#inspiration)
 - [Credits](#credits)
 - [License](#license)
 
@@ -240,6 +241,24 @@ All script files carry `// @ts-check` at the top, working with `allowJs + checkJ
 - **README languages**: [简体中文](./README.md) ｜ [繁體中文](./README.zh_TW.md) ｜ [日本語](./README.ja_JP.md)
 - **Developer Reference**: every script file has a one-line responsibility comment at the top; start reading at `BP/scripts/main.js`
 - **Configuration Guide**: after entering the game, open the config panel with a stick — each option has an explanation
+
+---
+
+## Inspiration
+
+This project's **gameplay concept** is inspired by the Java Edition modpack **[The Last Voyage of the Harpy Express](https://modrinth.com/modpack/harpy-express)**, and some **item textures** are also derived from the original work in that modpack.
+
+- **Modpack**: The Last Voyage of the Harpy Express
+- **Author**: RAT (Modrinth)
+- **Platform**: Minecraft Java Edition 1.21.1 / Fabric
+- **Upstream source**: [doctor4t/Wathe](https://github.com/doctor4t/Wathe)
+
+**Rights notice**
+
+The modpack and its art assets are copyright their original author and are licensed **All Rights Reserved**; **this repository has no permission to redistribute or use them commercially**.
+
+- This project has **no affiliation, partnership, or endorsement relationship** with that modpack; the Bedrock Edition implementation of Train Werewolf is written independently in this repository;
+- If you are the rights holder and consider this project's use inappropriate, please contact **xiaopa1214@163.com** and we will address it immediately.
 
 ---
 

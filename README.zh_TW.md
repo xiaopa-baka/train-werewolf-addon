@@ -23,6 +23,7 @@
 - [專案結構](#專案結構)
 - [開發指南](#開發指南)
 - [文件](#文件)
+- [靈感來源](#靈感來源)
 - [鳴謝](#鳴謝)
 - [授權條款](#授權條款)
 
@@ -240,6 +241,24 @@ npx tsc --noEmit   # 0 error 即通過
 - **README 語言版本**：[简体中文](./README.md) ｜ [日本語](./README.ja_JP.md) ｜ [English](./README.en.md)
 - **開發者資料**：每個腳本檔案頭部都有一行職責註解，閱讀入口為 `BP/scripts/main.js`
 - **設定說明**：進入遊戲後用木棍開啟設定面板，各項均有說明
+
+---
+
+## 靈感來源
+
+本專案的**玩法概念**受 Java 版整合包 **[The Last Voyage of the Harpy Express](https://modrinth.com/modpack/harpy-express)** 啟發，部分**物品貼圖**亦取材於該整合包原作。
+
+- **整合包**：The Last Voyage of the Harpy Express
+- **作者**：RAT（Modrinth）
+- **平台**：Minecraft Java Edition 1.21.1 / Fabric
+- **上游原始碼**：[doctor4t/Wathe](https://github.com/doctor4t/Wathe)
+
+**權利聲明**
+
+上述整合包及其美術資源版權歸原作者所有，採用「保留所有權利」（All Rights Reserved）授權，**本倉庫未取得其再散布或商用許可**。
+
+- 本專案與該整合包**無隸屬、合作或背書關係**，「列車狼人殺」的基岩版實作由本倉庫獨立撰寫；
+- 若你是權利人並認為本專案的使用方式不當，請透過 **xiaopa1214@163.com** 聯絡，我們會立即處理。
 
 ---
 
