@@ -7,7 +7,7 @@
         "min_engine_version": [
             1,
             26,
-            50
+            60
         ],
         "version": [
             1,
@@ -53,11 +53,11 @@
         },
         {
             "module_name": "@minecraft/server",
-            "version": "2.10.0"
+            "version": "2.11.0"
         },
         {
             "module_name": "@minecraft/server-ui",
-            "version": "2.2.0"
+            "version": "2.3.0"
         }
     ],
     "metadata": {

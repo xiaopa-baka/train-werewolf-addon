@@ -107,11 +107,11 @@ npx tsc --noEmit
 
 | 專案 | `main`（國際版） | `netease`（網易版） |
 |---|---|---|
-| `min_engine_version` | `[1, 26, 50]` | `[1, 21, 120]` |
-| `@minecraft/server` | `2.10.0` | `2.3.0` |
-| `@minecraft/server-ui` | `2.2.0` | `2.0.0` |
+| `min_engine_version` | `[1, 26, 60]` | `[1, 21, 120]` |
+| `@minecraft/server` | `2.11.0` | `2.3.0` |
+| `@minecraft/server-ui` | `2.3.0` | `2.0.0` |
 | BP `capabilities` | `["script_eval"]` | 無 |
-| `package.json` 開發相依套件 | 2.10.0 / 2.2.0 | 2.3.0 / 2.0.0 |
+| `package.json` 開發相依套件 | 2.11.0 / 2.3.0 | 2.3.0 / 2.0.0 |
 
 **約定**
 
@@ -123,7 +123,7 @@ npx tsc --noEmit
 
 ## 環境要求
 
-- **Minecraft Bedrock Edition**：國際版 ≥ 1.26.50，或網易版 ≥ 1.21.120
+- **Minecraft Bedrock Edition**：國際版 ≥ 1.26.60，或網易版 ≥ 1.21.120
 - 開發環境：
   - Node.js（用於 `npm install` 與 `tsc`）
   - TypeScript `^5.5.0`（作為 devDependency 安裝，僅用於型別檢查）
